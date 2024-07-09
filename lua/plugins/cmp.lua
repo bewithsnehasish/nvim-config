@@ -57,7 +57,7 @@ return {
       return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
     end
 
-    local icons = require "user.icons"
+    local icons = require "plugins.user.icons"
 
     cmp.setup {
       snippet = {

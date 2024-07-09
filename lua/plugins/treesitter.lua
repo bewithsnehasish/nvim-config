@@ -9,6 +9,7 @@ return {
         highlight = { enable = true },
         indent = { enable = true },
       })
+      return configs -- Return the configuration object
     end
   }
 }

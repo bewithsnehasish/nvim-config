@@ -3,7 +3,7 @@ return {
   {
     "SmiteshP/nvim-navic",
     config = function()
-      local icons = require("user.icons")
+      local icons = require("plugins.user.icons")
 
       require("nvim-navic").setup {
         icons = icons.kind,
