@@ -15,8 +15,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Require vim-options and lazy setup
 require("vim-options")
-require("lazy").setup(
-  "plugins")
+require("lazy").setup("plugins")
 
 --Load Keymaps plugins in the interface
 require("keymaps")

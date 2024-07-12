@@ -11,6 +11,7 @@ function M.config()
     "lua_ls",
     "cssls",
     "html",
+    "eslint",
     "tsserver",
     "pyright",
     "bashls",
@@ -30,4 +31,3 @@ function M.config()
 end
 
 return M
-

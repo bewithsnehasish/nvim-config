@@ -28,12 +28,21 @@ function M.common_capabilities()
   return capabilities
 end
 
+local function organize_imports()
+  local params = {
+    command = "_typescript.organizeImports",
+    arguments = {vim.api.nvim_buf_get_name(0)},
+    title = ""
+  }
+  vim.lsp.buf.execute_command(params)
+end
+
 function M.config()
   local wk = require "which-key"
   wk.register {
     ["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
     ["<leader>lf"] = {
-      "<cmd>lua vim.lsp.buf.formatting({async = true, filter = function(client) return client.name ~= 'typescript-tools' end})<cr>",
+      "<cmd>lua vim.lsp.buf.format({ async = true, filter = function(client) return client.name ~= 'typescript-tools' end })<cr>",
       "Format",
     },
     ["<leader>li"] = { "<cmd>LspInfo<cr>", "Info" },
@@ -60,7 +69,7 @@ function M.config()
     "cssls",
     "html",
     "tsserver",
-    -- Remove "eslint" from here
+    "eslint", -- Re-add eslint
     "pyright",
     "bashls",
     "jsonls",
@@ -77,8 +86,8 @@ function M.config()
         { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
       },
     },
-    virtual_text = false,
-    update_in_insert = false,
+    virtual_text = true,
+    update_in_insert = true,
     underline = true,
     severity_sort = true,
     float = {
@@ -113,14 +122,43 @@ function M.config()
     end
 
     if server == "tsserver" then
-      -- Example customization for tsserver, if needed
       server_config.settings = {
-        -- Your TypeScript server settings here, if any
+        diagnostics = true,
+        preferences = {
+          includeCompletionsForImportStatements = true,
+        },
+      }
+      server_config.commands = {
+        OrganizeImports = {
+          organize_imports,
+          description = "Organize Imports"
+        }
+      }
+      server_config.root_dir = function() return vim.loop.cwd() end
+      server_config.single_file_support = true
+      server_config.filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact", "typescript.ts" }
+    end
+
+    if server == "lua_ls" then
+      server_config.settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },
+          },
+        },
       }
     end
 
     lspconfig[server].setup(server_config)
   end
+
+  -- Additional Configuration for Omnifunc
+  vim.cmd [[
+    autocmd FileType javascript setlocal omnifunc=v:lua.vim.lsp.omnifunc
+    autocmd FileType javascriptreact setlocal omnifunc=v:lua.vim.lsp.omnifunc
+    autocmd FileType typescript setlocal omnifunc=v:lua.vim.lsp.omnifunc
+    autocmd FileType typescriptreact setlocal omnifunc=v:lua.vim.lsp.omnifunc
+  ]]
 end
 
 return M
