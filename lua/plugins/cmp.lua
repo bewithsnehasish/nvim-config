@@ -42,6 +42,7 @@ return {
     local luasnip = require "luasnip"
     luasnip.filetype_extend("javascriptreact", { "html", "css" })
     luasnip.filetype_extend("typescriptreact", { "html", "css" })
+    luasnip.filetype_extend("javascript",{"html","css"})
     luasnip.filetype_extend("yaml", { "markdown" })
     luasnip.filetype_extend("ini", { "sh" })
     luasnip.filetype_extend("conf", { "sh" })
