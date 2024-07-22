@@ -10,26 +10,16 @@ return {
         typescript = { "prettier" },
         javascriptreact = { "prettier" },
         typescriptreact = { "prettier" },
+        svelte = { "prettier" },
         css = { "prettier" },
         html = { "prettier" },
         json = { "prettier" },
         yaml = { "prettier" },
         markdown = { "prettier" },
+        graphql = { "prettier" },
+        liquid = { "prettier" },
         lua = { "stylua" },
         python = { "isort", "black" },
-        java = { "google-java-format" },
-        cpp = { "clang-format" },
-        c = { "clang-format" },
-        go = { "gofmt" },
-        rust = { "rustfmt" },
-        ruby = { "rubocop" },
-        php = { "php-cs-fixer" },
-        kotlin = { "ktlint" },
-        swift = { "swiftformat" },
-        sh = { "shfmt" },
-        jsonc = { "prettier" },
-        xml = { "prettier" },
-        toml = { "taplo" },
       },
       format_on_save = {
         lsp_fallback = true,
@@ -38,7 +28,7 @@ return {
       },
     })
 
-    vim.keymap.set({ "n", "v" }, "<leader>ft", function()
+    vim.keymap.set({ "n", "v" }, "<leader>mp", function()
       conform.format({
         lsp_fallback = true,
         async = false,

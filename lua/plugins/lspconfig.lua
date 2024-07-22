@@ -1,165 +1,124 @@
-local M = {
+return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
-    { "folke/neodev.nvim" },
-    { "hrsh7th/cmp-nvim-lsp" },
+    "folke/neodev.nvim",
+    "hrsh7th/cmp-nvim-lsp",
+    "williamboman/mason.nvim",
+    "hrsh7th/nvim-cmp",
+    "hrsh7th/cmp-buffer",
+    "stevearc/conform.nvim",
   },
-}
+  config = function()
+    local lspconfig = require "lspconfig"
+    local icons = require "plugins.user.icons"
+    local on_attach = require "plugins.user.lsp.on_attach"
+    local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-local function lsp_keymaps(bufnr)
-  local opts = { noremap = true, silent = true }
-  local keymap = vim.api.nvim_buf_set_keymap
-  keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-  keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-  keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
-end
+    require("neodev").setup {}
 
-M.on_attach = function(client, bufnr)
-  lsp_keymaps(bufnr)
-end
-
-function M.common_capabilities()
-  local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  return capabilities
-end
-
-local function organize_imports()
-  local params = {
-    command = "_typescript.organizeImports",
-    arguments = {vim.api.nvim_buf_get_name(0)},
-    title = ""
-  }
-  vim.lsp.buf.execute_command(params)
-end
-
-function M.config()
-  local wk = require "which-key"
-  wk.register {
-    ["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
-    ["<leader>lf"] = {
-      "<cmd>lua vim.lsp.buf.format({ async = true, filter = function(client) return client.name ~= 'typescript-tools' end })<cr>",
-      "Format",
-    },
-    ["<leader>li"] = { "<cmd>LspInfo<cr>", "Info" },
-    ["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
-    ["<leader>lh"] = { "<cmd>lua require('user.lspconfig').toggle_inlay_hints()<cr>", "Hints" },
-    ["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
-    ["<leader>ll"] = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    ["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
-    ["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-  }
-
-  wk.register {
-    ["<leader>la"] = {
-      name = "LSP",
-      a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action", mode = "v" },
-    },
-  }
-
-  local lspconfig = require "lspconfig"
-  local icons = require "plugins.user.icons"
-
-  local servers = {
-    "lua_ls",
-    "cssls",
-    "html",
-    "tsserver",
-    "eslint", -- Re-add eslint
-    "pyright",
-    "bashls",
-    "jsonls",
-    "yamlls",
-  }
-
-  local default_diagnostic_config = {
-    signs = {
-      active = true,
-      values = {
-        { name = "DiagnosticSignError", text = icons.diagnostics.Error },
-        { name = "DiagnosticSignWarn",  text = icons.diagnostics.Warning },
-        { name = "DiagnosticSignHint",  text = icons.diagnostics.Hint },
-        { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
+    -- Diagnostic configuration
+    local diagnostic_config = {
+      signs = {
+        active = true,
+        values = {
+          { name = "DiagnosticSignError", text = icons.diagnostics.Error },
+          { name = "DiagnosticSignWarn", text = icons.diagnostics.Warning },
+          { name = "DiagnosticSignHint", text = icons.diagnostics.Hint },
+          { name = "DiagnosticSignInfo", text = icons.diagnostics.Information },
+        },
       },
-    },
-    virtual_text = true,
-    update_in_insert = true,
-    underline = true,
-    severity_sort = true,
-    float = {
-      focusable = true,
-      style = "minimal",
-      border = "rounded",
-      source = "always",
-      header = "",
-      prefix = "",
-    },
-  }
+      virtual_text = true,
+      update_in_insert = true,
+      underline = true,
+      severity_sort = true,
+      float = {
+        focusable = true,
+        style = "minimal",
+        border = "rounded",
+        source = "always",
+        header = "",
+        prefix = "",
+      },
+    }
+    vim.diagnostic.config(diagnostic_config)
 
-  vim.diagnostic.config(default_diagnostic_config)
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+    vim.lsp.handlers["textDocument/signatureHelp"] =
+      vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
-  for _, sign in ipairs(vim.tbl_get(vim.diagnostic.config(), "signs", "values") or {}) do
-    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = sign.name })
-  end
-
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-  require("lspconfig.ui.windows").default_options.border = "rounded"
-
-  for _, server in pairs(servers) do
-    local server_config = {
-      on_attach = M.on_attach,
-      capabilities = M.common_capabilities(),
+    -- Language Server Configurations
+    local servers = {
+      "tsserver",
+      "eslint",
+      "html",
+      "cssls",
+      "jsonls",
+      "emmet_ls",
+      "lua_ls",
+      "pyright",
+      "bashls",
+      "solidity_ls",
+      "dockerls",
+      "clangd",
     }
 
-    local require_ok, settings = pcall(require, "user.lspsettings." .. server)
-    if require_ok then
-      server_config = vim.tbl_deep_extend("force", settings, server_config)
-    end
-
-    if server == "tsserver" then
-      server_config.settings = {
-        diagnostics = true,
-        preferences = {
-          includeCompletionsForImportStatements = true,
-        },
+    for _, server in ipairs(servers) do
+      local server_config = {
+        on_attach = function(client, bufnr)
+          client.server_capabilities.documentFormattingProvider = false
+          on_attach(client, bufnr)
+        end,
+        capabilities = capabilities,
       }
-      server_config.commands = {
-        OrganizeImports = {
-          organize_imports,
-          description = "Organize Imports"
+
+      if server == "tsserver" then
+        server_config.settings = {
+          typescript = { inlayHints = { includeInlayParameterNameHints = "all" } },
+          javascript = { inlayHints = { includeInlayParameterNameHints = "all" } },
         }
-      }
-      server_config.root_dir = function() return vim.loop.cwd() end
-      server_config.single_file_support = true
-      server_config.filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact", "typescript.ts" }
-    end
-
-    if server == "lua_ls" then
-      server_config.settings = {
-        Lua = {
-          diagnostics = {
-            globals = { "vim" },
+      elseif server == "lua_ls" then
+        server_config.settings = {
+          Lua = {
+            diagnostics = { globals = { "vim" } },
+            workspace = { library = vim.api.nvim_get_runtime_file("", true) },
           },
-        },
-      }
+        }
+      elseif server == "pyright" then
+        server_config.settings = {
+          python = {
+            analysis = {
+              typeCheckingMode = "basic",
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+            },
+          },
+        }
+      elseif server == "eslint" then
+        server_config.settings = {
+          workingDirectory = { mode = "auto" },
+          validate = "on",
+          packageManager = "npm",
+          useESLintClass = false,
+          experimental = { useFlatConfig = false },
+          codeActionOnSave = { enable = false, mode = "all" },
+          format = true,
+          quiet = false,
+          onIgnoredFiles = "off",
+          rulesCustomizations = {},
+          run = "onType",
+          problems = { shortenToSingleLine = false },
+        }
+      end
+
+      lspconfig[server].setup(server_config)
     end
-
-    lspconfig[server].setup(server_config)
-  end
-
-  -- Additional Configuration for Omnifunc
-  vim.cmd [[
-    autocmd FileType javascript setlocal omnifunc=v:lua.vim.lsp.omnifunc
-    autocmd FileType javascriptreact setlocal omnifunc=v:lua.vim.lsp.omnifunc
-    autocmd FileType typescript setlocal omnifunc=v:lua.vim.lsp.omnifunc
-    autocmd FileType typescriptreact setlocal omnifunc=v:lua.vim.lsp.omnifunc
-  ]]
-end
-
-return M
-
+    -- Additional Configuration for Omnifunc
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+      callback = function()
+        vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
+      end,
+    })
+  end,
+}

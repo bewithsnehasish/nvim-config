@@ -1,20 +1,15 @@
-local M = {
+return {
   "linrongbin16/gitlinker.nvim",
   dependencies = { { "nvim-lua/plenary.nvim" } },
   event = "VeryLazy",
+  keys = {
+    { "<leader>gy", "<cmd>GitLink!<cr>", desc = "Git link" },
+    { "<leader>gY", "<cmd>GitLink blam<cr>", desc = "Git link blame" },
+  },
+  config = function()
+    require("gitlinker").setup {
+      message = false,
+      console_log = false,
+    }
+  end,
 }
-
-function M.config()
-  local wk = require "which-key"
-  wk.register {
-    ["<leader>gy"] = { "<cmd>GitLink!<cr>", "Git link" },
-    ["<leader>gY"] = { "<cmd>GitLink blam<cr>", "Git link blame" },
-  }
-
-  require("gitlinker").setup {
-    message = false,
-    console_log = false,
-  }
-end
-
-return M

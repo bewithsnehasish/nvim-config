@@ -40,13 +40,13 @@ return {
   config = function()
     local cmp = require "cmp"
     local luasnip = require "luasnip"
-    luasnip.filetype_extend("javascriptreact", { "html", "css" })
-    luasnip.filetype_extend("typescriptreact", { "html", "css" })
-    luasnip.filetype_extend("javascript",{"html","css"})
-    luasnip.filetype_extend("yaml", { "markdown" })
-    luasnip.filetype_extend("ini", { "sh" })
-    luasnip.filetype_extend("conf", { "sh" })
-
+    -- luasnip.filetype_extend("javascriptreact", { "html", "css" })
+    -- luasnip.filetype_extend("typescriptreact", { "html", "css" })
+    -- luasnip.filetype_extend("javascript", { "html", "css" })
+    -- luasnip.filetype_extend("yaml", { "markdown" })
+    -- luasnip.filetype_extend("ini", { "sh" })
+    -- luasnip.filetype_extend("conf", { "sh" })
+    --
     require("luasnip/loaders/from_vscode").lazy_load()
 
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
@@ -166,4 +166,3 @@ return {
     }
   end,
 }
-

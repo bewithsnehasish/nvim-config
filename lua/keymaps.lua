@@ -14,6 +14,5 @@ vim.api.nvim_set_keymap("v", "<M-j>", ":m '>+1<CR>gv=gv", opts)
 -- Define the custom keybinding for deleting a word backward in insert mode
 vim.api.nvim_set_keymap("i", "<C-b>", "<C-o>db", { noremap = true, silent = true })
 
-
 -- Word Wrapper
-vim.api.nvim_set_keymap("n", "<leader>w", ":lua vim.wo.wrap = not vim.wo.wrap<CR>", opts)
+vim.api.nvim_set_keymap("n", "<leader>wr", ":lua vim.wo.wrap = not vim.wo.wrap<CR>", opts)
