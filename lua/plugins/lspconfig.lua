@@ -61,6 +61,7 @@ return {
       "solidity_ls",
       "dockerls",
       "clangd",
+      "tailwindcss",
     }
 
     for _, server in ipairs(servers) do
@@ -109,6 +110,22 @@ return {
           run = "onType",
           problems = { shortenToSingleLine = false },
         }
+      elseif server == "tailwindcss" then
+        server_config.settings = {
+          tailwindCSS = {
+            classAttributes = { "class", "className", "classList", "ngClass" },
+            lint = {
+              cssConflict = "warning",
+              invalidApply = "error",
+              invalidConfigPath = "error",
+              invalidScreen = "error",
+              invalidTailwindDirective = "error",
+              invalidVariant = "error",
+              recommendedVariantOrder = "warning",
+            },
+            validate = true,
+          },
+        }
       end
 
       lspconfig[server].setup(server_config)
@@ -118,6 +135,12 @@ return {
       pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
       callback = function()
         vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
+        -- Enable Tailwind CSS IntelliSense
+        -- vim.lsp.start {
+        --   name = "tailwindcss",
+        --   cmd = { "tailwindcss-language-server", "--stdio" },
+        --   root_dir = vim.fn.getcwd(),
+        -- }
       end,
     })
   end,
