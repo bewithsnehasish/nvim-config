@@ -14,6 +14,7 @@ function M.config()
     "lua_ls",
     "cssls",
     "html",
+    "jdtls",
     "eslint",
     "emmet_ls",
     "tsserver",
