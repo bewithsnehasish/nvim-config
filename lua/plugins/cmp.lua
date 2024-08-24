@@ -113,7 +113,6 @@ return {
         { name = "nvim_lua" },
         { name = "buffer" },
         { name = "path" },
-        { name = "calc" },
         { name = "emoji" },
       },
       confirm_opts = {
