@@ -16,3 +16,13 @@ vim.api.nvim_set_keymap("i", "<C-b>", "<C-o>db", { noremap = true, silent = true
 
 -- Word Wrapper
 vim.api.nvim_set_keymap("n", "<leader>wr", ":lua vim.wo.wrap = not vim.wo.wrap<CR>", opts)
+
+-- Paste From System Clipboardvim
+-- Normal mode
+vim.api.nvim_set_keymap("n", "<C-v>", '"+p', { noremap = true, silent = true })
+
+-- Insert mode
+vim.api.nvim_set_keymap("i", "<C-v>", "<C-R>+", { noremap = true, silent = true })
+
+-- Visual mode
+vim.api.nvim_set_keymap("v", "<C-v>", '"+p', { noremap = true, silent = true })

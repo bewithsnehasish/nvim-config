@@ -1,57 +1,76 @@
 return {
-  -- The compiler.nvim plugin
+  -- Compiler plugin
   {
     "Zeioth/compiler.nvim",
     cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
-    dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
+    dependencies = { "stevearc/overseer.nvim" },
     opts = {},
+    config = function()
+      require("compiler").setup()
+
+      -- C++ compiler configuration
+      require("compiler").set_compiler {
+        filetype = "cpp",
+        compiler = {
+          cmd = "g++",
+          args = {
+            "-std=c++17",
+            "-Wall",
+            "-Wextra",
+            "-O2",
+            "-o",
+            vim.fn.expand "%:p:r",
+            vim.fn.expand "%:p",
+          },
+        },
+        runner = {
+          cmd = vim.fn.expand "%:p:r",
+          args = {},
+        },
+      }
+
+      -- Java compiler configuration
+      require("compiler").set_compiler {
+        filetype = "java",
+        compiler = {
+          cmd = "javac",
+          args = {
+            vim.fn.expand "%:p",
+          },
+        },
+        runner = {
+          cmd = "java",
+          args = {
+            "-cp",
+            vim.fn.expand "%:p:h",
+            vim.fn.expand "%:t:r",
+          },
+        },
+      }
+    end,
   },
-  -- The overseer.nvim task runner
+
+  -- Overseer plugin (required by compiler.nvim)
   {
     "stevearc/overseer.nvim",
-    commit = "6271cab7ccc4ca840faa93f54440ffae3a3918bd",
-    cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
+    commit = "3047ede61cc1308069ad1184c0d447ebee92d749", -- Use the latest stable commit
     opts = {
       task_list = {
         direction = "bottom",
         min_height = 25,
         max_height = 25,
         default_detail = 1,
+        bindings = {
+          ["q"] = function()
+            vim.cmd "OverseerClose"
+          end,
+        },
       },
     },
   },
-  -- Configure the compiler.nvim plugin
   config = function()
-    require("compiler").setup()
-
-    -- Configure C++ compiler
-    vim.g.compiler_commands = {
-      cpp = {
-        build = "g++ -std=c++17 -o %:r %",
-        run = "./%:r",
-      },
-    }
-
-    -- Configure Java compiler
-    vim.g.compiler_commands = {
-      java = {
-        build = "javac %",
-        run = "java %:r",
-      },
-    }
-
-    -- Recommended keymaps
-    -- Open compiler
-    vim.api.nvim_set_keymap("n", "<F6>", "<cmd>CompilerOpen<cr>", { noremap = true, silent = true })
-    -- Redo last selected option
-    vim.api.nvim_set_keymap(
-      "n",
-      "<S-F6>",
-      "<cmd>CompilerStop<cr>" -- (Optional, to dispose all tasks before redo)
-        .. "<cmd>CompilerRedo<cr>",
-      { noremap = true, silent = true }
-    )
-    -- Toggle compiler results
-    vim.api.nvim_set_keymap("n", "<S-F7>", "<cmd>CompilerToggleResults<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<F5>", "<cmd>CompilerOpen<CR>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<F6>", "<cmd>CompilerRedo<CR>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<F7>", "<cmd>CompilerToggleResults<CR>", { noremap = true, silent = true })
   end,
 }

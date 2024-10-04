@@ -49,7 +49,7 @@ return {
 
     -- Language Server Configurations
     local servers = {
-      "tsserver",
+      "ts_ls",
       "eslint",
       "html",
       "cssls",
@@ -73,7 +73,7 @@ return {
         capabilities = capabilities,
       }
 
-      if server == "tsserver" then
+      if server == "ts_ls" then
         server_config.settings = {
           typescript = { inlayHints = { includeInlayParameterNameHints = "all" } },
           javascript = { inlayHints = { includeInlayParameterNameHints = "all" } },

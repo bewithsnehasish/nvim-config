@@ -17,7 +17,7 @@ function M.config()
     "jdtls",
     "eslint",
     "emmet_ls",
-    "tsserver",
+    "ts_ls",
     "pyright",
     "bashls",
     "jsonls",
