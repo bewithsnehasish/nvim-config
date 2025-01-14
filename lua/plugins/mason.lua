@@ -4,6 +4,7 @@ return {
   dependencies = {
     "williamboman/mason.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
+    "nvim-java/nvim-java", -- Add nvim-java as a dependency
   },
   config = function()
     -- Setup Mason with minimal UI config
@@ -17,7 +18,7 @@ return {
     require("mason-lspconfig").setup {
       ensure_installed = {
         "lua_ls", -- Lua
-        "ts_ls", -- TypeScript/JavaScript (corrected from ts_ls)
+        "tsserver", -- TypeScript/JavaScript (corrected from ts_ls)
         "eslint", -- JavaScript
         "html", -- HTML
         "cssls", -- CSS
@@ -25,6 +26,7 @@ return {
         "tailwindcss", -- Tailwind CSS
         "jsonls", -- JSON
         "yamlls", -- YAML
+        "jdtls", -- Java (added jdtls)
       },
       automatic_installation = true,
     }
@@ -35,6 +37,20 @@ return {
         "prettier", -- Web formatter
         "stylua", -- Lua formatter
         "black", -- Python formatter
+        "java-debug-adapter", -- Java debugger (added)
+        "java-test", -- Java test runner (added)
+      },
+    }
+
+    -- Configure nvim-java
+    require("java").setup {
+      jdtls = {
+        -- Use the jdtls installed by mason
+        cmd = { vim.fn.stdpath "data" .. "/mason/bin/jdtls" },
+      },
+      dap = {
+        -- Configure Java Debug Adapter Protocol (DAP)
+        hotcodereplace = "auto",
       },
     }
   end,
