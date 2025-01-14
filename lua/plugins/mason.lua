@@ -1,60 +1,96 @@
--- lua/plugins/mason.lua
-local M = {
+return {
   "williamboman/mason-lspconfig.nvim",
+  event = "BufReadPre",
   dependencies = {
     "williamboman/mason.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
   },
-  event = "BufReadPre", -- Load mason and mason-lspconfig before buffer is read
+  config = function()
+    -- Setup Mason with minimal UI config
+    require("mason").setup {
+      ui = {
+        border = "rounded",
+      },
+    }
+
+    -- Install and manage LSP servers
+    require("mason-lspconfig").setup {
+      ensure_installed = {
+        "lua_ls", -- Lua
+        "ts_ls", -- TypeScript/JavaScript (corrected from ts_ls)
+        "eslint", -- JavaScript
+        "html", -- HTML
+        "cssls", -- CSS
+        "pyright", -- Python
+        "tailwindcss", -- Tailwind CSS
+        "jsonls", -- JSON
+        "yamlls", -- YAML
+      },
+      automatic_installation = true,
+    }
+
+    -- Install formatters and linters
+    require("mason-tool-installer").setup {
+      ensure_installed = {
+        "prettier", -- Web formatter
+        "stylua", -- Lua formatter
+        "black", -- Python formatter
+      },
+    }
+  end,
 }
 
-function M.config()
-  -- List of servers to install and set up
-  local servers = {
-    "lua_ls",
-    "cssls",
-    "html",
-    "jdtls",
-    "eslint",
-    "emmet_ls",
-    "ts_ls",
-    "pyright",
-    "bashls",
-    "jsonls",
-    "yamlls",
-    "tailwindcss",
-    "clangd",
-    "dockerls",
-  }
-
-  -- Mason setup
-  require("mason").setup {
-    ui = {
-      border = "rounded",
-      icons = {
-        package_installed = "✓",
-        package_pending = "➜",
-        package_uninstalled = "✗",
-      },
-    },
-  }
-
-  -- Mason-lspconfig setup
-  require("mason-lspconfig").setup {
-    ensure_installed = servers,
-    automatic_installation = true, -- Automatically install LSP servers
-  }
-
-  -- Mason-tool-installer setup
-  require("mason-tool-installer").setup {
-    ensure_installed = {
-      "prettier", -- prettier formatter
-      "stylua", -- lua formatter
-      "isort", -- python formatter
-      "black", -- python formatter
-      "pylint", -- python linter
-    },
-  }
-end
-
-return M
+-- Old Config
+-- return {
+--   "williamboman/mason-lspconfig.nvim",
+--   event = "BufReadPre",
+--   dependencies = {
+--     "williamboman/mason.nvim",
+--     "WhoIsSethDaniel/mason-tool-installer.nvim",
+--   },
+--   config = function()
+--     local servers = {
+--       "lua_ls",
+--       "cssls",
+--       "html",
+--       "jdtls",
+--       "eslint",
+--       "emmet_ls",
+--       "ts_ls",
+--       "pyright",
+--       "bashls",
+--       "jsonls",
+--       "yamlls",
+--       "tailwindcss",
+--       "prismsls",
+--       "clangd",
+--       "dockerls",
+--     }
+--
+--     require("mason").setup({
+--       ui = {
+--         border = "rounded",
+--         icons = {
+--           package_installed = "✓",
+--           package_pending = "➜",
+--           package_uninstalled = "✗",
+--         },
+--       },
+--     })
+--
+--     require("mason-lspconfig").setup({
+--       ensure_installed = servers,
+--       automatic_installation = true,
+--     })
+--
+--     require("mason-tool-installer").setup({
+--       ensure_installed = {
+--         "prettier",
+--         "stylua",
+--         "isort",
+--         "black",
+--         "pylint",
+--       },
+--     })
+--   end,
+-- }

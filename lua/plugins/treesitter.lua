@@ -1,13 +1,5 @@
 local config = function()
   require("nvim-treesitter.configs").setup {
-    build = ":TSUpdate",
-    indent = {
-      enable = true,
-    },
-    event = {
-      "BufReadPre",
-      "BufNewFile",
-    },
     ensure_installed = {
       "vim",
       "regex",
@@ -34,6 +26,9 @@ local config = function()
       enable = true,
       additional_vim_regex_highlighting = false,
     },
+    indent = {
+      enable = true,
+    },
     incremental_selection = {
       enable = true,
       keymaps = {
@@ -43,7 +38,6 @@ local config = function()
         node_decremental = "<BS>",
       },
     },
-    -- Add the missing fields
     modules = {},
     sync_install = false,
     ignore_install = {},

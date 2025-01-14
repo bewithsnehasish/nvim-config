@@ -62,6 +62,7 @@ return {
       "dockerls",
       "clangd",
       "tailwindcss",
+      "prismals",
     }
 
     for _, server in ipairs(servers) do
@@ -126,13 +127,34 @@ return {
             validate = true,
           },
         }
+        -- Add filetypes that should trigger Tailwind CSS suggestions
+        server_config.filetypes = {
+          "html",
+          "javascriptreact",
+          "javascript",
+          "typescript",
+          "typescriptreact",
+          "vue",
+          "svelte",
+          "astro",
+          "php",
+        }
       end
 
       lspconfig[server].setup(server_config)
     end
     -- Additional Configuration for Omnifunc
     vim.api.nvim_create_autocmd("FileType", {
-      pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+      pattern = {
+        "html",
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "vue",
+        "svelte",
+        "astro",
+      },
       callback = function()
         vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
         -- Enable Tailwind CSS IntelliSense
