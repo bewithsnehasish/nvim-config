@@ -54,7 +54,6 @@ return {
       "html",
       "cssls",
       "jsonls",
-      "emmet_ls",
       "lua_ls",
       "pyright",
       "bashls",

@@ -18,14 +18,13 @@ return {
     require("mason-lspconfig").setup {
       ensure_installed = {
         "lua_ls", -- Lua
-        "tsserver", -- TypeScript/JavaScript (corrected from ts_ls)
+        "ts_ls", -- TypeScript/JavaScript (corrected from ts_ls)
         "eslint", -- JavaScript
         "html", -- HTML
         "cssls", -- CSS
         "pyright", -- Python
         "tailwindcss", -- Tailwind CSS
         "jsonls", -- JSON
-        "yamlls", -- YAML
         "jdtls", -- Java (added jdtls)
       },
       automatic_installation = true,
@@ -37,8 +36,8 @@ return {
         "prettier", -- Web formatter
         "stylua", -- Lua formatter
         "black", -- Python formatter
-        "java-debug-adapter", -- Java debugger (added)
-        "java-test", -- Java test runner (added)
+        "isort", -- Python formatter
+        "djlint", -- HTML formatter (added)
       },
     }
 

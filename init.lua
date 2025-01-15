@@ -11,7 +11,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-vim.o.guifont = "ZedMono NF Extd:h10"
+vim.g.neovide_font = "Cascadia Code:h12"
+vim.g.neovide_font_features = { "calt", "ss01" }
 
 -- Require vim-options and lazy setup
 require "vim-options"
