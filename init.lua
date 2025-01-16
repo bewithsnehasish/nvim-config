@@ -11,12 +11,13 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-vim.g.neovide_font = "Cascadia Code:h12"
-vim.g.neovide_font_features = { "calt", "ss01" }
-
 -- Require vim-options and lazy setup
 require "vim-options"
 require("lazy").setup "plugins"
 
 --Load Keymaps plugins in the interface
 require "keymaps"
+
+-- Enable italics
+vim.cmd [[highlight Comment gui=italic cterm=italic]]
+vim.cmd [[highlight Type gui=italic cterm=italic]]
