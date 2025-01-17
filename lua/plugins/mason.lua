@@ -4,108 +4,58 @@ return {
   dependencies = {
     "williamboman/mason.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    "nvim-java/nvim-java", -- Add nvim-java as a dependency
   },
   config = function()
-    -- Setup Mason with minimal UI config
+    -- Language servers that will be automatically installed
+    local language_servers = {
+      -- Web Development
+      "html", -- HTML
+      "cssls", -- CSS
+      "ts_ls", -- TypeScript/JavaScript
+      "eslint", -- ESLint
+      "tailwindcss", -- Tailwind CSS
+      "jsonls", -- JSON
+
+      -- Programming Languages
+      "lua_ls", -- Lua
+      "pyright", -- Python
+      "jdtls", -- Java
+      "intelephense", -- PHP
+    }
+
+    -- Code formatters and linters that will be automatically installed
+    local tools = {
+      -- Web Development
+      "prettier", -- JavaScript, TypeScript, CSS, HTML formatter
+      "djlint", -- HTML/Template formatter
+      -- Programming Languages
+      "stylua", -- Lua formatter
+      "black", -- Python formatter
+      "isort", -- Python import formatter
+      "php-cs-fixer", -- PHP formatter
+    }
+
+    -- Mason setup with nice icons
     require("mason").setup {
       ui = {
         border = "rounded",
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗",
+        },
       },
     }
 
-    -- Install and manage LSP servers
+    -- Ensure language servers are installed
     require("mason-lspconfig").setup {
-      ensure_installed = {
-        "lua_ls", -- Lua
-        "ts_ls", -- TypeScript/JavaScript (corrected from ts_ls)
-        "eslint", -- JavaScript
-        "html", -- HTML
-        "cssls", -- CSS
-        "pyright", -- Python
-        "tailwindcss", -- Tailwind CSS
-        "jsonls", -- JSON
-        "jdtls", -- Java (added jdtls)
-      },
+      ensure_installed = language_servers,
       automatic_installation = true,
     }
 
-    -- Install formatters and linters
+    -- Ensure formatters & linters are installed
     require("mason-tool-installer").setup {
-      ensure_installed = {
-        "prettier", -- Web formatter
-        "stylua", -- Lua formatter
-        "black", -- Python formatter
-        "isort", -- Python formatter
-        "djlint", -- HTML formatter (added)
-      },
-    }
-
-    -- Configure nvim-java
-    require("java").setup {
-      jdtls = {
-        -- Use the jdtls installed by mason
-        cmd = { vim.fn.stdpath "data" .. "/mason/bin/jdtls" },
-      },
-      dap = {
-        -- Configure Java Debug Adapter Protocol (DAP)
-        hotcodereplace = "auto",
-      },
+      ensure_installed = tools,
     }
   end,
 }
-
--- Old Config
--- return {
---   "williamboman/mason-lspconfig.nvim",
---   event = "BufReadPre",
---   dependencies = {
---     "williamboman/mason.nvim",
---     "WhoIsSethDaniel/mason-tool-installer.nvim",
---   },
---   config = function()
---     local servers = {
---       "lua_ls",
---       "cssls",
---       "html",
---       "jdtls",
---       "eslint",
---       "emmet_ls",
---       "ts_ls",
---       "pyright",
---       "bashls",
---       "jsonls",
---       "yamlls",
---       "tailwindcss",
---       "prismsls",
---       "clangd",
---       "dockerls",
---     }
---
---     require("mason").setup({
---       ui = {
---         border = "rounded",
---         icons = {
---           package_installed = "✓",
---           package_pending = "➜",
---           package_uninstalled = "✗",
---         },
---       },
---     })
---
---     require("mason-lspconfig").setup({
---       ensure_installed = servers,
---       automatic_installation = true,
---     })
---
---     require("mason-tool-installer").setup({
---       ensure_installed = {
---         "prettier",
---         "stylua",
---         "isort",
---         "black",
---         "pylint",
---       },
---     })
---   end,
--- }

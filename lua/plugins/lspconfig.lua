@@ -1,13 +1,13 @@
 return {
   "neovim/nvim-lspconfig",
-  event = { "BufReadPre", "BufNewFile" },
+  event = { "BufReadPre", "BufNewFile" }, -- Load LSP on buffer read or new file creation
   dependencies = {
-    "folke/neodev.nvim",
-    "hrsh7th/cmp-nvim-lsp",
-    "williamboman/mason.nvim",
-    "hrsh7th/nvim-cmp",
-    "hrsh7th/cmp-buffer",
-    "stevearc/conform.nvim",
+    "folke/neodev.nvim", -- Neovim-specific Lua development tools
+    "hrsh7th/cmp-nvim-lsp", -- LSP source for nvim-cmp
+    "williamboman/mason.nvim", -- Package manager for LSP servers
+    "hrsh7th/nvim-cmp", -- Autocompletion plugin
+    "hrsh7th/cmp-buffer", -- Buffer source for nvim-cmp
+    "stevearc/conform.nvim", -- Formatting plugin
   },
   config = function()
     local lspconfig = require "lspconfig"
@@ -15,10 +15,11 @@ return {
     local on_attach = require "plugins.user.lsp.on_attach"
     local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
+    -- Configure Neodev for Lua development
     require("neodev").setup {}
 
     -- Diagnostic configuration
-    local diagnostic_config = {
+    vim.diagnostic.config {
       signs = {
         active = true,
         values = {
@@ -28,10 +29,10 @@ return {
           { name = "DiagnosticSignInfo", text = icons.diagnostics.Information },
         },
       },
-      virtual_text = true,
-      update_in_insert = true,
-      underline = true,
-      severity_sort = true,
+      virtual_text = true, -- Show diagnostics inline
+      update_in_insert = true, -- Update diagnostics while typing
+      underline = true, -- Underline problematic code
+      severity_sort = true, -- Sort diagnostics by severity
       float = {
         focusable = true,
         style = "minimal",
@@ -41,62 +42,22 @@ return {
         prefix = "",
       },
     }
-    vim.diagnostic.config(diagnostic_config)
 
+    -- Customize hover and signature help borders
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
     vim.lsp.handlers["textDocument/signatureHelp"] =
       vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
-    -- Language Server Configurations
+    -- Server-specific configurations
     local servers = {
-      "ts_ls",
-      "eslint",
-      "html",
-      "cssls",
-      "jsonls",
-      "lua_ls",
-      "pyright",
-      "bashls",
-      "solidity_ls",
-      "dockerls",
-      "clangd",
-      "tailwindcss",
-      "prismals",
-    }
-
-    for _, server in ipairs(servers) do
-      local server_config = {
-        on_attach = function(client, bufnr)
-          client.server_capabilities.documentFormattingProvider = false
-          on_attach(client, bufnr)
-        end,
-        capabilities = capabilities,
-      }
-
-      if server == "ts_ls" then
-        server_config.settings = {
+      ts_ls = {
+        settings = {
           typescript = { inlayHints = { includeInlayParameterNameHints = "all" } },
           javascript = { inlayHints = { includeInlayParameterNameHints = "all" } },
-        }
-      elseif server == "lua_ls" then
-        server_config.settings = {
-          Lua = {
-            diagnostics = { globals = { "vim" } },
-            workspace = { library = vim.api.nvim_get_runtime_file("", true) },
-          },
-        }
-      elseif server == "pyright" then
-        server_config.settings = {
-          python = {
-            analysis = {
-              typeCheckingMode = "basic",
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
-            },
-          },
-        }
-      elseif server == "eslint" then
-        server_config.settings = {
+        },
+      },
+      eslint = {
+        settings = {
           workingDirectory = { mode = "auto" },
           validate = "on",
           packageManager = "npm",
@@ -109,9 +70,29 @@ return {
           rulesCustomizations = {},
           run = "onType",
           problems = { shortenToSingleLine = false },
-        }
-      elseif server == "tailwindcss" then
-        server_config.settings = {
+        },
+      },
+      lua_ls = {
+        settings = {
+          Lua = {
+            diagnostics = { globals = { "vim" } },
+            workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+          },
+        },
+      },
+      pyright = {
+        settings = {
+          python = {
+            analysis = {
+              typeCheckingMode = "basic",
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+            },
+          },
+        },
+      },
+      tailwindcss = {
+        settings = {
           tailwindCSS = {
             classAttributes = { "class", "className", "classList", "ngClass" },
             lint = {
@@ -125,24 +106,40 @@ return {
             },
             validate = true,
           },
-        }
-        -- Add filetypes that should trigger Tailwind CSS suggestions
-        server_config.filetypes = {
-          "html",
-          "javascriptreact",
-          "javascript",
-          "typescript",
-          "typescriptreact",
-          "vue",
-          "svelte",
-          "astro",
-          "php",
-        }
-      end
+        },
+      },
+      intelephense = {
+        settings = {
+          intelephense = {
+            files = {
+              maxSize = 5000000, -- Adjust file size limit if needed
+            },
+            storagePath = vim.fn.getenv "HOME" .. "/.intelephense", -- Custom storage path
+            globalStoragePath = vim.fn.getenv "HOME" .. "/.intelephense", -- Global storage path
+            licenceKey = nil, -- Set your license key here if needed
+            clearCache = false, -- Set to true to clear cache on startup
+          },
+        },
+        filetypes = { "php" }, -- Only PHP files
+        root_dir = lspconfig.util.root_pattern("composer.json", ".git"), -- Detect root directory
+      },
+    }
 
-      lspconfig[server].setup(server_config)
+    -- Set up each LSP server
+    for server, config in pairs(servers) do
+      lspconfig[server].setup {
+        on_attach = function(client, bufnr)
+          client.server_capabilities.documentFormattingProvider = false -- Disable formatting
+          on_attach(client, bufnr) -- Attach custom keybindings and behaviors
+        end,
+        capabilities = capabilities, -- Add default capabilities
+        settings = config.settings, -- Server-specific settings
+        filetypes = config.filetypes, -- Server-specific filetypes
+        root_dir = config.root_dir, -- Server-specific root directory detection
+      }
     end
-    -- Additional Configuration for Omnifunc
+
+    -- Configure omnifunc for autocompletion in specific filetypes
     vim.api.nvim_create_autocmd("FileType", {
       pattern = {
         "html",
@@ -155,13 +152,7 @@ return {
         "astro",
       },
       callback = function()
-        vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
-        -- Enable Tailwind CSS IntelliSense
-        -- vim.lsp.start {
-        --   name = "tailwindcss",
-        --   cmd = { "tailwindcss-language-server", "--stdio" },
-        --   root_dir = vim.fn.getcwd(),
-        -- }
+        vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc" -- Enable LSP-based omnifunc
       end,
     })
   end,

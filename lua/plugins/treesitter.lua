@@ -20,6 +20,7 @@ local config = function()
       "vue",
       "svelte",
       "toml",
+      "php",
     },
     auto_install = true,
     highlight = {
