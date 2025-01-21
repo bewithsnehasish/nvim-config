@@ -28,7 +28,6 @@ return {
       -- Web Development
       "prettier", -- JavaScript, TypeScript, CSS, HTML formatter
       "djlint", -- HTML/Template formatter
-      -- Programming Languages
       "stylua", -- Lua formatter
       "black", -- Python formatter
       "isort", -- Python import formatter

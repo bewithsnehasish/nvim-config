@@ -34,6 +34,9 @@ vim.g.user_emmet_settings = {
   ejs = {
     extends = "html, javascript",
   },
+  php = {
+    extends = "html, javascript ,css",
+  },
 }
 
 -- if vim.g.neovide then
