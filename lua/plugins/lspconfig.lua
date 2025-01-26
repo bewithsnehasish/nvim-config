@@ -17,7 +17,6 @@ return {
 
     require("neodev").setup {}
 
-    -- Diagnostic configuration
     local diagnostic_config = {
       signs = {
         active = true,
@@ -47,7 +46,6 @@ return {
     vim.lsp.handlers["textDocument/signatureHelp"] =
       vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
-    -- Language Server Configurations
     local servers = {
       "ts_ls",
       "html",
@@ -62,6 +60,29 @@ return {
       "clangd",
       "tailwindcss",
       "prismals",
+      "emmet_ls",
+      "intelephense",
+      "jdtls",
+    }
+
+    capabilities.textDocument.completion.completionItem = {
+      documentationFormat = { "markdown", "plaintext" },
+      snippetSupport = true,
+      preselectSupport = true,
+      insertReplaceSupport = true,
+      labelDetailsSupport = true,
+      deprecatedSupport = true,
+      commitCharactersSupport = true,
+      resolveSupport = {
+        properties = {
+          "documentation",
+          "detail",
+          "additionalTextEdits",
+        },
+      },
+      tagSupport = {
+        valueSet = { 1 },
+      },
     }
 
     for _, server in ipairs(servers) do
@@ -75,8 +96,51 @@ return {
 
       if server == "ts_ls" then
         server_config.settings = {
-          typescript = { inlayHints = { includeInlayParameterNameHints = "all" } },
-          javascript = { inlayHints = { includeInlayParameterNameHints = "all" } },
+          filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+          typescript = {
+            inlayHints = { includeInlayParameterNameHints = "all" },
+            suggest = {
+              includeCompletionsForModuleExports = true,
+              autoImports = true,
+              completeFunctionCalls = true,
+              includeCompletionsWithSnippetText = true,
+              classMemberSnippets = { enabled = true },
+              objectLiteralMethodSnippets = { enabled = true },
+              JSXAttributes = { enabled = true },
+            },
+            format = {
+              insertSpaceAfterOpeningAndBeforeClosingJSXExpressionBraces = true,
+            },
+            preferences = {
+              jsxAttributeCompletionStyle = "auto",
+              allowRenameOfImportPath = true,
+              includePackageJsonAutoImports = "auto",
+              quoteStyle = "single",
+            },
+            updateImportsOnFileMove = {
+              enabled = "always",
+            },
+          },
+          javascript = {
+            inlayHints = { includeInlayParameterNameHints = "all" },
+            suggest = {
+              includeCompletionsForModuleExports = true,
+              autoImports = true,
+              completeFunctionCalls = true,
+              includeCompletionsWithSnippetText = true,
+            },
+            preferences = {
+              jsxAttributeCompletionStyle = "auto",
+              allowRenameOfImportPath = true,
+              includePackageJsonAutoImports = "auto",
+              quoteStyle = "single",
+            },
+          },
+          completions = {
+            completeFunctionCalls = true,
+            autoImport = true,
+            enabled = true,
+          },
         }
       elseif server == "lua_ls" then
         server_config.settings = {
@@ -126,7 +190,6 @@ return {
             validate = true,
           },
         }
-        -- Add filetypes that should trigger Tailwind CSS suggestions
         server_config.filetypes = {
           "html",
           "javascriptreact",
@@ -138,11 +201,30 @@ return {
           "astro",
           "php",
         }
+      elseif server == "emmet_ls" then
+        server_config.filetypes = {
+          "html",
+          "php",
+          "javascriptreact",
+          "typescriptreact",
+          "css",
+          "sass",
+          "scss",
+          "less",
+          "blade",
+        }
+        server_config.init_options = {
+          html = {
+            options = {
+              ["bem.enabled"] = true,
+            },
+          },
+        }
       end
 
       lspconfig[server].setup(server_config)
     end
-    -- Additional Configuration for Omnifunc
+
     vim.api.nvim_create_autocmd("FileType", {
       pattern = {
         "html",
@@ -153,15 +235,10 @@ return {
         "vue",
         "svelte",
         "astro",
+        "php",
       },
       callback = function()
         vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
-        -- Enable Tailwind CSS IntelliSense
-        -- vim.lsp.start {
-        --   name = "tailwindcss",
-        --   cmd = { "tailwindcss-language-server", "--stdio" },
-        --   root_dir = vim.fn.getcwd(),
-        -- }
       end,
     })
   end,

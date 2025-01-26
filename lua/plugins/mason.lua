@@ -21,6 +21,8 @@ return {
       "pyright", -- Python
       "jdtls", -- Java
       "intelephense", -- PHP
+      "emmet_ls", -- Emmet
+      "prismals", -- Prisma
     }
 
     -- Code formatters and linters that will be automatically installed
@@ -32,6 +34,7 @@ return {
       "black", -- Python formatter
       "isort", -- Python import formatter
       "php-cs-fixer", -- PHP formatter
+      "google-java-format", -- Java
     }
 
     -- Mason setup with nice icons

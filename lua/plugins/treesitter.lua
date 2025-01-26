@@ -21,6 +21,7 @@ local config = function()
       "svelte",
       "toml",
       "php",
+      "java",
     },
     auto_install = true,
     highlight = {

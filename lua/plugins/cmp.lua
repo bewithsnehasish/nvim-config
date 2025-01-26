@@ -16,21 +16,33 @@ return {
     { "hrsh7th/cmp-nvim-lua" }, -- Neovim Lua API source
     { "dcampos/cmp-emmet-vim" }, -- Emmet source for nvim-cmp
     { "roobert/tailwindcss-colorizer-cmp.nvim", config = true }, -- Tailwind CSS colorizer
+    { "mattn/emmet-vim" }, -- Emmet plugin for HTML/CSS expansion
+    { "supermaven-inc/supermaven-nvim" }, -- Supermaven AI completion
   },
   config = function()
     local cmp = require "cmp"
     local luasnip = require "luasnip"
 
     -- Extend filetypes for LuaSnip
-    luasnip.filetype_extend("javascriptreact", { "html", "css" })
-    luasnip.filetype_extend("typescriptreact", { "html", "css" })
-    luasnip.filetype_extend("javascript", { "html", "css" })
-    luasnip.filetype_extend("yaml", { "markdown" })
-    luasnip.filetype_extend("ini", { "sh" })
-    luasnip.filetype_extend("conf", { "sh" })
+    -- luasnip.filetype_extend("php", { "html", "css" }) -- Add PHP
+    -- luasnip.filetype_extend("javascriptreact", { "html", "css" })
+    -- luasnip.filetype_extend("typescriptreact", { "html", "css" })
+    -- luasnip.filetype_extend("javascript", { "html", "css" })
+    -- luasnip.filetype_extend("yaml", { "markdown" })
+    -- luasnip.filetype_extend("ini", { "sh" })
+    -- luasnip.filetype_extend("conf", { "sh" })
 
     -- Load VSCode-style snippets
     require("luasnip/loaders/from_vscode").lazy_load()
+
+    -- Add custom snippets for JSX/TSX components
+    luasnip.add_snippets("javascriptreact", {
+      luasnip.parser.parse_snippet("component", "<$1></$1>"),
+    })
+
+    luasnip.add_snippets("typescriptreact", {
+      luasnip.parser.parse_snippet("component", "<$1></$1>"),
+    })
 
     -- Custom highlight groups
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
@@ -62,12 +74,33 @@ return {
         ["<C-b>"] = cmp.mapping.scroll_docs(-1), -- Scroll docs up
         ["<C-f>"] = cmp.mapping.scroll_docs(1), -- Scroll docs down
         ["<C-Space>"] = cmp.mapping.complete(), -- Trigger completion
-        ["<CR>"] = cmp.mapping.confirm { select = true }, -- Confirm selection
+        ["<CR>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            -- Confirm the selection
+            if cmp.confirm { select = true } then
+              -- Trigger snippet expansion if the selected item is a component
+              local entry = cmp.get_selected_entry()
+              if entry and entry.source.name == "nvim_lsp" then
+                local component_name = entry.completion_item.label
+                vim.api.nvim_feedkeys(
+                  vim.api.nvim_replace_termcodes(
+                    "<Esc>a<" .. component_name .. "></" .. component_name .. ">",
+                    true,
+                    true,
+                    true
+                  ),
+                  "n",
+                  true
+                )
+              end
+            end
+          else
+            fallback() -- Fallback to default behavior
+          end
+        end, { "i", "s" }), -- Map Enter in insert and select modes
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item() -- Select next item in completion menu
-          elseif require("supermaven-nvim.completion_preview").has_suggestion() then
-            require("supermaven-nvim.completion_preview").on_accept_suggestion() -- Accept Supermaven suggestion
           elseif luasnip.expandable() then
             luasnip.expand() -- Expand snippet
           elseif luasnip.expand_or_jumpable() then
@@ -78,19 +111,27 @@ return {
             fallback()
           end
         end, { "i", "s" }), -- Map Tab in insert and select modes
+        ["<C-y>"] = cmp.mapping(function(fallback)
+          if require("emmet-vim").expand_abbr() then
+            return
+          else
+            fallback()
+          end
+        end, { "i", "s" }), -- Map Ctrl+y to Emmet expansion
       },
       formatting = {
         fields = { "kind", "abbr", "menu" }, -- Fields to display in completion menu
         format = function(entry, vim_item)
           vim_item.kind = icons.kind[vim_item.kind] -- Set icon for completion item
           vim_item.menu = ({
-            nvim_lsp = "",
-            nvim_lua = "",
-            luasnip = "",
-            buffer = "",
-            path = "",
-            emoji = "",
-            emmet_vim = "Emmet", -- Add Emmet to the menu
+            nvim_lsp = "[LSP]",
+            nvim_lua = "[Lua]",
+            luasnip = "[Snippet]",
+            buffer = "[Buffer]",
+            path = "[Path]",
+            emoji = "[Emoji]",
+            emmet_vim = "[Emmet]", -- Add Emmet to the menu
+            supermaven = "[Supermaven]", -- Add Supermaven to the menu
           })[entry.source.name]
 
           -- Customize icons for specific sources
@@ -101,7 +142,7 @@ return {
             vim_item.kind = icons.misc.Robot
             vim_item.kind_hl_group = "CmpItemKindTabnine"
           elseif entry.source.name == "supermaven" then
-            vim_item.kind = ""
+            vim_item.kind = icons.misc.Robot
             vim_item.kind_hl_group = "CmpItemKindTabnine"
           end
 
@@ -110,16 +151,15 @@ return {
         end,
       },
       sources = {
-        { name = "copilot" }, -- GitHub Copilot
         { name = "supermaven" }, -- Supermaven
         { name = "nvim_lsp" }, -- LSP
         { name = "luasnip" }, -- LuaSnip snippets
-        { name = "cmp_tabnine" }, -- TabNine
         { name = "nvim_lua" }, -- Neovim Lua API
         { name = "buffer" }, -- Buffer completions
         { name = "path" }, -- Path completions
         { name = "emoji" }, -- Emoji completions
         { name = "emmet_vim" }, -- Emmet completions
+        { name = "emmet-ls" }, -- Emmet language server (if installed)
       },
       confirm_opts = {
         behavior = cmp.ConfirmBehavior.Replace,
@@ -135,7 +175,7 @@ return {
         },
       },
       experimental = {
-        ghost_text = false, -- Disable ghost text
+        ghost_text = true, -- Enable ghost text
       },
     }
   end,

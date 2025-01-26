@@ -40,17 +40,8 @@ vim.api.nvim_create_user_command("DapOpenSidebar", function()
 end, {})
 vim.api.nvim_set_keymap("n", "<leader>dus", "<cmd>DapOpenSidebar<CR>", opts)
 
--- Java keymaps
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>jb",
-  "<cmd>JavaBuildBuildWorkspace<CR>",
-  { noremap = true, desc = "Build workspace" }
-)
-vim.api.nvim_set_keymap("n", "<leader>jr", "<cmd>JavaRunnerRunMain<CR>", { noremap = true, desc = "Run main class" })
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>jt",
-  "<cmd>JavaTestRunCurrentClass<CR>",
-  { noremap = true, desc = "Run current test class" }
-)
+-- Java-specific keymaps
+vim.keymap.set("n", "<leader>ji", ":JavaProjectImport<CR>", { desc = "Import Java project" })
+vim.keymap.set("n", "<leader>jc", ":JavaProjectCompile<CR>", { desc = "Compile Java project" })
+vim.keymap.set("n", "<leader>jt", ":JavaTest<CR>", { desc = "Run Java tests" })
+vim.keymap.set("n", "<leader>jr", ":JavaRun<CR>", { desc = "Run Java file" })

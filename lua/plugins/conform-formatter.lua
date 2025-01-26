@@ -22,7 +22,7 @@ return {
         liquid = { "prettier" },
         lua = { "stylua" },
         python = { "isort", "black" },
-        java = { "astyle" },
+        java = { "google-java-format" },
         php = { "php_cs_fixer", "djlint" }, -- Use php-cs-fixer for PHP files
       },
 
