@@ -24,6 +24,7 @@ return {
         python = { "isort", "black" },
         java = { "google-java-format" },
         php = { "php_cs_fixer", "djlint" }, -- Use php-cs-fixer for PHP files
+        prisma = { "prisma" }, -- Add Prisma formatter
       },
 
       -- Custom formatter configurations
@@ -32,6 +33,11 @@ return {
           command = "php-cs-fixer", -- Ensure this matches the binary name
           args = { "fix", "$FILENAME" }, -- Arguments for php-cs-fixer
           stdin = false, -- php-cs-fixer does not support stdin
+        },
+        prisma = {
+          command = "prisma", -- Ensure this matches the binary name
+          args = { "format", "--stdin" }, -- Arguments for prisma format
+          stdin = true, -- prisma format supports stdin
         },
       },
 

@@ -174,6 +174,16 @@ return {
           run = "onType",
           problems = { shortenToSingleLine = false },
         }
+      elseif server == "prismals" then
+        server_config.settings = {
+          prisma = {
+            validate = true, -- Enable validation (default: true)
+            hover = true, -- Enable hover documentation (default: true)
+            completions = {
+              enabled = true, -- Enable autocompletion (default: true)
+            },
+          },
+        }
       elseif server == "tailwindcss" then
         server_config.settings = {
           tailwindCSS = {
