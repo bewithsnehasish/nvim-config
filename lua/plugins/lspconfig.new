@@ -1,0 +1,224 @@
+return {
+  "neovim/nvim-lspconfig",
+  event = { "BufReadPre", "BufNewFile" },
+  dependencies = {
+    "folke/neodev.nvim",
+    "hrsh7th/cmp-nvim-lsp",
+    "williamboman/mason.nvim",
+    "hrsh7th/nvim-cmp",
+    "hrsh7th/cmp-buffer",
+    "stevearc/conform.nvim",
+    "RRethy/vim-illuminate",
+  },
+  config = function()
+    -- 1. Imports
+    local lspconfig = require "lspconfig"
+    local cmp_nvim_lsp = require "cmp_nvim_lsp"
+    local icons = require "plugins.user.icons"
+    local on_attach = require "plugins.user.lsp.on_attach" -- Your existing on_attach
+    local conform = require "conform"
+
+    -- 2. Capabilities Configuration
+    local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    capabilities.textDocument.positionEncoding = "utf-16"
+    capabilities.textDocument.completion.completionItem = {
+      documentationFormat = { "markdown", "plaintext" },
+      snippetSupport = true,
+      preselectSupport = true,
+      insertReplaceSupport = true,
+      labelDetailsSupport = true,
+      deprecatedSupport = true,
+      commitCharactersSupport = true,
+      resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
+      tagSupport = { valueSet = { 1 } },
+    }
+
+    -- 3. UI Configuration
+    local ui_config = {
+      diagnostics = {
+        signs = {
+          active = true,
+          values = {
+            { name = "DiagnosticSignError", text = icons.diagnostics.Error },
+            { name = "DiagnosticSignWarn", text = icons.diagnostics.Warning },
+            { name = "DiagnosticSignHint", text = icons.diagnostics.Hint },
+            { name = "DiagnosticSignInfo", text = icons.diagnostics.Information },
+          },
+        },
+        virtual_text = { prefix = "●", source = "always" },
+        update_in_insert = false,
+        underline = true,
+        severity_sort = true,
+        float = {
+          focusable = true,
+          style = "minimal",
+          border = "rounded",
+          source = "always",
+          header = "",
+          prefix = "",
+        },
+      },
+      handlers = {
+        ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" }),
+        ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" }),
+      },
+    }
+    vim.diagnostic.config(ui_config.diagnostics)
+    vim.lsp.handlers = vim.tbl_extend("force", vim.lsp.handlers, ui_config.handlers)
+
+    -- Fix underline highlight groups
+    vim.api.nvim_set_hl(0, "DiagnosticUnderlineError", { undercurl = true, sp = "red" })
+    vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", { undercurl = true, sp = "yellow" })
+    vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { undercurl = true, sp = "blue" })
+    vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { undercurl = true, sp = "green" })
+
+    -- 4. Server Configuration
+    local servers = {
+      list = {
+        "ts_ls",
+        "html",
+        "eslint",
+        "cssls",
+        "jsonls",
+        "lua_ls",
+        "pyright",
+        "bashls",
+        "solidity_ls",
+        "dockerls",
+        "clangd",
+        "tailwindcss",
+        "prismals",
+        "emmet_ls",
+        "intelephense",
+        "jdtls",
+      },
+      settings = {
+        ts_ls = {
+          filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+          settings = {
+            typescript = {
+              inlayHints = { includeInlayParameterNameHints = "all" },
+              suggest = {
+                includeCompletionsForModuleExports = true,
+                autoImports = true,
+                completeFunctionCalls = true,
+                includeCompletionsWithSnippetText = true,
+              },
+              diagnostics = { ignoredCodes = {} },
+            },
+            javascript = {
+              inlayHints = { includeInlayParameterNameHints = "all" },
+              suggest = {
+                includeCompletionsForModuleExports = true,
+                autoImports = true,
+                completeFunctionCalls = true,
+                includeCompletionsWithSnippetText = true,
+              },
+            },
+          },
+          init_options = {
+            preferences = {
+              disableSuggestions = false,
+              includeCompletionsForImportStatements = true,
+            },
+            maxTsServerMemory = 4096,
+          },
+        },
+        eslint = {
+          filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+          settings = {
+            workingDirectory = { mode = "auto" },
+            validate = "on",
+            codeAction = {
+              disableRuleComment = { enable = true, location = "separateLine" },
+              showDocumentation = { enable = true },
+            },
+            rulesCustomizations = {},
+            run = "onType",
+            format = false,
+          },
+          on_attach = function(client, bufnr)
+            client.server_capabilities.documentFormattingProvider = false
+            on_attach(client, bufnr)
+          end,
+        },
+        lua_ls = {
+          settings = {
+            Lua = {
+              diagnostics = { globals = { "vim" } },
+              workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+            },
+          },
+        },
+        pyright = {
+          settings = {
+            python = {
+              analysis = { typeCheckingMode = "basic", autoSearchPaths = true, useLibraryCodeForTypes = true },
+            },
+          },
+        },
+        tailwindcss = {
+          filetypes = {
+            "html",
+            "javascriptreact",
+            "javascript",
+            "typescript",
+            "typescriptreact",
+            "vue",
+            "svelte",
+            "astro",
+            "php",
+          },
+          settings = { tailwindCSS = { validate = true } },
+        },
+        emmet_ls = {
+          filetypes = { "html", "javascriptreact", "typescriptreact", "css" },
+          init_options = { html = { options = { ["bem.enabled"] = true } } },
+        },
+      },
+    }
+
+    -- 5. Setup Function
+    local function setup_lsp()
+      require("neodev").setup {}
+
+      -- Enhanced custom on_attach
+      local custom_on_attach = function(client, bufnr)
+        local filetype = vim.bo[bufnr].filetype
+        if conform.get_formatter_info(filetype, bufnr) then
+          client.server_capabilities.documentFormattingProvider = false
+        end
+
+        -- Call your existing on_attach
+        on_attach(client, bufnr)
+
+        -- Add keybinding to show diagnostic float
+        local opts = { buffer = bufnr, noremap = true, silent = true }
+        vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- Press <leader>d to show errors
+      end
+
+      -- Configure servers
+      for _, server in ipairs(servers.list) do
+        if server == "jdtls" then
+          goto continue
+        end
+
+        local server_config = vim.tbl_deep_extend("force", {
+          on_attach = servers.settings[server] and servers.settings[server].on_attach or custom_on_attach,
+          capabilities = capabilities,
+          on_init = function(client)
+            if not client then
+              vim.notify("Failed to start LSP: " .. server, vim.log.levels.WARN)
+            end
+          end,
+        }, servers.settings[server] or {})
+
+        lspconfig[server].setup(server_config)
+        ::continue::
+      end
+    end
+
+    -- Execute setup
+    setup_lsp()
+  end,
+}

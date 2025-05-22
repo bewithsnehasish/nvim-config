@@ -4,18 +4,18 @@ return {
     "RRethy/vim-illuminate",
     event = "VeryLazy",
     config = function()
-      -- Define custom highlight groups
-      vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = "#3E4452" }) -- Change this to your preferred color
-      vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#3E4452" }) -- Change this to your preferred color
-      vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#3E4452" }) -- Change this to your preferred color
+      -- Define custom highlight groups with subtle styling to avoid clashing with diagnostics
+      vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = "#3E4452", underline = false })
+      vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#3E4452", underline = false })
+      vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#3E4452", underline = false })
 
       require("illuminate").configure {
         delay = 100,
-        modes_allowlist = { "n", "v", "i" },
+        modes_allowlist = { "n", "v" }, -- Remove "i" to reduce interference during typing
         providers = {
-          "lsp",
-          "treesitter",
-          "regex",
+          "treesitter", -- Prioritize Treesitter for performance and accuracy
+          "regex", -- Fallback to regex
+          -- "lsp" removed to avoid overlap with ts_ls diagnostics
         },
         filetypes_denylist = {
           "mason",
@@ -42,8 +42,7 @@ return {
           "DressingSelect",
           "TelescopePrompt",
         },
-        filetypes_allowlist = {},
-        modes_denylist = {},
+        under_cursor = true, -- Highlight word under cursor
       }
     end,
   },

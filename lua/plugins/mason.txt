@@ -1,0 +1,92 @@
+return {
+  "williamboman/mason-lspconfig.nvim",
+  event = "BufReadPre",
+  dependencies = {
+    "williamboman/mason.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+  },
+  config = function()
+    -- Language servers that will be automatically installed
+    local language_servers = {
+      -- Web Development
+      "html", -- HTML
+      "cssls", -- CSS
+      "ts_ls", -- TypeScript/JavaScript
+      "eslint", -- ESLint
+      "tailwindcss", -- Tailwind CSS
+      "jsonls", -- JSON
+      "svelte", -- Svelte
+
+      -- Programming Languages
+      "lua_ls", -- Lua
+      "pyright", -- Python
+      "jdtls", -- Java
+      "intelephense", -- PHP
+      "emmet_ls", -- Emmet
+      "prismals", -- Prisma
+    }
+
+    -- Code formatters and linters that will be automatically installed
+    local tools = {
+      -- Web Development
+      "prettier", -- JavaScript, TypeScript, CSS, HTML formatter
+      "prettierd", -- JavaScript, TypeScript, CSS, HTML formatter
+      "djlint", -- HTML/Template formatter
+      "stylua", -- Lua formatter
+      "black", -- Python formatter
+      "isort", -- Python import formatter
+      "php-cs-fixer", -- PHP formatter
+      "google-java-format", -- Java
+      "superhtml",
+    }
+
+    -- Mason setup with nice icons
+    require("mason").setup {
+      ui = {
+        border = "rounded",
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗",
+        },
+      },
+    }
+
+    -- Define LSP capabilities with positionEncoding
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument = capabilities.textDocument or {}
+    capabilities.textDocument.positionEncoding = "utf-16" -- Set to utf-16 as a safe default
+
+    -- Ensure language servers are installed and configured
+    require("mason-lspconfig").setup {
+      ensure_installed = language_servers,
+      automatic_installation = true,
+      handlers = {
+        -- Default handler for all language servers
+        function(server_name)
+          require("lspconfig")[server_name].setup {
+            capabilities = capabilities, -- Apply the capabilities with positionEncoding
+          }
+        end,
+        -- Optional: Override specific servers if needed
+        ["lua_ls"] = function()
+          require("lspconfig").lua_ls.setup {
+            capabilities = capabilities,
+            settings = {
+              Lua = {
+                diagnostics = {
+                  globals = { "vim" }, -- Recognize 'vim' global for Neovim config
+                },
+              },
+            },
+          }
+        end,
+      },
+    }
+
+    -- Ensure formatters & linters are installed
+    require("mason-tool-installer").setup {
+      ensure_installed = tools,
+    }
+  end,
+}
