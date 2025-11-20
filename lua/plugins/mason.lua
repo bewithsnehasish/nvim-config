@@ -43,30 +43,54 @@ return {
 
     mason_lspconfig.setup {
       ensure_installed = {
-        "ts_ls", -- Use ts_ls (handled by typescript-tools in lspconfig)
+        -- Web Development (React/React Native focused)
+        "ts_ls",
         "html",
-        "eslint",
         "cssls",
-        "pyright",
-        "ruff",
-        "jsonls",
-        "lua_ls",
-        "pyright",
-        "bashls",
         "tailwindcss",
-        "prismals",
         "emmet_ls",
+        "eslint",
+        "jsonls",
+
+        -- Python
+        "pyright", -- FIXED: Removed duplicate
+        "ruff",
+
+        -- Other Languages
+        "lua_ls",
+        "bashls",
+        "prismals",
         "intelephense",
-        "jdtls",
       },
       automatic_installation = true,
       handlers = {
+        -- Default handler for servers NOT configured in lspconfig.lua
         function(server_name)
+          -- Skip servers that are manually configured in lspconfig.lua
+          local skip_servers = {
+            "ts_ls", -- Handled by typescript-tools
+            "typescript_tools", -- Custom setup
+            "pyright", -- Custom setup in lspconfig
+            "ruff", -- Custom setup in lspconfig
+            "html", -- Custom setup in lspconfig
+            "tailwindcss", -- Custom setup in lspconfig
+            "emmet_ls", -- Custom setup in lspconfig
+            "lua_ls", -- Custom setup below
+            "prismals", -- Custom setup in lspconfig
+            "intelephense", -- Custom setup in lspconfig
+          }
+
+          if vim.tbl_contains(skip_servers, server_name) then
+            return -- Let lspconfig.lua handle it
+          end
+
           require("lspconfig")[server_name].setup {
             capabilities = capabilities,
             flags = { debounce_text_changes = 150 },
           }
         end,
+
+        -- Only keep lua_ls here as it's simple and doesn't need lspconfig.lua
         ["lua_ls"] = function()
           require("lspconfig").lua_ls.setup {
             capabilities = capabilities,
@@ -86,31 +110,6 @@ return {
             },
           }
         end,
-        ["jdtls"] = function()
-          require("lspconfig").jdtls.setup {
-            capabilities = capabilities,
-            flags = { debounce_text_changes = 150 },
-            settings = {
-              java = {
-                configuration = { runtimes = {} },
-                format = {
-                  enabled = true,
-                  settings = {
-                    url = "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
-                  },
-                },
-              },
-            },
-          }
-        end,
-        ["emmet_ls"] = function()
-          require("lspconfig").emmet_ls.setup {
-            capabilities = capabilities,
-            flags = { debounce_text_changes = 150 },
-            filetypes = { "html", "css", "svelte", "javascriptreact", "typescriptreact", "php" },
-            init_options = { html = { options = { ["bem.enabled"] = true } } },
-          }
-        end,
       },
     }
 
@@ -122,16 +121,22 @@ return {
 
     mason_tool_installer.setup {
       ensure_installed = {
-        "prettierd",
+        -- Formatters
+        -- "prettierd",
         "prettier",
-        "djlint",
         "stylua",
         "black",
         "isort",
+
+        -- Django (if you use it)
+        "djlint",
+
+        -- Other
         "php-cs-fixer",
         "google-java-format",
       },
       auto_update = false,
+      run_on_start = true,
     }
   end,
 }

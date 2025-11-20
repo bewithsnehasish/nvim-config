@@ -16,120 +16,142 @@ return {
 
       conform.setup {
         formatters_by_ft = {
-          -- Django and Python
-          python = { "isort", "black", "ruff_fix" },
+          -- Python
+          python = { "isort", "black" },
+
+          -- Django
           htmldjango = { "djlint" },
-          -- Web Development
-          javascript = { "prettier", "prettierd" }, -- Reversed to prefer prettier
-          typescript = { "prettier", "prettierd" },
-          javascriptreact = { "prettier", "prettierd" },
-          typescriptreact = { "prettier", "prettierd" },
-          svelte = { "prettier", "prettierd" },
-          css = { "prettier", "prettierd" },
-          html = { "prettier", "prettierd" },
-          json = { "prettier", "prettierd" },
-          yaml = { "prettier", "prettierd" },
-          markdown = { "prettier", "prettierd" },
-          graphql = { "prettier", "prettierd" },
-          liquid = { "prettier", "prettierd" },
+
+          -- Web Development (React/React Native focused)
+          javascript = { "prettierd", "prettier", stop_after_first = true },
+          typescript = { "prettierd", "prettier", stop_after_first = true },
+          javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+          typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+
+          -- Other Web
+          svelte = { "prettierd", "prettier", stop_after_first = true },
+          vue = { "prettierd", "prettier", stop_after_first = true },
+          css = { "prettierd", "prettier", stop_after_first = true },
+          scss = { "prettierd", "prettier", stop_after_first = true },
+          html = { "prettierd", "prettier", stop_after_first = true },
+          json = { "prettierd", "prettier", stop_after_first = true },
+          jsonc = { "prettierd", "prettier", stop_after_first = true },
+          yaml = { "prettierd", "prettier", stop_after_first = true },
+          markdown = { "prettierd", "prettier", stop_after_first = true },
+          graphql = { "prettierd", "prettier", stop_after_first = true },
+
           -- Other Languages
           lua = { "stylua" },
           java = { "google-java-format" },
           php = { "php-cs-fixer" },
           prisma = { "prisma-format" },
         },
+
         formatters = {
+          prettier = {
+            prepend_args = {
+              "--single-quote",
+              "--jsx-single-quote",
+              "--tab-width",
+              "2",
+              "--trailing-comma",
+              "es5",
+              "--print-width",
+              "100",
+              "--arrow-parens",
+              "avoid",
+            },
+          },
+          -- prettierd = {
+          --   args = { "--stdin-filepath", "$FILENAME" },
+          --   prepend_args = {
+          --     "--single-quote",
+          --     "--jsx-single-quote",
+          --     "--tab-width",
+          --     "2",
+          --     "--trailing-comma",
+          --     "es5",
+          --     "--print-width",
+          --     "100",
+          --     "--arrow-parens",
+          --     "avoid",
+          --   },
+          -- },
           isort = {
-            command = "isort",
-            args = { "--quiet", "--filename", "$FILENAME", "-" },
-            stdin = true,
+            prepend_args = { "--profile", "black" },
           },
           black = {
-            command = "black",
-            args = { "--quiet", "--fast", "-" },
-            stdin = true,
-          },
-          ruff_fix = {
-            command = "ruff",
-            args = { "format", "--quiet", "--stdin-filename", "$FILENAME", "-" },
-            stdin = true,
-          },
-          djlint = {
-            command = "djlint",
-            args = { "--reformat", "--quiet", "-" },
-            stdin = true,
-            cwd = function()
-              local templates_dir = vim.fn.finddir("templates", ".;")
-              return templates_dir ~= "" and templates_dir:match "(.+)/templates" or vim.fn.getcwd()
-            end,
-          },
-          prettier = {
-            command = "prettier",
-            args = { "--stdin-filepath", "$FILENAME" },
-            stdin = true,
+            prepend_args = { "--line-length", "100" },
           },
           stylua = {
-            command = "stylua",
-            args = { "--search-parent-directories", "-" },
-            stdin = true,
+            prepend_args = { "--indent-type", "Spaces", "--indent-width", "2" },
           },
-          ["google-java-format"] = {
-            command = "google-java-format",
-            args = { "-" },
-            stdin = true,
-          },
-          prisma_format = {
-            command = "prisma", -- Ensure this matches the binary name
-            args = { "format", "--stdin" }, -- Arguments for prisma format
-            stdin = true, -- prisma format supports stdin
-          },
-          php_cs_fixer = {
+          ["php-cs-fixer"] = {
             command = "php-cs-fixer",
-            args = { "fix", "--quiet", "-" },
-            stdin = true,
-            condition = function()
-              return vim.fn.filereadable ".php-cs-fixer.php" == 1 or vim.fn.filereadable ".php_cs" == 1
-            end,
+            args = { "fix", "$FILENAME" },
+            stdin = false,
           },
         },
-        format_on_save = {
+
+        format_on_save = function(bufnr)
+          -- Disable with a global or buffer-local variable
+          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+            return
+          end
+
+          return {
+            timeout_ms = 2000,
+            lsp_fallback = true,
+          }
+        end,
+
+        format_after_save = {
           lsp_fallback = true,
-          timeout_ms = 2000,
-          async = false,
         },
+
         notify_on_error = true,
-        notify_on_success = false, -- Handled by custom notification
       }
 
-      -- Custom error handling for formatter failures
-      local function notify_formatter_error(err, formatter)
-        vim.notify(
-          string.format("Formatter '%s' failed: %s", formatter, err),
-          vim.log.levels.ERROR,
-          { timeout = 2000, title = "Conform Error", icon = "❌" }
-        )
-      end
-
-      -- Override format function to include error handling
-      local original_format = conform.format
-      conform.format = function(opts)
-        local ok, err = pcall(original_format, opts)
-        if not ok then
-          local formatter = opts.formatters and table.concat(opts.formatters, ", ") or "unknown"
-          notify_formatter_error(err, formatter)
-        elseif not opts.async then
-          vim.notify("Formatted buffer", vim.log.levels.INFO, { timeout = 500, title = "Conform", icon = "📝" })
+      -- Toggle format on save
+      vim.api.nvim_create_user_command("FormatToggle", function()
+        vim.g.disable_autoformat = not vim.g.disable_autoformat
+        if vim.g.disable_autoformat then
+          vim.notify("Auto-format disabled", vim.log.levels.INFO)
+        else
+          vim.notify("Auto-format enabled", vim.log.levels.INFO)
         end
-      end
+      end, {
+        desc = "Toggle format on save",
+      })
 
-      -- Keybinding for manual formatting
+      -- Format command
+      vim.api.nvim_create_user_command("Format", function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+        require("conform").format { async = true, lsp_fallback = true, range = range }
+      end, { range = true })
+
+      -- Keybindings
       vim.keymap.set({ "n", "v" }, "<leader>mp", function()
         conform.format {
           lsp_fallback = true,
           async = true,
           timeout_ms = 2000,
         }
-      end, { desc = "Format file or range (in visual mode)", noremap = true })
+      end, { desc = "Format file or range", noremap = true, silent = true })
+
+      vim.keymap.set(
+        "n",
+        "<leader>mf",
+        "<cmd>FormatToggle<cr>",
+        { desc = "Toggle format on save", noremap = true, silent = true }
+      )
     end,
   },
 }

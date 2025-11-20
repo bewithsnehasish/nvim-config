@@ -151,15 +151,15 @@ return {
         end,
       },
       sources = {
+        { name = "path" }, -- Path completions
         { name = "supermaven" }, -- Supermaven
+        { name = "emmet-ls" }, -- Emmet language server (if installed)
+        { name = "emmet_vim" }, -- Emmet completions
         { name = "nvim_lsp" }, -- LSP
         { name = "luasnip" }, -- LuaSnip snippets
         { name = "nvim_lua" }, -- Neovim Lua API
         { name = "buffer" }, -- Buffer completions
-        { name = "path" }, -- Path completions
         { name = "emoji" }, -- Emoji completions
-        { name = "emmet_vim" }, -- Emmet completions
-        { name = "emmet-ls" }, -- Emmet language server (if installed)
       },
       confirm_opts = {
         behavior = cmp.ConfirmBehavior.Replace,
