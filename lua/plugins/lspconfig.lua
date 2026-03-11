@@ -3,7 +3,7 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "folke/neodev.nvim",
+      "folke/lazydev.nvim",
       "hrsh7th/cmp-nvim-lsp",
       "williamboman/mason.nvim",
       "hrsh7th/nvim-cmp",
@@ -16,27 +16,36 @@ return {
       -- 1. Imports
       local cmp_nvim_lsp_status, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       if not cmp_nvim_lsp_status then
-        vim.notify(
-          "Failed to load cmp-nvim-lsp",
-          vim.log.levels.ERROR,
-          { timeout = 2000, title = "LSP Error", icon = "❌" }
-        )
-        return
+        vim.notify("Failed to load cmp-nvim-lsp, using base capabilities", vim.log.levels.WARN, {
+          timeout = 2000,
+          title = "LSP Warning",
+          icon = "⚠️",
+        })
       end
 
       local typescript_tools_status, typescript_tools = pcall(require, "typescript-tools")
       if not typescript_tools_status then
-        vim.notify(
-          "Failed to load typescript-tools",
-          vim.log.levels.WARN,
-          { timeout = 2000, title = "LSP Warning", icon = "⚠️" }
-        )
+        vim.notify("Failed to load typescript-tools", vim.log.levels.WARN, {
+          timeout = 2000,
+          title = "LSP Warning",
+          icon = "⚠️",
+        })
       end
 
-      local on_attach = require "plugins.user.lsp.on_attach"
+      local on_attach = require "user.lsp.on_attach"
 
-      -- 2. Capabilities Configuration
-      local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+      -- 2. Lazydev Setup (must be before lspconfig for Lua LSP support)
+      require("lazydev").setup {
+        library = {
+          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        },
+      }
+
+      -- 3. Capabilities Configuration
+      local capabilities = cmp_nvim_lsp_status
+          and cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+        or vim.lsp.protocol.make_client_capabilities()
+
       capabilities.textDocument.positionEncoding = "utf-16"
       capabilities.textDocument.completion.completionItem = {
         documentationFormat = { "markdown", "plaintext" },
@@ -54,24 +63,23 @@ return {
         lineFoldingOnly = true,
       }
 
-      -- 3. UI Configuration
+      -- 4. UI / Diagnostic Configuration
       local diagnostic_config = {
         signs = {
           text = {
-            [vim.diagnostic.severity.ERROR] = "", -- ERROR
-            [vim.diagnostic.severity.WARN] = "", -- WARN
-            [vim.diagnostic.severity.HINT] = "", -- HINT
-            [vim.diagnostic.severity.INFO] = "", -- INFO
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.HINT] = "",
+            [vim.diagnostic.severity.INFO] = "",
           },
-          -- Optional: add colors via linehl/numhl
         },
         virtual_text = {
           prefix = function(diagnostic)
             local icons = {
-              [vim.diagnostic.severity.ERROR] = "",
-              [vim.diagnostic.severity.WARN] = "",
-              [vim.diagnostic.severity.HINT] = "",
-              [vim.diagnostic.severity.INFO] = "",
+              [vim.diagnostic.severity.ERROR] = "",
+              [vim.diagnostic.severity.WARN] = "",
+              [vim.diagnostic.severity.HINT] = "",
+              [vim.diagnostic.severity.INFO] = "",
             }
             return icons[diagnostic.severity] or "●"
           end,
@@ -116,13 +124,38 @@ return {
       vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { undercurl = true, sp = "#55aaff" })
       vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { undercurl = true, sp = "#55ff55" })
 
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-      vim.lsp.handlers["textDocument/signatureHelp"] =
+      -- FIX 9: Replaced vim.lsp.with (deprecated in 0.11+) with plain handler functions
+      if vim.lsp.config then
+        vim.lsp.config("*", {
+          handlers = {
+            ["textDocument/hover"] = function(err, result, ctx, config)
+              return vim.lsp.handlers.hover(
+                err,
+                result,
+                ctx,
+                vim.tbl_extend("force", config or {}, { border = "rounded" })
+              )
+            end,
+            ["textDocument/signatureHelp"] = function(err, result, ctx, config)
+              return vim.lsp.handlers.signature_help(
+                err,
+                result,
+                ctx,
+                vim.tbl_extend("force", config or {}, { border = "rounded" })
+              )
+            end,
+          },
+        })
+      else
+        -- Fallback for Neovim < 0.11 (vim.lsp.with is NOT deprecated there)
+        vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+        vim.lsp.handlers["textDocument/signatureHelp"] =
           vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+      end
 
-      -- 4. Enhanced On-Attach
+      -- 5. Enhanced On-Attach
       local custom_on_attach = function(client, bufnr)
-        -- Disable formatting if conform.nvim has a formatter
+        -- Disable formatting if conform.nvim has a formatter for this buffer
         local conform_status, conform = pcall(require, "conform")
         if conform_status then
           local formatters = conform.list_formatters(bufnr)
@@ -140,61 +173,50 @@ return {
         vim.keymap.set("n", "<leader>d", function()
           local winid = vim.fn.win_getid()
           local float_opts = {
-            scope = "cursor",  -- or "line" if you prefer
+            scope = "cursor",
             focusable = true,
-            close_events = {}, -- disable auto-close
+            close_events = {},
             border = "rounded",
             source = "if_many",
-            -- Optional: custom format
             format = function(diagnostic)
               local source = diagnostic.source and (" [" .. diagnostic.source .. "]") or ""
               return string.format("%s%s", diagnostic.message, source)
             end,
           }
 
-          -- Open float
           local float_bufnr, float_winid = vim.diagnostic.open_float(nil, float_opts)
 
           if float_winid then
-            -- Switch focus to float window
+            -- FIX 3: Focus float first, then set keymaps directly.
+            --        WinEnter already fired by the time the autocmd was registered,
+            --        so keymaps inside WinEnter callback were never being set.
             vim.fn.win_gotoid(float_winid)
 
-            -- Create augroup for float-local keymaps
-            local float_group = vim.api.nvim_create_augroup("DiagnosticFloat_" .. float_winid, { clear = true })
+            vim.keymap.set("n", "<C-y>", function()
+              vim.cmd "normal! ggVGy"
+              vim.notify("Diagnostic text yanked!", vim.log.levels.INFO, { title = "Yank" })
+            end, { buffer = float_bufnr, nowait = true })
 
-            -- Keymaps inside the float
-            vim.api.nvim_create_autocmd("WinEnter", {
-              group = float_group,
-              buffer = float_bufnr,
+            vim.keymap.set("n", "<Esc>", function()
+              vim.api.nvim_win_close(float_winid, true)
+              vim.fn.win_gotoid(winid)
+            end, { buffer = float_bufnr, nowait = true })
+
+            vim.keymap.set("n", "<CR>", function()
+              vim.api.nvim_win_close(float_winid, true)
+              vim.fn.win_gotoid(winid)
+            end, { buffer = float_bufnr, nowait = true })
+
+            -- FIX 4: WinClosed with once=true handles cleanup and focus restore.
+            --        Replaced the named augroup (DiagnosticFloat_N) that was leaking
+            --        a new augroup on every <leader>d press without ever being deleted.
+            -- FIX 5: Removed the dead WinLeave autocmd that had a string/int type
+            --        mismatch on args.match and an empty body.
+            vim.api.nvim_create_autocmd("WinClosed", {
+              pattern = tostring(float_winid),
+              once = true,
               callback = function()
-                -- Yank entire float content
-                vim.keymap.set("n", "<C-y>", function()
-                  vim.cmd("normal! ggVGy")
-                  vim.notify("Diagnostic text yanked!", vim.log.levels.INFO, { title = "Yank" })
-                end, { buffer = float_bufnr, nowait = true })
-
-                -- Close float (like <Esc>)
-                vim.keymap.set("n", "<Esc>", function()
-                  vim.api.nvim_win_close(float_winid, true)
-                  vim.fn.win_gotoid(winid) -- return to original window
-                end, { buffer = float_bufnr, nowait = true })
-
-                -- Optional: go back to source on <CR>
-                vim.keymap.set("n", "<CR>", function()
-                  vim.api.nvim_win_close(float_winid, true)
-                  vim.fn.win_gotoid(winid)
-                end, { buffer = float_bufnr, nowait = true })
-              end,
-            })
-
-            -- Optional: close float when leaving it
-            vim.api.nvim_create_autocmd("WinLeave", {
-              group = float_group,
-              callback = function(args)
-                if args.match == float_winid then
-                  -- Don't auto-close — let user control it
-                  -- (remove this if you want auto-close on leave)
-                end
+                vim.fn.win_gotoid(winid)
               end,
             })
           else
@@ -202,17 +224,21 @@ return {
           end
         end, opts)
 
-        -- Navigation keymaps (still useful!)
-        vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-        vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+        -- Navigation
+        vim.keymap.set("n", "]d", function()
+          vim.diagnostic.jump { count = 1, float = true }
+        end, opts)
+        vim.keymap.set("n", "[d", function()
+          vim.diagnostic.jump { count = -1, float = true }
+        end, opts)
 
         -- Debug: inspect raw diagnostics
-        vim.keymap.set("n", "<leader>dd", function()
+        vim.keymap.set("n", "<leader>dD", function()
           local diags = vim.diagnostic.get(bufnr)
           print(vim.inspect(#diags > 0 and diags or "No diagnostics"))
         end, opts)
 
-        -- Auto-hover (non-interactive, for quick glance)
+        -- Auto-hover on CursorHold (non-interactive, quick glance)
         local filetype = vim.bo[bufnr].filetype
         if filetype ~= "htmldjango" then
           local group = vim.api.nvim_create_augroup("LspDiagnosticsHover_" .. bufnr, { clear = true })
@@ -236,9 +262,8 @@ return {
         end
       end
 
-      vim.o.updatetime = 300
-
-      -- 5. TypeScript Tools Setup (for React/React Native)
+      -- 6. TypeScript Tools Setup
+      -- FIX 8: Removed non-standard filetypes "typescript.tsx" and "javascript.jsx"
       if typescript_tools_status then
         typescript_tools.setup {
           filetypes = {
@@ -246,8 +271,6 @@ return {
             "typescriptreact",
             "javascript",
             "javascriptreact",
-            "typescript.tsx",
-            "javascript.jsx",
           },
           capabilities = capabilities,
           on_attach = custom_on_attach,
@@ -275,8 +298,24 @@ return {
         }
       end
 
-      -- 6. Server Configurations using new vim.lsp.config API
+      -- 7. Server Configurations
       local server_configs = {
+        -- FIX 6: Added missing lua_ls config (was absent despite lazydev being set up)
+        lua_ls = {
+          filetypes = { "lua" },
+          settings = {
+            Lua = {
+              diagnostics = {
+                globals = { "vim", "require", "P", "R" },
+              },
+              workspace = {
+                checkThirdParty = false,
+              },
+              telemetry = { enable = false },
+            },
+          },
+        },
+
         pyright = {
           filetypes = { "python" },
           settings = {
@@ -297,24 +336,23 @@ return {
             end
           end,
         },
+
         ruff = {
           filetypes = { "python" },
           settings = {
-            ruff = {
-              enable = true,
-            }
+            ruff = { enable = true },
           },
           on_attach = function(client, bufnr)
             client.server_capabilities.hoverProvider = false
             custom_on_attach(client, bufnr)
           end,
         },
-        html = {
-          filetypes = { "html", "htmldjango" },
-        },
+
+        html = { filetypes = { "html", "htmldjango" } },
         cssls = {},
         jsonls = {},
         bashls = {},
+
         tailwindcss = {
           filetypes = {
             "html",
@@ -334,7 +372,7 @@ return {
               experimental = {
                 classRegex = {
                   { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-                  { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" },
+                  { "cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
                 },
               },
               lint = {
@@ -350,6 +388,7 @@ return {
             },
           },
         },
+
         prismals = {
           settings = {
             prisma = {
@@ -359,6 +398,7 @@ return {
             },
           },
         },
+
         emmet_ls = {
           filetypes = {
             "html",
@@ -377,11 +417,22 @@ return {
               options = {
                 ["bem.enabled"] = true,
                 ["jsx.enabled"] = true,
-              }
+              },
             },
           },
         },
+
+        -- FIX 7: Scoped by root_dir so eslint and biome don't both activate
+        --        on the same project simultaneously
         eslint = {
+          root_dir = require("lspconfig.util").root_pattern(
+            ".eslintrc",
+            ".eslintrc.js",
+            ".eslintrc.json",
+            ".eslintrc.cjs",
+            "eslint.config.js",
+            "eslint.config.mjs"
+          ),
           filetypes = {
             "javascript",
             "javascriptreact",
@@ -392,18 +443,10 @@ return {
           },
           settings = {
             codeAction = {
-              disableRuleComment = {
-                enable = true,
-                location = "separateLine",
-              },
-              showDocumentation = {
-                enable = true,
-              },
+              disableRuleComment = { enable = true, location = "separateLine" },
+              showDocumentation = { enable = true },
             },
-            codeActionOnSave = {
-              enable = false,
-              mode = "all",
-            },
+            codeActionOnSave = { enable = false, mode = "all" },
             format = false,
             nodePath = "",
             onIgnoredFiles = "off",
@@ -413,17 +456,43 @@ return {
             run = "onType",
             useESLintClass = false,
             validate = "on",
-            workingDirectory = {
-              mode = "location",
-            },
+            workingDirectory = { mode = "location" },
           },
         },
+
         intelephense = {
           filetypes = { "php" },
         },
+
+        graphql = {
+          cmd = { "graphql-lsp", "server", "-m", "stream" },
+          filetypes = { "graphql", "typescriptreact", "javascriptreact" },
+          root_dir = require("lspconfig.util").root_pattern(".graphqlrc*", ".graphql.config.*", "graphql.config.*"),
+        },
+
+        -- FIX 2 + FIX 7: Scoped by root_dir; on_attach calls base on_attach
+        --                 then explicitly re-enables formatting AFTER, so conform
+        --                 check inside custom_on_attach can't override it
+        biome = {
+          root_dir = require("lspconfig.util").root_pattern("biome.json", "biome.jsonc"),
+          filetypes = {
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+            "json",
+            "jsonc",
+          },
+          on_attach = function(client, bufnr)
+            on_attach(client, bufnr)
+            -- Re-enable AFTER on_attach so conform check cannot disable it
+            client.server_capabilities.documentFormattingProvider = true
+            client.server_capabilities.documentRangeFormattingProvider = true
+          end,
+        },
       }
 
-      -- Setup each server using the new API
+      -- Apply each server config
       for server_name, config in pairs(server_configs) do
         local default_config = {
           capabilities = capabilities,
@@ -431,32 +500,23 @@ return {
           flags = { debounce_text_changes = 150 },
         }
 
-        -- Merge custom config with defaults
         local final_config = vim.tbl_deep_extend("force", default_config, config)
 
-        -- Use new API if available (Neovim 0.11+), fallback to lspconfig
         if vim.lsp.config then
+          -- Neovim 0.11+ native API
           vim.lsp.config(server_name, final_config)
+          vim.lsp.enable(server_name)
         else
-          -- Fallback for older Neovim versions
+          -- Fallback for Neovim < 0.11
           require("lspconfig")[server_name].setup(final_config)
         end
       end
-
-      -- 7. Neodev Setup (for Neovim Lua development)
-      require("neodev").setup {
-        library = {
-          enabled = true,
-          runtime = true,
-          types = true,
-          plugins = true,
-        },
-      }
 
       -- 8. Omnifunc for specific filetypes
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
           "python",
+          "lua",
           "html",
           "htmldjango",
           "javascript",
@@ -467,6 +527,7 @@ return {
           "svelte",
           "astro",
           "php",
+          "graphql",
         },
         group = vim.api.nvim_create_augroup("LspOmnifunc", { clear = true }),
         callback = function()

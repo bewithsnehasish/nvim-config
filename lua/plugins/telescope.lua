@@ -14,7 +14,7 @@ return {
       { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent File" },
     },
     config = function()
-      local icons = require "plugins.user.icons"
+      local icons = require "user.icons"
       local actions = require "telescope.actions"
 
       require("telescope").setup {

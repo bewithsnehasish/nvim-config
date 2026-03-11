@@ -46,34 +46,6 @@ return {
           end
         end,
       }
-
-      -- Manual update on BufEnter and CursorMoved for relevant filetypes
-      vim.api.nvim_create_autocmd({ "BufEnter", "CursorMoved" }, {
-        group = vim.api.nvim_create_augroup("ContextCommentstring", { clear = true }),
-        pattern = {
-          "*.js",
-          "*.ts",
-          "*.jsx",
-          "*.tsx",
-          "*.svelte",
-          "*.html",
-          "*.css",
-          "*.lua",
-          "*.py",
-          "*.java",
-          "*.php",
-        },
-        callback = function()
-          local ok, _ = pcall(context_commentstring.update_commentstring)
-          if not ok then
-            vim.notify(
-              "Commentstring update failed",
-              vim.log.levels.WARN,
-              { timeout = 2000, title = "Comment Warning" }
-            )
-          end
-        end,
-      })
     end,
   },
   {
@@ -105,13 +77,6 @@ return {
           line = "gc", -- Visual mode line comment
           block = "gb", -- Visual mode block comment
         },
-        post_hook = function()
-          vim.notify(
-            "Commented/uncommented code",
-            vim.log.levels.INFO,
-            { timeout = 500, title = "Comment", icon = "💬" }
-          )
-        end,
       }
     end,
   },

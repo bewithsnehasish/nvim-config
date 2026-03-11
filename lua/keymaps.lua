@@ -27,7 +27,7 @@ vim.api.nvim_set_keymap("v", "<C-v>", '"+p', opts)
 -- DAP (Debugger) keymaps
 vim.api.nvim_set_keymap("n", "<leader>db", "<cmd>DapToggleBreakpoint<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dr", "<cmd>DapContinue<CR>", opts)
-vim.api.nvim_set_keymap("n", "<leader>dt", "<cmd>DapTerminate<CR>", opts)
+vim.api.nvim_set_keymap("n", "<leader>dT", "<cmd>DapTerminate<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dso", "<cmd>DapStepOver<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dsi", "<cmd>DapStepInto<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dsu", "<cmd>DapStepOut<CR>", opts)
@@ -45,3 +45,19 @@ vim.keymap.set("n", "<leader>ji", ":JavaProjectImport<CR>", { desc = "Import Jav
 vim.keymap.set("n", "<leader>jc", ":JavaProjectCompile<CR>", { desc = "Compile Java project" })
 vim.keymap.set("n", "<leader>jt", ":JavaTest<CR>", { desc = "Run Java tests" })
 vim.keymap.set("n", "<leader>jr", ":JavaRun<CR>", { desc = "Run Java file" })
+
+-- ==========================================
+-- Buffer & Tab Navigation (Bufferline)
+-- ==========================================
+
+-- Navigate between open buffers
+vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Go to next buffer", noremap = true, silent = true })
+vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Go to previous buffer", noremap = true, silent = true })
+
+-- Buffer Management (Closing files)
+vim.keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "Close current buffer", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>X", "<cmd>BufferLineCloseOthers<CR>", { desc = "Close all OTHER buffers", noremap = true, silent = true })
+
+-- Buffer Utility
+vim.keymap.set("n", "<leader>bp", "<cmd>BufferLineTogglePin<CR>", { desc = "Pin/Unpin current buffer", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>bo", "<cmd>BufferLinePick<CR>", { desc = "Pick buffer by letter", noremap = true, silent = true })

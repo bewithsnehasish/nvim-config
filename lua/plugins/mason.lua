@@ -1,6 +1,6 @@
 return {
   "williamboman/mason-lspconfig.nvim",
-  event = { "LspAttach", "BufReadPost" },
+  event = { "BufReadPre", "BufNewFile" },
   cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUninstallAll", "MasonLog" },
   dependencies = {
     "williamboman/mason.nvim",
@@ -44,13 +44,14 @@ return {
     mason_lspconfig.setup {
       ensure_installed = {
         -- Web Development (React/React Native focused)
-        "ts_ls",
+        -- "ts_ls", -- Not needed: typescript-tools handles TS/JS
         "html",
         "cssls",
         "tailwindcss",
         "emmet_ls",
         "eslint",
         "jsonls",
+        "biome",
 
         -- Python
         "pyright", -- FIXED: Removed duplicate
@@ -61,6 +62,8 @@ return {
         "bashls",
         "prismals",
         "intelephense",
+
+        "graphql",
       },
       automatic_installation = true,
       handlers = {
@@ -73,11 +76,17 @@ return {
             "pyright", -- Custom setup in lspconfig
             "ruff", -- Custom setup in lspconfig
             "html", -- Custom setup in lspconfig
+            "cssls", -- Custom setup in lspconfig
+            "jsonls", -- Custom setup in lspconfig
+            "bashls", -- Custom setup in lspconfig
+            "eslint", -- Custom setup in lspconfig
+            "biome", -- Custom setup in lspconfig
             "tailwindcss", -- Custom setup in lspconfig
             "emmet_ls", -- Custom setup in lspconfig
-            "lua_ls", -- Custom setup below
+            "lua_ls", -- Custom setup in lspconfig
             "prismals", -- Custom setup in lspconfig
             "intelephense", -- Custom setup in lspconfig
+            "graphql", -- Custom setup in lspconfig
           }
 
           if vim.tbl_contains(skip_servers, server_name) then
@@ -87,27 +96,6 @@ return {
           require("lspconfig")[server_name].setup {
             capabilities = capabilities,
             flags = { debounce_text_changes = 150 },
-          }
-        end,
-
-        -- Only keep lua_ls here as it's simple and doesn't need lspconfig.lua
-        ["lua_ls"] = function()
-          require("lspconfig").lua_ls.setup {
-            capabilities = capabilities,
-            flags = { debounce_text_changes = 150 },
-            settings = {
-              Lua = {
-                diagnostics = {
-                  globals = { "vim", "require" },
-                  disable = { "missing-fields" },
-                },
-                workspace = {
-                  library = vim.api.nvim_get_runtime_file("", true),
-                  checkThirdParty = false,
-                },
-                telemetry = { enable = false },
-              },
-            },
           }
         end,
       },

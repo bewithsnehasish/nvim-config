@@ -20,4 +20,7 @@ local main_plugins = load_plugins_from_folder "plugins"
 local extra_plugins = load_plugins_from_folder "plugins/extras"
 
 -- Combine and return all plugins
-return vim.tbl_extend("force", main_plugins, extra_plugins)
+local all_plugins = {}
+vim.list_extend(all_plugins, main_plugins)
+vim.list_extend(all_plugins, extra_plugins)
+return all_plugins

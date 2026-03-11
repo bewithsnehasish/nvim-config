@@ -57,7 +57,7 @@ return {
     end
 
     -- Icons for completion menu
-    local icons = require "plugins.user.icons"
+    local icons = require "user.icons"
 
     -- Setup nvim-cmp
     cmp.setup {
@@ -74,30 +74,7 @@ return {
         ["<C-b>"] = cmp.mapping.scroll_docs(-1), -- Scroll docs up
         ["<C-f>"] = cmp.mapping.scroll_docs(1), -- Scroll docs down
         ["<C-Space>"] = cmp.mapping.complete(), -- Trigger completion
-        ["<CR>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            -- Confirm the selection
-            if cmp.confirm { select = true } then
-              -- Trigger snippet expansion if the selected item is a component
-              local entry = cmp.get_selected_entry()
-              if entry and entry.source.name == "nvim_lsp" then
-                local component_name = entry.completion_item.label
-                vim.api.nvim_feedkeys(
-                  vim.api.nvim_replace_termcodes(
-                    "<Esc>a<" .. component_name .. "></" .. component_name .. ">",
-                    true,
-                    true,
-                    true
-                  ),
-                  "n",
-                  true
-                )
-              end
-            end
-          else
-            fallback() -- Fallback to default behavior
-          end
-        end, { "i", "s" }), -- Map Enter in insert and select modes
+        ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Confirm selection
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item() -- Select next item in completion menu
@@ -111,12 +88,9 @@ return {
             fallback()
           end
         end, { "i", "s" }), -- Map Tab in insert and select modes
-        ["<C-y>"] = cmp.mapping(function(fallback)
-          if require("emmet-vim").expand_abbr() then
-            return
-          else
-            fallback()
-          end
+        ["<C-y>"] = cmp.mapping(function(_)
+          -- Emmet expansion via feedkeys (emmet-vim is Vimscript, not a Lua module)
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-y>,", true, true, true), "n", true)
         end, { "i", "s" }), -- Map Ctrl+y to Emmet expansion
       },
       formatting = {

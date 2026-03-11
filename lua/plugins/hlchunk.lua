@@ -49,7 +49,7 @@
 return {
   {
     "shellRaining/hlchunk.nvim",
-    event = { "BufReadPost", "BufNewFile" },
+    event = { "BufReadPre", "BufNewFile" },
     config = function()
       local status, hlchunk = pcall(require, "hlchunk")
       if not status then

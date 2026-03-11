@@ -16,7 +16,7 @@ return {
       window = {
         border = "rounded",
       },
-      icons = require("plugins.user.icons").kind,
+      icons = require("user.icons").kind,
       lsp = { auto_attach = true },
     }
   end,

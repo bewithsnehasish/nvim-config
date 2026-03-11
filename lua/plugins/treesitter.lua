@@ -1,7 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPost", "BufNewFile" },
+    event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
     dependencies = {
       "windwp/nvim-ts-autotag",
@@ -39,7 +39,9 @@ return {
           "gitignore",
           "toml",
           "vue",
+          "graphql",
         },
+        ignore_install = { "ipynb" }, -- No treesitter parser exists for ipynb (notebooks are JSON)
         auto_install = true,
         sync_install = false,
         highlight = {
@@ -47,7 +49,7 @@ return {
           additional_vim_regex_highlighting = { "htmldjango" }, -- Enhance Django template highlighting
           disable = function(lang, buf)
             local max_filesize = 100 * 1024 -- 100 KB
-            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
             local disabled = { "neo-tree", "help", "terminal", "" }
             if
               vim.tbl_contains(disabled, lang)

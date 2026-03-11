@@ -1,7 +1,6 @@
 return {
   {
     "nvim-tree/nvim-web-devicons",
-    tag = "nerd-v2-compat",
     config = function()
       require("nvim-web-devicons").setup {
         override = {
@@ -44,13 +43,12 @@ return {
     "echasnovski/mini.nvim",
     version = false,
     config = function()
-      -- Configure modules of mini.nvim
+      -- Only mini.surround — the rest conflict with dedicated plugins:
+      -- mini.comment  -> Comment.nvim (comment-code.lua)
+      -- mini.pairs    -> nvim-autopairs (autopairs.lua)
+      -- mini.statusline -> lualine.nvim (lualine.lua)
+      -- mini.tabline  -> bufferline.nvim (extras/ui.lua)
       require("mini.surround").setup {}
-      require("mini.comment").setup {}
-      require("mini.pairs").setup {}
-      require("mini.statusline").setup {}
-      require("mini.tabline").setup {}
-      -- Add more mini.nvim modules as needed
     end,
   },
 }

@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre", "BufReadPost" },
+    event = { "BufReadPre", "BufNewFile" },
     cmd = { "ConformInfo" },
     config = function()
       local status, conform = pcall(require, "conform")
@@ -23,10 +23,10 @@ return {
           htmldjango = { "djlint" },
 
           -- Web Development (React/React Native focused)
-          javascript = { "prettierd", "prettier", stop_after_first = true },
-          typescript = { "prettierd", "prettier", stop_after_first = true },
-          javascriptreact = { "prettierd", "prettier", stop_after_first = true },
-          typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+          javascript = { "prettierd", "prettier", "biome", stop_after_first = true },
+          typescript = { "prettierd", "prettier", "biome", stop_after_first = true },
+          javascriptreact = { "prettierd", "prettier", "biome", stop_after_first = true },
+          typescriptreact = { "prettierd", "prettier", "biome", stop_after_first = true },
 
           -- Other Web
           svelte = { "prettierd", "prettier", stop_after_first = true },
@@ -104,10 +104,6 @@ return {
             lsp_fallback = true,
           }
         end,
-
-        format_after_save = {
-          lsp_fallback = true,
-        },
 
         notify_on_error = true,
       }
