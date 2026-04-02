@@ -34,6 +34,20 @@ return {
 
       local on_attach = require "user.lsp.on_attach"
 
+      local function find_local_python(root)
+        local candidates = {
+          root .. "/.venv/bin/python",
+          root .. "/.venv/Scripts/python.exe",
+          root .. "/.venv/Scripts/python",
+        }
+
+        for _, candidate in ipairs(candidates) do
+          if vim.fn.executable(candidate) == 1 then
+            return candidate
+          end
+        end
+      end
+
       -- 2. Lazydev Setup (must be before lspconfig for Lua LSP support)
       require("lazydev").setup {
         library = {
@@ -169,8 +183,10 @@ return {
 
         local opts = { buffer = bufnr, noremap = true, silent = true }
 
-        -- 🔍 INTERACTIVE DIAGNOSTIC FLOAT (focusable + selectable + yankable)
-        vim.keymap.set("n", "<leader>d", function()
+        -- 🔍 INTERACTIVE DIAGNOSTIC FLOAT — moved to <leader>ld (LSP namespace)
+        -- Reason: <leader>d was buffer-local and had higher priority than global
+        -- DAP keymaps (<leader>db, <leader>dr, etc.), causing them to fail.
+        vim.keymap.set("n", "<leader>ld", function()
           local winid = vim.fn.win_getid()
           local float_opts = {
             scope = "cursor",
@@ -232,11 +248,11 @@ return {
           vim.diagnostic.jump { count = -1, float = true }
         end, opts)
 
-        -- Debug: inspect raw diagnostics
-        vim.keymap.set("n", "<leader>dD", function()
+        -- Raw diagnostic inspector (kept out of <leader>d DAP namespace)
+        vim.keymap.set("n", "<leader>lD", function()
           local diags = vim.diagnostic.get(bufnr)
           print(vim.inspect(#diags > 0 and diags or "No diagnostics"))
-        end, opts)
+        end, vim.tbl_extend("force", opts, { desc = "Inspect raw diagnostics" }))
 
         -- Auto-hover on CursorHold (non-interactive, quick glance)
         local filetype = vim.bo[bufnr].filetype
@@ -263,8 +279,14 @@ return {
       end
 
       -- 6. TypeScript Tools Setup
-      -- FIX 8: Removed non-standard filetypes "typescript.tsx" and "javascript.jsx"
       if typescript_tools_status then
+        -- Resolve tsserver from Mason's typescript-language-server bundle.
+        -- typescript-tools searches local node_modules + global npm, but NOT Mason.
+        -- This makes it work even when TypeScript is not installed globally.
+        local mason_tsserver = vim.fn.stdpath "data"
+          .. "/mason/packages/typescript-language-server/node_modules/typescript/bin/tsserver"
+        local tsserver_path = vim.fn.filereadable(mason_tsserver) == 1 and mason_tsserver or nil
+
         typescript_tools.setup {
           filetypes = {
             "typescript",
@@ -276,16 +298,18 @@ return {
           on_attach = custom_on_attach,
           flags = { debounce_text_changes = 150 },
           settings = {
+            tsserver_path = tsserver_path,
             separate_diagnostic_server = true,
             publish_diagnostic_on = "insert_leave",
             expose_as_code_action = "all",
             tsserver_file_preferences = {
-              includeInlayParameterNameHints = "all",
+              -- "literals" only: shows hints for non-obvious params, not every single arg
+              includeInlayParameterNameHints = "literals",
               includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-              includeInlayFunctionParameterTypeHints = true,
-              includeInlayVariableTypeHints = true,
-              includeInlayPropertyDeclarationTypeHints = true,
-              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayFunctionParameterTypeHints = false,
+              includeInlayVariableTypeHints = false,
+              includeInlayPropertyDeclarationTypeHints = false,
+              includeInlayFunctionLikeReturnTypeHints = false,
               includeInlayEnumMemberValueHints = true,
               includeCompletionsForModuleExports = true,
               quotePreference = "auto",
@@ -323,15 +347,15 @@ return {
               analysis = {
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
-                diagnosticMode = "workspace",
+                diagnosticMode = "openFilesOnly",
                 typeCheckingMode = "basic",
               },
             },
           },
           before_init = function(_, config)
             local path = vim.fn.getcwd()
-            local venv = path .. "/.venv/bin/python"
-            if vim.fn.executable(venv) == 1 then
+            local venv = find_local_python(path)
+            if venv then
               config.settings.python.pythonPath = venv
             end
           end,
@@ -348,9 +372,21 @@ return {
           end,
         },
 
-        html = { filetypes = { "html", "htmldjango" } },
+        html = { filetypes = { "html", "htmldjango", "blade", "razor", "cshtml" } },
         cssls = {},
-        jsonls = {},
+        jsonls = {
+          -- on_new_config: defers schemastore require until the server actually starts,
+          -- so lazy-loading of schemastore.nvim is preserved.
+          on_new_config = function(new_config)
+            local ok, schemastore = pcall(require, "schemastore")
+            if ok then
+              new_config.settings = new_config.settings or {}
+              new_config.settings.json = new_config.settings.json or {}
+              new_config.settings.json.schemas = schemastore.json.schemas()
+              new_config.settings.json.validate = { enable = true }
+            end
+          end,
+        },
         bashls = {},
 
         tailwindcss = {
@@ -365,6 +401,9 @@ return {
             "svelte",
             "astro",
             "php",
+            "blade",
+            "razor",
+            "cshtml",
           },
           settings = {
             tailwindCSS = {
@@ -411,6 +450,7 @@ return {
             "svelte",
             "vue",
             "php",
+            "blade",
           },
           init_options = {
             html = {
@@ -431,7 +471,9 @@ return {
             ".eslintrc.json",
             ".eslintrc.cjs",
             "eslint.config.js",
-            "eslint.config.mjs"
+            "eslint.config.mjs",
+            "eslint.config.cjs",
+            "eslint.config.ts"
           ),
           filetypes = {
             "javascript",
@@ -453,15 +495,27 @@ return {
             packageManager = "npm",
             quiet = false,
             rulesCustomizations = {},
-            run = "onType",
+            run = "onSave",
             useESLintClass = false,
             validate = "on",
-            workingDirectory = { mode = "location" },
+            workingDirectory = { mode = "auto" },
           },
         },
 
         intelephense = {
-          filetypes = { "php" },
+          filetypes = { "php", "blade" },
+          settings = {
+            intelephense = {
+              environment = {
+                includePaths = {
+                  "vendor/laravel/framework/src",
+                },
+              },
+              files = {
+                maxSize = 5000000,
+              },
+            },
+          },
         },
 
         graphql = {
@@ -470,9 +524,6 @@ return {
           root_dir = require("lspconfig.util").root_pattern(".graphqlrc*", ".graphql.config.*", "graphql.config.*"),
         },
 
-        -- FIX 2 + FIX 7: Scoped by root_dir; on_attach calls base on_attach
-        --                 then explicitly re-enables formatting AFTER, so conform
-        --                 check inside custom_on_attach can't override it
         biome = {
           root_dir = require("lspconfig.util").root_pattern("biome.json", "biome.jsonc"),
           filetypes = {
@@ -483,12 +534,6 @@ return {
             "json",
             "jsonc",
           },
-          on_attach = function(client, bufnr)
-            on_attach(client, bufnr)
-            -- Re-enable AFTER on_attach so conform check cannot disable it
-            client.server_capabilities.documentFormattingProvider = true
-            client.server_capabilities.documentRangeFormattingProvider = true
-          end,
         },
       }
 
@@ -527,6 +572,10 @@ return {
           "svelte",
           "astro",
           "php",
+          "blade",
+          "cs",
+          "razor",
+          "cshtml",
           "graphql",
         },
         group = vim.api.nvim_create_augroup("LspOmnifunc", { clear = true }),

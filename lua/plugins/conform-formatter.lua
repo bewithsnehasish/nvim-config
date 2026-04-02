@@ -23,22 +23,23 @@ return {
           htmldjango = { "djlint" },
 
           -- Web Development (React/React Native focused)
-          javascript = { "prettierd", "prettier", "biome", stop_after_first = true },
-          typescript = { "prettierd", "prettier", "biome", stop_after_first = true },
-          javascriptreact = { "prettierd", "prettier", "biome", stop_after_first = true },
-          typescriptreact = { "prettierd", "prettier", "biome", stop_after_first = true },
+          -- biome first: if biome.json exists, use it. prettierd fallback is fast (daemon).
+          javascript = { "biome", "prettierd", stop_after_first = true },
+          typescript = { "biome", "prettierd", stop_after_first = true },
+          javascriptreact = { "biome", "prettierd", stop_after_first = true },
+          typescriptreact = { "biome", "prettierd", stop_after_first = true },
 
           -- Other Web
-          svelte = { "prettierd", "prettier", stop_after_first = true },
-          vue = { "prettierd", "prettier", stop_after_first = true },
-          css = { "prettierd", "prettier", stop_after_first = true },
-          scss = { "prettierd", "prettier", stop_after_first = true },
-          html = { "prettierd", "prettier", stop_after_first = true },
-          json = { "prettierd", "prettier", stop_after_first = true },
-          jsonc = { "prettierd", "prettier", stop_after_first = true },
-          yaml = { "prettierd", "prettier", stop_after_first = true },
-          markdown = { "prettierd", "prettier", stop_after_first = true },
-          graphql = { "prettierd", "prettier", stop_after_first = true },
+          svelte = { "prettierd", stop_after_first = true },
+          vue = { "prettierd", stop_after_first = true },
+          css = { "prettierd", stop_after_first = true },
+          scss = { "prettierd", stop_after_first = true },
+          html = { "prettierd", stop_after_first = true },
+          json = { "biome", "prettierd", stop_after_first = true },
+          jsonc = { "biome", "prettierd", stop_after_first = true },
+          yaml = { "prettierd", stop_after_first = true },
+          markdown = { "prettierd", stop_after_first = true },
+          graphql = { "prettierd", stop_after_first = true },
 
           -- Other Languages
           lua = { "stylua" },
@@ -62,21 +63,6 @@ return {
               "avoid",
             },
           },
-          -- prettierd = {
-          --   args = { "--stdin-filepath", "$FILENAME" },
-          --   prepend_args = {
-          --     "--single-quote",
-          --     "--jsx-single-quote",
-          --     "--tab-width",
-          --     "2",
-          --     "--trailing-comma",
-          --     "es5",
-          --     "--print-width",
-          --     "100",
-          --     "--arrow-parens",
-          --     "avoid",
-          --   },
-          -- },
           isort = {
             prepend_args = { "--profile", "black" },
           },

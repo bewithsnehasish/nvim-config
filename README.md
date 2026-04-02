@@ -3,8 +3,9 @@
 A modern, fast, and modular Neovim configuration tailored for full-stack web development (React, TypeScript, Django/Python, PHP) and general programming. Powered by `lazy.nvim`.
 
 ## ✨ Core Features
-- **Plugin Manager**: `lazy.nvim` with a custom auto-discovery loader.
+- **Plugin Manager**: `lazy.nvim` with a custom auto-discovery loader that skips empty specs.
 - **LSP & Formatting**: Fully automated LSP installation via `mason.nvim`, `mason-lspconfig`, and `mason-tool-installer`. Formatting handled strictly by `conform.nvim` (format-on-save).
+- **Backend Stacks**: First-class support for ASP.NET Core/Razor via `roslyn.nvim`, and PHP/Laravel via `intelephense`, Blade filetypes, and Neotest adapters.
 - **AI Assistance**: Integrated with Supermaven for lightning-fast AI completions.
 - **UI & Aesthetics**: Cyberdream colorscheme, `lualine` statusline, `bufferline` (buffer mode), and smooth scroll/animations.
 - **File & Search**: `neo-tree` for file browsing, `telescope` with `fzf-native` for fuzzy finding.
@@ -21,9 +22,11 @@ This config uses a clean, auto-discovering modular architecture.
 │   ├── plugins.lua       # Engine that auto-loads all files in plugins/
 │   ├── user/             # Shared custom utilities (icons, LSP on_attach)
 │   └── plugins/          # 📦 Plugin definitions (One file per plugin)
-│       └── extras/       # Optional/UI plugin definitions
+│       └── extras/       # Optional plugin definitions enabled explicitly
 ```
-*Note: Any `.lua` file dropped into `lua/plugins/` or `lua/plugins/extras/` is automatically loaded by the plugin manager.*
+*Notes:*
+- Any non-empty `.lua` file dropped into `lua/plugins/` is automatically loaded.
+- Extra plugins in `lua/plugins/extras/` load only when listed in `vim.g.enabled_extra_plugins` inside `lua/vim-options.lua`.
 
 ---
 
@@ -34,7 +37,7 @@ The `<leader>` key is mapped to `<Space>`.
 ### 🪟 General & Window Navigation
 | Key | Action |
 |---|---|
-| `<C-h/j/k/l>` | Navigate between splits (integrated with Tmux) |
+| `<C-h/j/k/l>` | Navigate between splits / Tmux panes |
 | `<M-k>` / `<M-j>` | Move current line up/down (Normal, Insert, Visual) |
 | `<C-b>` | Delete word backward (Insert mode) |
 | `<C-v>` | Paste from system clipboard |
@@ -59,6 +62,7 @@ The `<leader>` key is mapped to `<Space>`.
 | `<leader>bf` | Show buffers in floating Neo-tree |
 | `<leader>fs` | Show filesystem in floating Neo-tree |
 | `<leader>dt` | Reveal Django `templates` dir |
+| `<leader>dm` | Reveal Django `migrations` dir |
 | `<leader>wp` | Pick window (window-picker) |
 
 ### 🔭 Fuzzy Finding (`telescope`)
@@ -81,8 +85,10 @@ The `<leader>` key is mapped to `<Space>`.
 | `gr` | Find References |
 | `<leader>rn` | Rename symbol (`inc-rename`) |
 | `<leader>ca` | Code Action |
-| `<C-k>` | Signature Help |
+| `gK` | Signature Help |
 | `<leader>o` | Open Navbuddy (Breadcrumb outline) |
+| `<leader>ct` | Select Roslyn solution target |
+| `<leader>cR` | Restart Roslyn |
 
 ### ⚠️ Diagnostics
 | Key | Action |
@@ -108,6 +114,19 @@ The `<leader>` key is mapped to `<Space>`.
 | `<leader>dsi` | Step Into |
 | `<leader>dsu` | Step Out |
 | `<leader>dus` | Open DAP UI Sidebar |
+| `<leader>du` | Toggle DAP UI |
+| `<leader>de` | Evaluate expression |
+
+### 🧪 Testing (`neotest`)
+| Key | Action |
+|---|---|
+| `<leader>tn` | Run nearest test |
+| `<leader>tf` | Run current file tests |
+| `<leader>ts` | Run full test suite |
+| `<leader>td` | Debug nearest test |
+| `<leader>tt` | Toggle test summary |
+| `<leader>to` | Open test output |
+| `<leader>tl` | Re-run last test |
 
 ### ☕ Java Specific
 | Key | Action |
@@ -123,3 +142,8 @@ The `<leader>` key is mapped to `<Space>`.
 | `<leader>gg` | Open LazyGit |
 | `<leader>gf` | LazyGit Filter |
 | `<leader>gc` | LazyGit Filter Current File |
+
+## Language Notes
+- **ASP.NET Core / Razor**: requires `.NET SDK` and Mason-installed `roslyn` + `netcoredbg`.
+- **PHP / Laravel**: requires modern `PHP 8.2+`, `Composer`, and usually project-local `vendor/bin/phpunit` or `vendor/bin/pest`.
+- **PHP debugging**: expects Xdebug on port `9003`.

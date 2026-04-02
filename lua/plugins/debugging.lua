@@ -1,0 +1,166 @@
+return {
+  -- {
+  --   "mfussenegger/nvim-dap",
+  --   event = "VeryLazy",
+  --   dependencies = {
+  --     "nvim-neotest/nvim-nio",
+  --     "rcarriga/nvim-dap-ui",
+  --     "theHamsta/nvim-dap-virtual-text",
+  --     "williamboman/mason.nvim",
+  --     "mxsdev/nvim-dap-vscode-js",
+  --   },
+  --   config = function()
+  --     local dap = require "dap"
+  --     local dapui = require "dapui"
+  --     local function package_path(name, ...)
+  --       return vim.fs.joinpath(vim.fn.stdpath "data", "mason", "packages", name, ...)
+  --     end
+  --
+  --     local function find_dotnet_dll()
+  --       local dlls = vim.fn.globpath(vim.fn.getcwd(), "**/bin/Debug/**/*.dll", false, true)
+  --       local default = ""
+  --
+  --       for _, dll in ipairs(dlls) do
+  --         if not dll:match "testhost%.dll$" and not dll:match "ref[/\\]" then
+  --           default = dll
+  --           break
+  --         end
+  --       end
+  --
+  --       return vim.fn.input("Path to dll: ", default, "file")
+  --     end
+  --
+  --     require("nvim-dap-virtual-text").setup {}
+  --     dapui.setup {}
+  --
+  --     local netcoredbg = package_path("netcoredbg", "netcoredbg", "netcoredbg.exe")
+  --     if netcoredbg and vim.fn.executable(netcoredbg) == 1 then
+  --       dap.adapters.netcoredbg = {
+  --         type = "executable",
+  --         command = netcoredbg,
+  --         args = { "--interpreter=vscode" },
+  --       }
+  --     end
+  --
+  --     local php_debug = package_path("php-debug-adapter", "extension", "out", "phpDebug.js")
+  --     if php_debug and vim.fn.filereadable(php_debug) == 1 then
+  --       dap.adapters.php = {
+  --         type = "executable",
+  --         command = "node",
+  --         args = { php_debug },
+  --       }
+  --     end
+  --
+  --     dap.configurations.cs = {
+  --       {
+  --         type = "netcoredbg",
+  --         name = "Launch .NET project",
+  --         request = "launch",
+  --         program = find_dotnet_dll,
+  --         cwd = "${workspaceFolder}",
+  --         stopAtEntry = false,
+  --         console = "integratedTerminal",
+  --       },
+  --     }
+  --
+  --     dap.configurations.php = {
+  --       {
+  --         type = "php",
+  --         request = "launch",
+  --         name = "Listen for Xdebug",
+  --         port = 9003,
+  --         stopOnEntry = false,
+  --         pathMappings = {
+  --           ["/var/www/html"] = "${workspaceFolder}",
+  --         },
+  --         xdebugSettings = {
+  --           max_children = 512,
+  --           max_data = 1024,
+  --           max_depth = 4,
+  --         },
+  --       },
+  --     }
+  --
+  --     dap.configurations.blade = dap.configurations.php
+  --
+  --     -- ── Python (debugpy) ──────────────────────────────────────────────────
+  --     local debugpy = package_path("debugpy", "venv", "Scripts", "python.exe")
+  --     if vim.fn.executable(debugpy) ~= 1 then
+  --       -- Unix path fallback
+  --       debugpy = package_path("debugpy", "venv", "bin", "python")
+  --     end
+  --     if vim.fn.executable(debugpy) == 1 then
+  --       require("dap-python").setup(debugpy)
+  --     end
+  --
+  --     -- ── JavaScript / TypeScript (js-debug-adapter) ────────────────────────
+  --     local js_debug = package_path("js-debug-adapter", "js-debug", "src", "dapDebugServer.js")
+  --     if vim.fn.filereadable(js_debug) == 1 then
+  --       require("dap-vscode-js").setup {
+  --         debugger_path = package_path("js-debug-adapter"),
+  --         debugger_cmd = { "js-debug", "src", "dapDebugServer.js" },
+  --         adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" },
+  --       }
+  --       for _, lang in ipairs { "javascript", "typescript", "javascriptreact", "typescriptreact" } do
+  --         dap.configurations[lang] = {
+  --           {
+  --             type = "pwa-node",
+  --             request = "launch",
+  --             name = "Launch Node.js file",
+  --             program = "${file}",
+  --             cwd = "${workspaceFolder}",
+  --             sourceMaps = true,
+  --             resolveSourceMapLocations = { "${workspaceFolder}/**", "!**/node_modules/**" },
+  --           },
+  --           {
+  --             type = "pwa-node",
+  --             request = "attach",
+  --             name = "Attach to Node.js process",
+  --             processId = require("dap.utils").pick_process,
+  --             cwd = "${workspaceFolder}",
+  --             sourceMaps = true,
+  --           },
+  --           {
+  --             type = "pwa-chrome",
+  --             request = "launch",
+  --             name = "Launch Chrome (React)",
+  --             url = "http://localhost:3000",
+  --             webRoot = "${workspaceFolder}/src",
+  --             sourceMaps = true,
+  --           },
+  --         }
+  --       end
+  --     end
+  --
+  --     dap.listeners.before.attach.dapui_config = function()
+  --       dapui.open()
+  --     end
+  --     dap.listeners.before.launch.dapui_config = function()
+  --       dapui.open()
+  --     end
+  --     dap.listeners.before.event_terminated.dapui_config = function()
+  --       dapui.close()
+  --     end
+  --     dap.listeners.before.event_exited.dapui_config = function()
+  --       dapui.close()
+  --     end
+  --   end,
+  --   keys = {
+  --     {
+  --       "<leader>du",
+  --       function()
+  --         require("dapui").toggle {}
+  --       end,
+  --       desc = "Toggle DAP UI",
+  --     },
+  --     {
+  --       "<leader>de",
+  --       function()
+  --         require("dapui").eval()
+  --       end,
+  --       desc = "Evaluate expression",
+  --       mode = { "n", "v" },
+  --     },
+  --   },
+  -- },
+}

@@ -17,14 +17,32 @@ return {
     { "dcampos/cmp-emmet-vim" }, -- Emmet source for nvim-cmp
     { "roobert/tailwindcss-colorizer-cmp.nvim", config = true }, -- Tailwind CSS colorizer
     { "mattn/emmet-vim" }, -- Emmet plugin for HTML/CSS expansion
-    { "supermaven-inc/supermaven-nvim" }, -- Supermaven AI completion
+    {
+      "supermaven-inc/supermaven-nvim",
+      opts = {
+        keymaps = {
+          accept_suggestion = "<C-l>",
+          clear_suggestion = "<C-]>",
+          accept_word = "<M-l>",
+        },
+        ignore_filetypes = { cpp = true },
+        color = {
+          suggestion_color = "#7b8496",
+          cterm = 244,
+        },
+        log_level = "info",
+        disable_inline_completion = false,
+        disable_keymaps = false,
+      },
+    },
   },
   config = function()
     local cmp = require "cmp"
     local luasnip = require "luasnip"
 
     -- Extend filetypes for LuaSnip
-    -- luasnip.filetype_extend("php", { "html", "css" }) -- Add PHP
+    luasnip.filetype_extend("php", { "html", "css" })
+    luasnip.filetype_extend("blade", { "html", "css", "php" })
     -- luasnip.filetype_extend("javascriptreact", { "html", "css" })
     -- luasnip.filetype_extend("typescriptreact", { "html", "css" })
     -- luasnip.filetype_extend("javascript", { "html", "css" })
@@ -74,7 +92,7 @@ return {
         ["<C-b>"] = cmp.mapping.scroll_docs(-1), -- Scroll docs up
         ["<C-f>"] = cmp.mapping.scroll_docs(1), -- Scroll docs down
         ["<C-Space>"] = cmp.mapping.complete(), -- Trigger completion
-        ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Confirm selection
+        ["<CR>"] = cmp.mapping.confirm { select = true }, -- Confirm selection
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item() -- Select next item in completion menu
@@ -125,15 +143,16 @@ return {
         end,
       },
       sources = {
-        { name = "path" }, -- Path completions
-        { name = "supermaven" }, -- Supermaven
-        { name = "emmet-ls" }, -- Emmet language server (if installed)
-        { name = "emmet_vim" }, -- Emmet completions
-        { name = "nvim_lsp" }, -- LSP
-        { name = "luasnip" }, -- LuaSnip snippets
-        { name = "nvim_lua" }, -- Neovim Lua API
-        { name = "buffer" }, -- Buffer completions
-        { name = "emoji" }, -- Emoji completions
+        { name = "path" },
+        { name = "supermaven" },
+        { name = "emmet_vim" },
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+        { name = "nvim_lua" },
+        -- keyword_length=3: only trigger after 3 chars; max_item_count=8: cap results
+        -- prevents scanning the entire buffer on every keystroke in large files
+        { name = "buffer", keyword_length = 3, max_item_count = 8 },
+        { name = "emoji" },
       },
       confirm_opts = {
         behavior = cmp.ConfirmBehavior.Replace,
@@ -149,8 +168,32 @@ return {
         },
       },
       experimental = {
-        ghost_text = true, -- Enable ghost text
+        -- Disabled: Supermaven already renders inline ghost text.
+        -- Having both enabled causes double rendering and visual conflicts.
+        ghost_text = false,
       },
     }
+
+    -- Autopairs integration: tells autopairs when cmp confirms a completion so it
+    -- doesn't add a second closing bracket on top of what LSP already inserted.
+    -- Without this: selecting `useState` inserts `useState()` then autopairs adds `)` → `useState())`.
+    local autopairs_ok, cmp_autopairs = pcall(require, "nvim-autopairs.completion.cmp")
+    if autopairs_ok then
+      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+    end
+
+    -- Command-line completion (cmp-cmdline is already a dependency but was never configured)
+    cmp.setup.cmdline({ "/", "?" }, {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = { { name = "buffer" } },
+    })
+
+    cmp.setup.cmdline(":", {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = cmp.config.sources(
+        { { name = "path" } },
+        { { name = "cmdline", option = { ignore_cmds = { "Man", "!" } } } }
+      ),
+    })
   end,
 }

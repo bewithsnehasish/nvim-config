@@ -23,6 +23,7 @@ return {
           typescriptreact = "{/* %s */}",
           svelte = "<!-- %s -->", -- Default for Svelte HTML
           html = "<!-- %s -->",
+          blade = "{{-- %s --}}",
           css = "/* %s */",
           lua = "-- %s",
           python = "# %s",

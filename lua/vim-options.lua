@@ -1,23 +1,77 @@
+-- Ensure .mjs/.cjs files are treated as javascript so ESLint LSP attaches
+vim.filetype.add {
+  extension = {
+    mjs = "javascript",
+    cjs = "javascript",
+  },
+}
+
 vim.cmd "set expandtab"
 vim.cmd "set tabstop=2"
 vim.cmd "set softtabstop=2"
 vim.cmd "set shiftwidth=2"
 
-vim.o.updatetime = 300
+-- 800ms: balances CursorHold diagnostic float responsiveness vs constant firing
+vim.o.updatetime = 800
 
 vim.g.mapleader = " "
 vim.g.background = "light"
+vim.g.enabled_extra_plugins = {
+  "bqf",
+  "cellular-automaton",
+  "eyeliner",
+  "mini-animate",
+  "navbuddy",
+  "neotab",
+  "ufo",
+  "ui",
+}
 
 vim.opt.swapfile = false
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
 
--- Navigate vim panes better
-vim.keymap.set("n", "<c-k>", ":wincmd k<CR>")
-vim.keymap.set("n", "<c-j>", ":wincmd j<CR>")
-vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
-vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
+-- 1. Tell Neovim to use its built-in OSC52 provider for the system clipboard
+-- vim.g.clipboard = {
+--   name = "OSC 52",
+--   copy = {
+--     ["+"] = require("vim.ui.clipboard.osc52").copy "+",
+--     ["*"] = require("vim.ui.clipboard.osc52").copy "*",
+--   },
+--   paste = {
+--     ["+"] = require("vim.ui.clipboard.osc52").paste "+",
+--     ["*"] = require("vim.ui.clipboard.osc52").paste "*",
+--   },
+-- }
+--
+-- vim.opt.clipboard = "unnamedplus"
+vim.g.clipboard = {
+  name = "win32yank",
+  copy = {
+    ["+"] = "win32yank.exe -i --crlf",
+    ["*"] = "win32yank.exe -i --crlf",
+  },
+  paste = {
+    ["+"] = "win32yank.exe -o --lf",
+    ["*"] = "win32yank.exe -o --lf",
+  },
+  cache_enabled = 0,
+}
+
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("Osc52YankNotify", { clear = true }),
+  callback = function()
+    -- Only notify if it was yanked to the system clipboard (+) or (*)
+    if vim.v.event.operator == "y" and (vim.v.event.regname == "+" or vim.v.event.regname == "*") then
+      vim.notify(
+        "Yanked to system clipboard",
+        vim.log.levels.INFO,
+        { timeout = 500, title = "Clipboard", icon = "📋" }
+      )
+    end
+  end,
+})
 
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>")
 vim.wo.number = true
@@ -32,6 +86,9 @@ vim.g.user_emmet_settings = {
   },
   javascriptreact = {
     extends = "html",
+  },
+  blade = {
+    extends = "html, php",
   },
   ejs = {
     extends = "html, javascript",

@@ -122,29 +122,15 @@ return {
             quickfix = true,
           },
         },
-        blank = {
-          enable = true,
-          chars = {
-            "․",
-          },
-          style = {
-            { fg = "#2D3640" },
-          },
-          exclude_filetypes = {
-            ["neo-tree"] = true,
-            htmldjango = true, -- Prevent errors in Django templates
-            terminal = true,
-            help = true,
-            [""] = true,
-            nofile = true,
-            prompt = true,
-            quickfix = true,
-          },
-        },
+        -- blank disabled: renders extmarks on every blank line in the file.
+        -- In large files (hundreds of blank lines) this causes heavy scroll lag.
+        blank = { enable = false },
       }
 
       -- Disable hlchunk for non-code buffers and problematic filetypes
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "TextChanged", "TextChangedI" }, {
+      -- Removed TextChanged/TextChangedI: these fired on every keystroke,
+      -- running filetype checks constantly during active editing.
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
         group = vim.api.nvim_create_augroup("HlchunkDisable", { clear = true }),
         callback = function(ev)
           local bufnr = ev.buf

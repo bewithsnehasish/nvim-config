@@ -267,12 +267,6 @@ return {
         "<CMD>Neotree toggle reveal dir=./migrations<CR>",
         { desc = "Show Django migrations", noremap = true }
       )
-      vim.keymap.set(
-        "n",
-        "<leader>da",
-        "<CMD>Neotree toggle reveal dir=./<YOUR_APP_NAME><CR>",
-        { desc = "Show Django app", noremap = true }
-      )
       vim.keymap.set("n", "<leader>wp", function()
         require("window-picker").pick_window()
       end, { desc = "Pick window", noremap = true })

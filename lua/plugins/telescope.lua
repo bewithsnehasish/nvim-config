@@ -1,7 +1,15 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = { { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
+    dependencies = {
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        -- Windows needs cmake; Unix/Mac can use make.
+        build = vim.fn.has "win32" == 1
+            and "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build"
+          or "make",
+      },
+    },
     keys = {
       { "<leader>bb", "<cmd>Telescope buffers previewer=false<cr>", desc = "Find buffers" },
       { "<leader>fb", "<cmd>Telescope git_branches<cr>", desc = "Checkout branch" },
@@ -36,6 +44,25 @@ return {
             "--smart-case",
             "--hidden",
             "--glob=!.git/",
+            "--glob=!node_modules/",
+            "--glob=!dist/",
+            "--glob=!build/",
+            "--glob=!.next/",
+            "--glob=!.nuxt/",
+            "--glob=!.cache/",
+            "--glob=!vendor/",
+            "--glob=!*.min.js",
+            "--glob=!*.lock",
+          },
+          file_ignore_patterns = {
+            "node_modules/",
+            "%.git/",
+            "dist/",
+            "build/",
+            "%.next/",
+            "%.nuxt/",
+            "%.cache/",
+            "vendor/",
           },
 
           mappings = {
@@ -72,6 +99,7 @@ return {
           lsp_definitions = { theme = "dropdown", initial_mode = "normal" },
           lsp_declarations = { theme = "dropdown", initial_mode = "normal" },
           lsp_implementations = { theme = "dropdown", initial_mode = "normal" },
+          lsp_type_definitions = { theme = "dropdown", initial_mode = "normal" },
         },
         extensions = {
           fzf = {
@@ -82,6 +110,16 @@ return {
           },
         },
       }
+      -- Guarded load: if fzf native wasn't compiled (e.g. cmake missing),
+      -- telescope still works with the Lua sorter instead of crashing entirely.
+      local fzf_ok, fzf_err = pcall(require("telescope").load_extension, "fzf")
+      if not fzf_ok then
+        vim.notify(
+          "telescope-fzf-native not compiled — run :Lazy build telescope-fzf-native.nvim\n" .. tostring(fzf_err),
+          vim.log.levels.WARN,
+          { title = "Telescope", timeout = 5000 }
+        )
+      end
     end,
   },
 }

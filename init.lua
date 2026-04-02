@@ -17,7 +17,3 @@ require("lazy").setup "plugins"
 
 --Load Keymaps plugins in the interface
 require "keymaps"
-
--- Enable italics
-vim.cmd [[highlight Comment gui=italic cterm=italic]]
-vim.cmd [[highlight Type gui=italic cterm=italic]]

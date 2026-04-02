@@ -15,6 +15,10 @@ return {
     end
 
     mason.setup {
+      registries = {
+        "github:mason-org/mason-registry",
+        "github:Crashdummyy/mason-registry",
+      },
       ui = {
         border = "rounded",
         icons = {
@@ -44,7 +48,9 @@ return {
     mason_lspconfig.setup {
       ensure_installed = {
         -- Web Development (React/React Native focused)
-        -- "ts_ls", -- Not needed: typescript-tools handles TS/JS
+        -- ts_ls is NOT activated as an LSP (handler skips it below).
+        -- It IS installed so typescript-tools.nvim can use its bundled tsserver binary.
+        "ts_ls",
         "html",
         "cssls",
         "tailwindcss",
@@ -110,7 +116,7 @@ return {
     mason_tool_installer.setup {
       ensure_installed = {
         -- Formatters
-        -- "prettierd",
+        "prettierd",
         "prettier",
         "stylua",
         "black",
@@ -122,6 +128,15 @@ return {
         -- Other
         "php-cs-fixer",
         "google-java-format",
+        "netcoredbg",
+        "php-debug-adapter",
+        "roslyn",
+
+        -- JavaScript/TypeScript debugger
+        "js-debug-adapter",
+
+        -- Python debugger
+        "debugpy",
       },
       auto_update = false,
       run_on_start = true,

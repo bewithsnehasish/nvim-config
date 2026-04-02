@@ -51,13 +51,43 @@ vim.keymap.set("n", "<leader>jr", ":JavaRun<CR>", { desc = "Run Java file" })
 -- ==========================================
 
 -- Navigate between open buffers
-vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Go to next buffer", noremap = true, silent = true })
-vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Go to previous buffer", noremap = true, silent = true })
+vim.keymap.set(
+  "n",
+  "<Tab>",
+  "<cmd>BufferLineCycleNext<CR>",
+  { desc = "Go to next buffer", noremap = true, silent = true }
+)
+vim.keymap.set(
+  "n",
+  "<S-Tab>",
+  "<cmd>BufferLineCyclePrev<CR>",
+  { desc = "Go to previous buffer", noremap = true, silent = true }
+)
 
 -- Buffer Management (Closing files)
 vim.keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "Close current buffer", noremap = true, silent = true })
-vim.keymap.set("n", "<leader>X", "<cmd>BufferLineCloseOthers<CR>", { desc = "Close all OTHER buffers", noremap = true, silent = true })
+vim.keymap.set(
+  "n",
+  "<leader>X",
+  "<cmd>BufferLineCloseOthers<CR>",
+  { desc = "Close all OTHER buffers", noremap = true, silent = true }
+)
 
 -- Buffer Utility
-vim.keymap.set("n", "<leader>bp", "<cmd>BufferLineTogglePin<CR>", { desc = "Pin/Unpin current buffer", noremap = true, silent = true })
-vim.keymap.set("n", "<leader>bo", "<cmd>BufferLinePick<CR>", { desc = "Pick buffer by letter", noremap = true, silent = true })
+vim.keymap.set(
+  "n",
+  "<leader>bp",
+  "<cmd>BufferLineTogglePin<CR>",
+  { desc = "Pin/Unpin current buffer", noremap = true, silent = true }
+)
+vim.keymap.set(
+  "n",
+  "<leader>bo",
+  "<cmd>BufferLinePick<CR>",
+  { desc = "Pick buffer by letter", noremap = true, silent = true }
+)
+
+-- Clipboard Management
+vim.keymap.set("n", "<leader>c", '"+y', { desc = "Copy to system clipboard" })
+vim.keymap.set("v", "<leader>c", '"+y', { desc = "Copy selection to system clipboard" })
+vim.keymap.set("n", "<leader>cc", '"+yy', { desc = "Copy line to system clipboard" })

@@ -9,6 +9,10 @@ return {
     config = function()
       local status, treesitter = pcall(require, "nvim-treesitter.configs")
       if not status then
+        status, treesitter = pcall(require, "nvim-treesitter")
+      end
+
+      if not status then
         vim.notify(
           "Failed to load nvim-treesitter: " .. tostring(treesitter),
           vim.log.levels.ERROR,
@@ -24,6 +28,7 @@ return {
           "javascript",
           "typescript",
           "tsx",
+          "c_sharp",
           "html",
           "css",
           "svelte",
@@ -38,6 +43,7 @@ return {
           "dockerfile",
           "gitignore",
           "toml",
+          "xml",
           "vue",
           "graphql",
         },

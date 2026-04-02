@@ -10,7 +10,7 @@ return {
       vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#3E4452", underline = false })
 
       require("illuminate").configure {
-        delay = 100,
+        delay = 300,
         modes_allowlist = { "n", "v" }, -- Remove "i" to reduce interference during typing
         providers = {
           "treesitter", -- Prioritize Treesitter for performance and accuracy
