@@ -26,14 +26,15 @@ return {
 
         local opts = { buffer = bufnr, noremap = true, silent = true }
 
-        vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+        -- Use <leader>ld to stay out of the DAP <leader>d* keymap namespace.
+        vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts)
         vim.keymap.set("n", "]d", function()
           vim.diagnostic.jump { count = 1, float = true }
         end, opts)
         vim.keymap.set("n", "[d", function()
           vim.diagnostic.jump { count = -1, float = true }
         end, opts)
-        vim.keymap.set("n", "<leader>dD", function()
+        vim.keymap.set("n", "<leader>lD", function()
           local diags = vim.diagnostic.get(bufnr)
           print(vim.inspect(#diags > 0 and diags or "No diagnostics"))
         end, opts)
@@ -44,7 +45,9 @@ return {
 
         if client.server_capabilities.codeLensProvider then
           local group = vim.api.nvim_create_augroup("RoslynCodeLens" .. bufnr, { clear = true })
-          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+          -- CursorHold removed: it fires every 800 ms while idle, causing constant
+          -- server round-trips. BufEnter + InsertLeave is sufficient.
+          vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
             buffer = bufnr,
             group = group,
             callback = vim.lsp.codelens.refresh,
@@ -58,8 +61,12 @@ return {
         on_attach = roslyn_on_attach,
         settings = {
           ["csharp|background_analysis"] = {
-            dotnet_analyzer_diagnostics_scope = "fullSolution",
-            dotnet_compiler_diagnostics_scope = "fullSolution",
+            -- "openFiles": Roslyn only analyzes currently open files.
+            -- Required for large solutions — "fullSolution" forces Roslyn to index the
+            -- entire repo on attach, which freezes Neovim for minutes on big codebases.
+            -- To run full-solution analysis temporarily: :Roslyn restart after switching.
+            dotnet_analyzer_diagnostics_scope = "openFiles",
+            dotnet_compiler_diagnostics_scope = "openFiles",
           },
           ["csharp|code_lens"] = {
             dotnet_enable_references_code_lens = true,
@@ -89,6 +96,9 @@ return {
       })
 
       require("roslyn").setup {
+        -- "roslyn": delegates file watching to the Roslyn server itself, which is more
+        -- efficient than libuv inotify — especially important on WSL2 and large solutions.
+        filewatching = "roslyn",
         broad_search = true,
         lock_target = false,
         silent = true,

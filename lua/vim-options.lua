@@ -32,32 +32,53 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
 
--- 1. Tell Neovim to use its built-in OSC52 provider for the system clipboard
--- vim.g.clipboard = {
---   name = "OSC 52",
---   copy = {
---     ["+"] = require("vim.ui.clipboard.osc52").copy "+",
---     ["*"] = require("vim.ui.clipboard.osc52").copy "*",
---   },
---   paste = {
---     ["+"] = require("vim.ui.clipboard.osc52").paste "+",
---     ["*"] = require("vim.ui.clipboard.osc52").paste "*",
---   },
--- }
---
--- vim.opt.clipboard = "unnamedplus"
-vim.g.clipboard = {
-  name = "win32yank",
-  copy = {
-    ["+"] = "win32yank.exe -i --crlf",
-    ["*"] = "win32yank.exe -i --crlf",
-  },
-  paste = {
-    ["+"] = "win32yank.exe -o --lf",
-    ["*"] = "win32yank.exe -o --lf",
-  },
-  cache_enabled = 0,
-}
+-- OS detection — set once at startup, consumed by clipboard, shell, and path logic.
+-- is_windows: native Windows Neovim (nvim-qt, neovide, wezterm on Windows, etc.)
+-- is_wsl:     Neovim running inside WSL2 (Linux kernel + Windows host)
+local is_windows = vim.fn.has "win32" == 1
+local is_wsl = vim.fn.has "wsl" == 1
+vim.g.is_windows = is_windows
+vim.g.is_wsl = is_wsl
+
+-- Clipboard strategy:
+--   Native Windows → Neovim handles the clipboard automatically; no config needed.
+--   WSL            → win32yank.exe bridges to the Windows host clipboard.
+--   Native Linux   → Neovim auto-detects xsel / xclip / wl-copy; no config needed.
+if is_wsl then
+  vim.g.clipboard = {
+    name = "win32yank-wsl",
+    copy = {
+      ["+"] = "win32yank.exe -i --crlf",
+      ["*"] = "win32yank.exe -i --crlf",
+    },
+    paste = {
+      ["+"] = "win32yank.exe -o --lf",
+      ["*"] = "win32yank.exe -o --lf",
+    },
+    cache_enabled = 0,
+  }
+end
+
+-- Disable expensive features for files >= 500 KB to prevent editor freezing
+vim.api.nvim_create_autocmd("BufReadPre", {
+  group = vim.api.nvim_create_augroup("LargeFilePerf", { clear = true }),
+  callback = function(ev)
+    local ok, stats = pcall(vim.uv.fs_stat, ev.match)
+    if ok and stats and stats.size > 500 * 1024 then
+      vim.b[ev.buf].large_file = true
+      vim.b[ev.buf].hlchunk_disabled = true
+      vim.b[ev.buf].miniindentscope_disable = true
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.spell = false
+      vim.opt_local.swapfile = false
+      vim.opt_local.undofile = false
+      vim.opt_local.signcolumn = "no"
+      vim.opt_local.colorcolumn = ""
+      -- Treesitter is disabled per-buffer via its own disable callback (100KB limit)
+      -- illuminate and hlchunk check vim.b.large_file themselves
+    end
+  end,
+})
 
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = vim.api.nvim_create_augroup("Osc52YankNotify", { clear = true }),

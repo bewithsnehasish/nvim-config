@@ -372,7 +372,9 @@ return {
           end,
         },
 
-        html = { filetypes = { "html", "htmldjango", "blade", "razor", "cshtml" } },
+        -- "razor"/"cshtml" removed: roslyn handles all Razor/CSHTML HTML editing.
+        -- "php" removed: intelephense understands embedded HTML inside PHP files.
+        html = { filetypes = { "html", "htmldjango", "blade" } },
         cssls = {},
         jsonls = {
           -- on_new_config: defers schemastore require until the server actually starts,
@@ -439,11 +441,12 @@ return {
         },
 
         emmet_ls = {
+          -- "javascriptreact"/"typescriptreact" removed: typescript-tools already
+          -- provides JSX completions and emmet_ls conflicts with its completion items.
+          -- Emmet tab expansion in JSX/TSX still works via cmp-emmet-vim.
           filetypes = {
             "html",
             "htmldjango",
-            "javascriptreact",
-            "typescriptreact",
             "css",
             "scss",
             "sass",
@@ -506,13 +509,20 @@ return {
           filetypes = { "php", "blade" },
           settings = {
             intelephense = {
-              environment = {
-                includePaths = {
-                  "vendor/laravel/framework/src",
-                },
-              },
               files = {
                 maxSize = 5000000,
+              },
+              -- CodeIgniter 4 is Composer-based; intelephense indexes vendor/ automatically.
+              -- These stubs cover PHP core + all standard extensions used in CI4 projects.
+              stubs = {
+                "apache", "bcmath", "bz2", "calendar", "Core", "ctype", "curl",
+                "date", "dom", "exif", "fileinfo", "filter", "ftp", "gd",
+                "gettext", "gmp", "hash", "iconv", "intl", "json", "libxml",
+                "mbstring", "meta", "mysqli", "openssl", "pcntl", "pcre", "PDO",
+                "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar", "posix",
+                "readline", "Reflection", "session", "SimpleXML", "soap",
+                "sockets", "sodium", "SPL", "sqlite3", "standard", "superglobals",
+                "tokenizer", "xml", "xmlreader", "xmlwriter", "xsl", "zip", "zlib",
               },
             },
           },

@@ -67,19 +67,33 @@ return {
         add_exec(opts)
       end
 
+      -- Shell selection: PowerShell 7 (pwsh) → PowerShell 5 → system default.
+      -- On native Windows, cmd.exe (the default vim.o.shell) is too limited for dev work.
+      -- On WSL/Linux, nil inherits the user's shell (bash/zsh).
+      local function pick_shell()
+        if vim.g.is_windows then
+          if vim.fn.executable "pwsh" == 1 then
+            return "pwsh"
+          elseif vim.fn.executable "powershell" == 1 then
+            return "powershell"
+          end
+        end
+        return nil
+      end
+
       require("toggleterm").setup {
         size = 20,
         open_mapping = [[<c-\>]],
-        hide_numbers = true, -- hide the number column in toggleterm buffers
+        hide_numbers = true,
         shade_filetypes = {},
         shade_terminals = true,
-        shading_factor = 2, -- the degree by which to darken to terminal colour, default: 1 for dark backgrounds, 3 for light
+        shading_factor = 2,
         start_in_insert = true,
-        insert_mappings = true, -- whether or not the open mapping applies in insert mode
+        insert_mappings = true,
         persist_size = false,
         direction = "float",
-        close_on_exit = true, -- close the terminal window when the process exits
-        shell = nil, -- change the default shell
+        close_on_exit = true,
+        shell = pick_shell(),
         float_opts = {
           border = "rounded",
           winblend = 0,
