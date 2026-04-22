@@ -26,11 +26,13 @@ return {
         word_diff = false,
         watch_gitdir = { follow_files = true },
         attach_to_untracked = true,
-        current_line_blame = false,
+        -- Inline blame shown at end-of-line; toggle with <leader>hb
+        current_line_blame = true,
         current_line_blame_opts = {
           virt_text = true,
           virt_text_pos = "eol",
-          delay = 800,
+          delay = 600,
+          ignore_whitespace = true,
         },
         preview_config = { border = "rounded" },
 

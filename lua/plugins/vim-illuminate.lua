@@ -9,14 +9,23 @@ return {
       vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#3E4452", underline = false })
       vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#3E4452", underline = false })
 
+      -- Jump between occurrences of the word under cursor
+      vim.keymap.set("n", "]r", function() require("illuminate").goto_next_reference() end,
+        { desc = "Next reference (illuminate)" })
+      vim.keymap.set("n", "[r", function() require("illuminate").goto_prev_reference() end,
+        { desc = "Prev reference (illuminate)" })
+
       require("illuminate").configure {
         delay = 300,
-        modes_allowlist = { "n", "v" }, -- Remove "i" to reduce interference during typing
+        modes_allowlist = { "n", "v" },
         providers = {
-          "treesitter", -- Prioritize Treesitter for performance and accuracy
-          "regex", -- Fallback to regex
-          -- "lsp" removed to avoid overlap with ts_ls diagnostics
+          "treesitter",
+          "regex",
         },
+        -- Skip illuminate on large files (set by the LargeFilePerf autocmd)
+        predicate = function(buf)
+          return not vim.b[buf].large_file
+        end,
         filetypes_denylist = {
           "mason",
           "harpoon",
