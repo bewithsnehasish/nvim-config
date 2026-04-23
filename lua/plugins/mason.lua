@@ -121,6 +121,7 @@ return {
         "stylua",
         "black",
         "isort",
+        "csharpier",
 
         -- Django (if you use it)
         "djlint",

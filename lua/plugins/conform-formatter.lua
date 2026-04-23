@@ -41,6 +41,11 @@ return {
           markdown = { "prettierd", stop_after_first = true },
           graphql = { "prettierd", stop_after_first = true },
 
+          -- C# / .NET
+          cs     = { "csharpier" },
+          razor  = { "csharpier" },
+          cshtml = { "csharpier" },
+
           -- Other Languages
           lua = { "stylua" },
           java = { "google-java-format" },
@@ -77,6 +82,11 @@ return {
             args = { "fix", "$FILENAME" },
             stdin = false,
           },
+          -- Override to always pass --stdin-path so csharpier resolves .csharpierrc
+          -- relative to the file regardless of whether it's a global or Mason install.
+          csharpier = {
+            args = { "format", "--stdin-path", "$FILENAME" },
+          },
         },
 
         format_on_save = function(bufnr)
@@ -87,7 +97,7 @@ return {
 
           return {
             timeout_ms = 2000,
-            lsp_fallback = true,
+            lsp_format = "fallback",
           }
         end,
 
@@ -116,13 +126,13 @@ return {
             ["end"] = { args.line2, end_line:len() },
           }
         end
-        require("conform").format { async = true, lsp_fallback = true, range = range }
+        require("conform").format { async = true, lsp_format = "fallback", range = range }
       end, { range = true })
 
       -- Keybindings
       vim.keymap.set({ "n", "v" }, "<leader>mp", function()
         conform.format {
-          lsp_fallback = true,
+          lsp_format = "fallback",
           async = true,
           timeout_ms = 2000,
         }
