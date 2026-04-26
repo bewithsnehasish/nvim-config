@@ -15,15 +15,20 @@ return {
           file = { filename_first = false, truncate = 80 },
         },
         sources = {
-          -- Code-context pickers: use ivy (full-width bottom panel) for readable previews
-          grep            = { layout = { preset = "ivy", preview = "main" } },
-          grep_word       = { layout = { preset = "ivy", preview = "main" } },
-          lsp_references  = { layout = { preset = "ivy", preview = "main" } },
-          lsp_definitions = { layout = { preset = "ivy", preview = "main" } },
-          lsp_implementations = { layout = { preset = "ivy", preview = "main" } },
-          lsp_type_definitions = { layout = { preset = "ivy", preview = "main" } },
-          lsp_symbols     = { layout = { preset = "ivy", preview = "main" } },
-          lsp_workspace_symbols = { layout = { preset = "ivy", preview = "main" } },
+          -- Grep: ivy bottom panel, preview pane shows the matched file at the hit line
+          grep      = { layout = { preset = "ivy" } },
+          grep_word = { layout = { preset = "ivy" } },
+
+          -- LSP pickers: vertical split — top half = results list with file+line+code,
+          -- bottom half = live preview of the file at the selected reference.
+          -- "preview = main" was wrong: it replaced the preview with the editor window
+          -- instead of showing the reference content alongside the results list.
+          lsp_references       = { layout = { preset = "vertical" } },
+          lsp_definitions      = { layout = { preset = "vertical" } },
+          lsp_implementations  = { layout = { preset = "vertical" } },
+          lsp_type_definitions = { layout = { preset = "vertical" } },
+          lsp_symbols          = { layout = { preset = "vertical" } },
+          lsp_workspace_symbols = { layout = { preset = "vertical" } },
         },
         win = {
           input = {
