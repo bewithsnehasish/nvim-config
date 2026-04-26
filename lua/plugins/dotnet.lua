@@ -45,15 +45,20 @@ return {
 
         if client.server_capabilities.codeLensProvider then
           local group = vim.api.nvim_create_augroup("RoslynCodeLens" .. bufnr, { clear = true })
-          -- CursorHold removed: it fires every 800 ms while idle, causing constant
-          -- server round-trips. BufEnter + InsertLeave is sufficient.
           vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
             buffer = bufnr,
             group = group,
             callback = vim.lsp.codelens.refresh,
           })
-          vim.lsp.codelens.refresh()
+          -- Roslyn needs a few seconds to index the solution before it can
+          -- return codelens data. Immediate refresh always returns empty.
+          -- 4 s covers most solution sizes; BufEnter keeps it fresh after that.
+          vim.defer_fn(vim.lsp.codelens.refresh, 4000)
         end
+
+        -- Manual codelens refresh — useful if virtualtext doesn't appear
+        vim.keymap.set("n", "<leader>lc", vim.lsp.codelens.refresh,
+          { buffer = bufnr, noremap = true, silent = true, desc = "Refresh code lens" })
       end
 
       vim.lsp.config("roslyn", {
