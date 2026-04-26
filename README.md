@@ -227,6 +227,20 @@ Auto-highlights the word under the cursor and lets you jump between occurrences.
 | `<leader>ct` | Select Roslyn solution target |
 | `<leader>cR` | Restart Roslyn |
 
+### Code Folding (nvim-ufo)
+
+Powered by LSP + treesitter. Folded blocks show a line count: `▶ public class OrgService {··· 23 lines`
+
+| Key | Action |
+|---|---|
+| `za` | Toggle fold under cursor (collapse / expand) |
+| `zc` / `zo` | Close / open fold under cursor |
+| `zM` | Close ALL folds in file |
+| `zR` | Open ALL folds in file |
+| `zm` / `zr` | Close / open folds one level at a time |
+| `zj` / `zk` | Jump to next / previous fold |
+| `[z` / `]z` | Jump to start / end of current fold |
+
 ### Formatting (conform.nvim)
 
 | Key | Action |
