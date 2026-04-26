@@ -1,40 +1,39 @@
 return function(client, bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr }
-  local tb = require "telescope.builtin"
 
-  -- ── Navigation (Telescope pickers for fuzzy, multi-result, preview) ──────
+  -- ── Navigation (snacks.nvim picker for fuzzy, multi-result, preview) ─────
   -- gd: go to definition. If multiple definitions exist, shows a picker.
   vim.keymap.set("n", "gd", function()
-    tb.lsp_definitions { reuse_win = true }
+    Snacks.picker.lsp_definitions()
   end, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
 
   -- gD: go to declaration (e.g. header files in C, interface in TS)
   vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
 
-  -- gr: show ALL references in a Telescope picker with preview
+  -- gr: show ALL references in a snacks picker with preview
   vim.keymap.set("n", "gr", function()
-    tb.lsp_references { include_declaration = false }
+    Snacks.picker.lsp_references({ include_declaration = false })
   end, vim.tbl_extend("force", opts, { desc = "Show references" }))
 
   -- gi: implementations (useful for interfaces/abstract classes)
   vim.keymap.set("n", "gi", function()
-    tb.lsp_implementations { reuse_win = true }
+    Snacks.picker.lsp_implementations()
   end, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
 
   -- gt: type definition (e.g. jump from variable to its type declaration)
   vim.keymap.set("n", "gt", function()
-    tb.lsp_type_definitions { reuse_win = true }
+    Snacks.picker.lsp_type_definitions()
   end, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
 
   -- ── Symbols ───────────────────────────────────────────────────────────────
   -- <leader>ls: document symbols (functions, classes, vars in current file)
   vim.keymap.set("n", "<leader>ls", function()
-    tb.lsp_document_symbols()
+    Snacks.picker.lsp_symbols()
   end, vim.tbl_extend("force", opts, { desc = "Document symbols" }))
 
   -- <leader>lw: workspace symbols (search symbols across entire project)
   vim.keymap.set("n", "<leader>lw", function()
-    tb.lsp_dynamic_workspace_symbols()
+    Snacks.picker.lsp_workspace_symbols()
   end, vim.tbl_extend("force", opts, { desc = "Workspace symbols" }))
 
   -- ── Code actions ──────────────────────────────────────────────────────────

@@ -94,7 +94,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
-vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>")
+-- Clear search highlight with <Esc> (a no-op otherwise in normal mode).
+-- Frees up <leader>h to be exclusive to the gitsigns hunk namespace.
+vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 vim.wo.number = true
 
 -- In your init.lua or a separate Lua file for plugin configuration

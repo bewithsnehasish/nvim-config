@@ -1,3 +1,6 @@
+-- Telescope disabled in favor of snacks.nvim picker (see snacks.lua).
+-- Kept commented for easy revert. Delete once snacks is proven stable.
+if true then return {} end
 return {
   {
     "nvim-telescope/telescope.nvim",
@@ -53,6 +56,23 @@ return {
             "--glob=!vendor/",
             "--glob=!*.min.js",
             "--glob=!*.lock",
+            -- Skip data/asset files that have no business being grepped
+            "--glob=!*.csv",
+            "--glob=!*.tsv",
+            "--glob=!*.sql",
+            "--glob=!*.map",
+            "--glob=!*.svg",
+            "--glob=!*.png",
+            "--glob=!*.jpg",
+            "--glob=!*.jpeg",
+            "--glob=!*.gif",
+            "--glob=!*.ico",
+            "--glob=!*.woff",
+            "--glob=!*.woff2",
+            "--glob=!*.ttf",
+            -- Prevents rg from freezing on CSV rows with thousands of columns
+            "--max-columns=150",
+            "--max-columns-preview",
           },
           file_ignore_patterns = {
             "node_modules/",
@@ -63,6 +83,20 @@ return {
             "%.nuxt/",
             "%.cache/",
             "vendor/",
+            -- Binary and data files that should never appear in file search
+            "%.csv",
+            "%.tsv",
+            "%.sql",
+            "%.map",
+            "%.png",
+            "%.jpg",
+            "%.jpeg",
+            "%.gif",
+            "%.ico",
+            "%.woff",
+            "%.woff2",
+            "%.ttf",
+            "%.eot",
           },
 
           mappings = {
@@ -83,7 +117,27 @@ return {
         pickers = {
           live_grep = { theme = "dropdown" },
           grep_string = { theme = "dropdown" },
-          find_files = { theme = "dropdown", previewer = false },
+          find_files = {
+            theme = "dropdown",
+            previewer = false,
+            -- fd excludes at the source level; faster than Lua-level file_ignore_patterns
+            find_command = {
+              "fd",
+              "--type", "f",
+              "--hidden",
+              "--follow",
+              "--exclude", ".git",
+              "--exclude", "node_modules",
+              "--exclude", "dist",
+              "--exclude", "build",
+              "--exclude", "vendor",
+              "--exclude", "*.csv",
+              "--exclude", "*.tsv",
+              "--exclude", "*.sql",
+              "--exclude", "*.map",
+              "--strip-cwd-prefix",
+            },
+          },
           buffers = {
             theme = "dropdown",
             previewer = false,

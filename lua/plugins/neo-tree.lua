@@ -188,7 +188,10 @@ return {
             enabled = true,
             leave_dirs_open = true,
           },
-          use_libuv_file_watcher = true,
+          -- libuv/inotify file watchers are very slow on WSL2 with large codebases:
+          -- they set up a kernel watcher per directory, blocking the UI on startup.
+          -- Use manual :Neotree refresh instead.
+          use_libuv_file_watcher = false,
           hijack_netrw_behavior = "open_default",
         },
         buffers = {

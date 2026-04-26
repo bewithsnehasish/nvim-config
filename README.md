@@ -98,7 +98,19 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 | `<C-v>` | Paste from system clipboard |
 | `<leader>c` / `<leader>cc` | Copy selection / Copy line to clipboard |
 | `<leader>wr` | Toggle word wrap |
-| `<leader>h` | Clear search highlight |
+| `<Esc>` | Clear search highlight (normal mode) |
+
+### Discoverability (which-key)
+
+`which-key` shows all available keymaps grouped by namespace as you type `<leader>`.
+Uses the **modern** preset (clean bottom popup) with named groups (`Find`, `Git`, `LSP`, …)
+and per-keymap icons.
+
+| Key | Action |
+|---|---|
+| `<leader>` | Wait → see all leader groups |
+| `<leader>?` | Show buffer-local keymaps only (LSP-attached buffers reveal `gd`, `gr`, …) |
+| `<leader>K` | Browse all leader keymaps (loop mode — keeps panel open) |
 
 ### Buffer Navigation
 
@@ -121,7 +133,11 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 | `<leader>fs` | Filesystem in floating Neo-tree |
 | `<leader>wp` | Pick window |
 
-### Fuzzy Finding (Telescope)
+### Fuzzy Finding (snacks.nvim picker)
+
+Picker layouts: `default` (centered float with right-side preview) for files/buffers,
+`ivy` (full-width bottom panel) for grep and LSP references — gives readable previews
+on wide code blocks.
 
 | Key | Action |
 |---|---|
@@ -131,6 +147,8 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 | `<leader>fl` | Resume last search |
 | `<leader>fc` | Change colorscheme |
 | `<leader>fb` | Git branches |
+| `<leader>fp` | Projects |
+| `<leader>fh` | Help tags |
 
 ### LSP & Code Navigation
 
@@ -159,6 +177,48 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 | `<leader>lD` | Inspect raw diagnostics |
 | `]d` / `[d` | Next / previous diagnostic |
 
+### Trouble (panel for diagnostics / references / lists)
+
+| Key | Action |
+|---|---|
+| `<leader>xx` | Workspace diagnostics |
+| `<leader>xb` | Buffer diagnostics |
+| `<leader>xr` | LSP references panel |
+| `<leader>xd` | LSP definitions panel |
+| `<leader>xi` | LSP info panel (right side) |
+| `<leader>xq` | Quickfix list |
+| `<leader>xl` | Location list |
+
+### Search & Replace (Spectre)
+
+| Key | Action |
+|---|---|
+| `<leader>sr` | Project-wide search & replace |
+| `<leader>sw` | Search word under cursor (Visual: search selection) |
+| `<leader>sf` | Search & replace in current file |
+
+### Harpoon (instant jump to marked files)
+
+Mark 2–4 files you're actively editing, then jump between them with one keystroke.
+Marks persist per project. Namespaced under `<leader>j` ("jump") to keep `<leader>h`
+exclusive to gitsigns hunks.
+
+| Key | Action |
+|---|---|
+| `<leader>ja` | Add (mark) current file |
+| `<leader>jj` | Toggle quick menu |
+| `<leader>jt` | Browse marks in snacks picker (with preview) |
+| `<leader>1` … `<leader>4` | Jump to slot 1–4 |
+| `<leader>jn` / `<leader>jp` | Cycle next / previous |
+
+### Reference Highlighting (vim-illuminate)
+
+Auto-highlights the word under the cursor and lets you jump between occurrences.
+
+| Key | Action |
+|---|---|
+| `]r` / `[r` | Next / previous reference of word under cursor |
+
 ### C# / Roslyn
 
 | Key | Action |
@@ -175,6 +235,7 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 
 Formatter priority per filetype: **Biome** (if `biome.json`) → **prettierd** → LSP fallback.
 PHP uses `php-cs-fixer`. Python uses `isort` + `black`. Lua uses `stylua`.
+**C# / Razor / CSHTML** use `csharpier` (installed via Mason); falls back to Roslyn LSP if missing.
 
 ### Debugging (nvim-dap)
 
@@ -235,6 +296,7 @@ PHP uses `php-cs-fixer`. Python uses `isort` + `black`. Lua uses `stylua`.
 
 ### C# / ASP.NET Core
 - **LSP**: `roslyn.nvim` — install server via `:MasonInstall roslyn`
+- **Formatting**: `csharpier` via conform.nvim (passes `--stdin-path` so `.csharpierrc` resolves correctly)
 - **Diagnostics**: Open files only by default; full-solution available via `:Roslyn restart`
 - **File watching**: Delegated to Roslyn server (`filewatching = "roslyn"`)
 - **Debugger**: `netcoredbg` via Mason + nvim-dap

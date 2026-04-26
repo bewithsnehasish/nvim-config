@@ -14,30 +14,37 @@ return {
         },
       }
 
-      -- Telescope integration: browse harpoon list in a Telescope picker
-      local function harpoon_telescope()
-        local conf = require("telescope.config").values
-        local file_paths = {}
-        for _, item in ipairs(harpoon:list().items) do
-          table.insert(file_paths, item.value)
-        end
-        require("telescope.pickers")
-          .new({}, {
-            prompt_title = "Harpoon",
-            finder = require("telescope.finders").new_table { results = file_paths },
-            previewer = conf.file_previewer {},
-            sorter = conf.generic_sorter {},
+      -- snacks.nvim picker: browse the harpoon list with file preview
+      local function harpoon_picker()
+        local items = {}
+        for i, item in ipairs(harpoon:list().items) do
+          table.insert(items, {
+            idx = i,
+            text = item.value,
+            file = item.value,
           })
-          :find()
+        end
+        Snacks.picker.pick({
+          source = "harpoon",
+          title = "Harpoon",
+          items = items,
+          format = "file",
+          preview = "file",
+          confirm = function(picker, item)
+            picker:close()
+            if item then harpoon:list():select(item.idx) end
+          end,
+        })
       end
 
-      -- Mark / list
-      vim.keymap.set("n", "<leader>ha", function() harpoon:list():add() end,
-        { desc = "Harpoon: mark file" })
-      vim.keymap.set("n", "<leader>hh", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
+      -- Mark / list — namespaced under <leader>j ("jump") to avoid clashing
+      -- with gitsigns' <leader>h* (hunk) keymaps.
+      vim.keymap.set("n", "<leader>ja", function() harpoon:list():add() end,
+        { desc = "Harpoon: add (mark) file" })
+      vim.keymap.set("n", "<leader>jj", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
         { desc = "Harpoon: quick menu" })
-      vim.keymap.set("n", "<leader>ht", harpoon_telescope,
-        { desc = "Harpoon: telescope picker" })
+      vim.keymap.set("n", "<leader>jt", harpoon_picker,
+        { desc = "Harpoon: snacks picker (with preview)" })
 
       -- Jump to slot 1-4 with <leader>1..4 — instant, no searching needed
       for i = 1, 4 do
@@ -46,9 +53,9 @@ return {
       end
 
       -- Cycle through harpooned files
-      vim.keymap.set("n", "<leader>hp", function() harpoon:list():prev() end,
+      vim.keymap.set("n", "<leader>jp", function() harpoon:list():prev() end,
         { desc = "Harpoon: prev file" })
-      vim.keymap.set("n", "<leader>hn", function() harpoon:list():next() end,
+      vim.keymap.set("n", "<leader>jn", function() harpoon:list():next() end,
         { desc = "Harpoon: next file" })
     end,
   },

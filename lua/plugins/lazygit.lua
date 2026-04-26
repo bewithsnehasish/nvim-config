@@ -2,7 +2,6 @@ return {
   "kdheepak/lazygit.nvim",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-telescope/telescope.nvim",
   },
   cmd = {
     "LazyGit",
@@ -17,9 +16,6 @@ return {
     { "<leader>gc", "<cmd>LazyGitFilterCurrentFile<cr>", desc = "LazyGit Filter Current File" },
   },
   config = function()
-    -- Load Telescope extension
-    require("telescope").load_extension "lazygit"
-
     -- Configuration options
     vim.g.lazygit_floating_window_winblend = 0 -- transparency of floating window
     vim.g.lazygit_floating_window_scaling_factor = 0.9 -- scaling factor for floating window
