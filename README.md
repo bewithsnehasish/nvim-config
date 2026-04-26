@@ -149,6 +149,7 @@ on wide code blocks.
 | `<leader>fb` | Git branches |
 | `<leader>fp` | Projects |
 | `<leader>fh` | Help tags |
+| `<leader>fk` | Search keymaps by description |
 
 ### LSP & Code Navigation
 

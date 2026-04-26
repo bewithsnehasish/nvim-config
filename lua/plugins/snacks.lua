@@ -78,6 +78,7 @@ return {
       -- Misc
       { "<leader>fc", function() Snacks.picker.colorschemes() end,   desc = "Colorscheme" },
       { "<leader>fh", function() Snacks.picker.help() end,           desc = "Help tags" },
+      { "<leader>fk", function() Snacks.picker.keymaps() end,        desc = "Keymaps" },
     },
   },
 }
