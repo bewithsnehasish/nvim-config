@@ -58,6 +58,7 @@ return {
         { "<leader>r", group = "Refactor",        icon = "" },
         { "<leader>s", group = "Search / Replace", icon = "" },
         { "<leader>t", group = "Test",            icon = "󰙨" },
+        { "<leader>u", group = "UI Toggles",       icon = "" },
         { "<leader>w", group = "Window / Wrap",   icon = "" },
         { "<leader>x", group = "Trouble",         icon = "" },
       },

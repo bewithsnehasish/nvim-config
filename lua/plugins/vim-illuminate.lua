@@ -15,6 +15,16 @@ return {
       vim.keymap.set("n", "[r", function() require("illuminate").goto_prev_reference() end,
         { desc = "Prev reference (illuminate)" })
 
+      -- Toggle word-under-cursor highlighting globally
+      vim.keymap.set("n", "<leader>ui", function()
+        require("illuminate").toggle()
+        vim.notify(
+          "Illuminate " .. (require("illuminate").is_paused() and "disabled" or "enabled"),
+          vim.log.levels.INFO,
+          { title = "Illuminate", timeout = 1500 }
+        )
+      end, { desc = "Toggle reference highlighting" })
+
       require("illuminate").configure {
         delay = 300,
         modes_allowlist = { "n", "v" },
