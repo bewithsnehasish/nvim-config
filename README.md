@@ -21,8 +21,13 @@ A fast, modular Neovim configuration for full-stack development: **React/TypeScr
 | Git for Windows | Required by lazy.nvim |
 | ripgrep | `winget install BurntSushi.ripgrep.MSVC` |
 | fd | `winget install sharkdp.fd` |
+| CMake | `winget install Kitware.CMake` |
+| C compiler | Visual Studio Build Tools or LLVM/MSYS2; required by nvim-treesitter |
 | .NET SDK | Required by Roslyn (C# LSP) — [dotnet.microsoft.com](https://dotnet.microsoft.com) |
 | Nerd Font | Set in your terminal for icons (e.g. JetBrainsMono Nerd Font) |
+
+Run `:ConfigHealth` after installation to verify Windows/WSL shell, clipboard,
+Mason, Roslyn, DAP, and treesitter prerequisites.
 
 ### WSL2 Prerequisites
 
@@ -262,7 +267,7 @@ PHP uses `php-cs-fixer`. Python uses `isort` + `black`. Lua uses `stylua`.
 | `<leader>dso` | Step over |
 | `<leader>dsi` | Step into |
 | `<leader>dsu` | Step out |
-| `<leader>dus` | Open DAP sidebar |
+| `<leader>de` | Evaluate expression |
 
 ### Testing (neotest)
 
@@ -314,8 +319,9 @@ PHP uses `php-cs-fixer`. Python uses `isort` + `black`. Lua uses `stylua`.
 - **Formatting**: `csharpier` via conform.nvim (passes `--stdin-path` so `.csharpierrc` resolves correctly)
 - **Diagnostics**: Open files only by default; full-solution available via `:Roslyn restart`
 - **File watching**: Delegated to Roslyn server (`filewatching = "roslyn"`)
-- **Debugger**: `netcoredbg` via Mason + nvim-dap
-- **Razor / CSHTML**: Fully handled by Roslyn — no separate html LSP attached
+- **Debugger**: `netcoredbg` via Mason + nvim-dap; `<leader>td` debugs nearest .NET test through neotest
+- **Razor / CSHTML**: Roslyn handles LSP; treesitter uses the Razor parser and autotag is enabled for Razor markup
+- **Version note**: newer upstream `roslyn.nvim` Razor co-hosting guidance targets Neovim 0.12+; this config currently runs on Neovim 0.11.x
 
 ### PHP / CodeIgniter 4
 - **LSP**: `intelephense` — auto-indexes `vendor/` from `composer.json` root

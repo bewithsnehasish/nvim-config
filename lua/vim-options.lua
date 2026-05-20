@@ -94,6 +94,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+vim.api.nvim_create_user_command("ConfigHealth", function()
+  require("user.health.config").run()
+end, { desc = "Show config-specific health checks" })
+
 -- Clear search highlight with <Esc> (a no-op otherwise in normal mode).
 -- Frees up <leader>h to be exclusive to the gitsigns hunk namespace.
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })

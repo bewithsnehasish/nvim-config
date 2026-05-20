@@ -57,8 +57,12 @@ return {
         end
 
         -- Manual codelens refresh — useful if virtualtext doesn't appear
-        vim.keymap.set("n", "<leader>lc", vim.lsp.codelens.refresh,
-          { buffer = bufnr, noremap = true, silent = true, desc = "Refresh code lens" })
+        vim.keymap.set(
+          "n",
+          "<leader>lc",
+          vim.lsp.codelens.refresh,
+          { buffer = bufnr, noremap = true, silent = true, desc = "Refresh code lens" }
+        )
       end
 
       vim.lsp.config("roslyn", {
@@ -104,7 +108,9 @@ return {
         -- "roslyn": delegates file watching to the Roslyn server itself, which is more
         -- efficient than libuv inotify — especially important on WSL2 and large solutions.
         filewatching = "roslyn",
-        broad_search = true,
+        -- Keep upstream's narrow solution discovery by default. Enable this only
+        -- for repos where projects live outside the solution root.
+        broad_search = false,
         lock_target = false,
         silent = true,
       }

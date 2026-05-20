@@ -188,10 +188,9 @@ return {
             enabled = true,
             leave_dirs_open = true,
           },
-          -- libuv/inotify file watchers are very slow on WSL2 with large codebases:
-          -- they set up a kernel watcher per directory, blocking the UI on startup.
-          -- Use manual :Neotree refresh instead.
-          use_libuv_file_watcher = false,
+          -- WSL2 file watchers are slow on large repos, especially under /mnt/c.
+          -- Native Windows handles libuv watchers better, so keep live refresh there.
+          use_libuv_file_watcher = vim.g.is_windows and not vim.g.is_wsl,
           hijack_netrw_behavior = "open_default",
         },
         buffers = {

@@ -283,9 +283,34 @@ return {
         -- Resolve tsserver from Mason's typescript-language-server bundle.
         -- typescript-tools searches local node_modules + global npm, but NOT Mason.
         -- This makes it work even when TypeScript is not installed globally.
-        local mason_tsserver = vim.fn.stdpath "data"
-          .. "/mason/packages/typescript-language-server/node_modules/typescript/bin/tsserver"
-        local tsserver_path = vim.fn.filereadable(mason_tsserver) == 1 and mason_tsserver or nil
+        local tsserver_candidates = {
+          vim.fs.joinpath(
+            vim.fn.stdpath "data",
+            "mason",
+            "packages",
+            "typescript-language-server",
+            "node_modules",
+            "typescript",
+            "bin",
+            "tsserver"
+          ),
+          vim.fs.joinpath(
+            vim.fn.stdpath "data",
+            "mason",
+            "packages",
+            "typescript-language-server",
+            "node_modules",
+            ".bin",
+            "tsserver.cmd"
+          ),
+        }
+        local tsserver_path = nil
+        for _, candidate in ipairs(tsserver_candidates) do
+          if vim.fn.filereadable(candidate) == 1 then
+            tsserver_path = candidate
+            break
+          end
+        end
 
         typescript_tools.setup {
           filetypes = {

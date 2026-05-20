@@ -3,10 +3,25 @@ return {
     "akinsho/toggleterm.nvim",
     event = "VeryLazy",
     config = function()
+      -- Shell selection: PowerShell 7 (pwsh) → PowerShell 5 → system default.
+      -- On native Windows, cmd.exe (the default vim.o.shell) is too limited for dev work.
+      -- On WSL/Linux, nil inherits the user's shell (bash/zsh).
+      local function pick_shell()
+        if vim.g.is_windows then
+          if vim.fn.executable "pwsh" == 1 then
+            return "pwsh"
+          elseif vim.fn.executable "powershell" == 1 then
+            return "powershell"
+          end
+        end
+        return nil
+      end
+
+      local terminal_shell = pick_shell()
       local execs = {
-        { nil, "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
-        { nil, "<M-2>", "Vertical Terminal", "vertical", 0.4 },
-        { nil, "<M-3>", "Float Terminal", "float", nil },
+        { terminal_shell or vim.o.shell, "<M-1>", "Horizontal Terminal", "horizontal", 0.3 },
+        { terminal_shell or vim.o.shell, "<M-2>", "Vertical Terminal", "vertical", 0.4 },
+        { terminal_shell or vim.o.shell, "<M-3>", "Float Terminal", "float", nil },
       }
 
       local function get_buf_size()
@@ -67,20 +82,6 @@ return {
         add_exec(opts)
       end
 
-      -- Shell selection: PowerShell 7 (pwsh) → PowerShell 5 → system default.
-      -- On native Windows, cmd.exe (the default vim.o.shell) is too limited for dev work.
-      -- On WSL/Linux, nil inherits the user's shell (bash/zsh).
-      local function pick_shell()
-        if vim.g.is_windows then
-          if vim.fn.executable "pwsh" == 1 then
-            return "pwsh"
-          elseif vim.fn.executable "powershell" == 1 then
-            return "powershell"
-          end
-        end
-        return nil
-      end
-
       require("toggleterm").setup {
         size = 20,
         open_mapping = [[<c-\>]],
@@ -93,7 +94,7 @@ return {
         persist_size = false,
         direction = "float",
         close_on_exit = true,
-        shell = pick_shell(),
+        shell = terminal_shell,
         float_opts = {
           border = "rounded",
           winblend = 0,

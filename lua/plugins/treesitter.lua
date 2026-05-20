@@ -29,6 +29,7 @@ return {
           "typescript",
           "tsx",
           "c_sharp",
+          "razor",
           "html",
           "css",
           "svelte",
@@ -82,6 +83,8 @@ return {
         },
       }
 
+      vim.treesitter.language.register("razor", "cshtml")
+
       -- Re-enable injections for Django template compatibility
       local enabled_injections = { "javascript", "typescript", "tsx" }
       for _, lang in ipairs(enabled_injections) do
@@ -129,6 +132,8 @@ return {
           "typescriptreact",
           "svelte",
           "vue",
+          "razor",
+          "cshtml",
         },
       }
     end,

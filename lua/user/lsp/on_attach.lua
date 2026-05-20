@@ -7,13 +7,33 @@ return function(client, bufnr)
     Snacks.picker.lsp_definitions()
   end, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
 
+  local function move_to_mouse()
+    local mouse = vim.fn.getmousepos()
+    if mouse.winid and mouse.winid ~= 0 then
+      pcall(vim.api.nvim_set_current_win, mouse.winid)
+    end
+    if mouse.line > 0 and mouse.column > 0 then
+      pcall(vim.api.nvim_win_set_cursor, 0, { mouse.line, mouse.column - 1 })
+    end
+  end
+
+  vim.keymap.set("n", "<C-LeftMouse>", function()
+    move_to_mouse()
+    vim.lsp.buf.definition()
+  end, vim.tbl_extend("force", opts, { desc = "Ctrl-click definition" }))
+
   -- gD: go to declaration (e.g. header files in C, interface in TS)
   vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
 
   -- gr: show ALL references in a snacks picker with preview
   vim.keymap.set("n", "gr", function()
-    Snacks.picker.lsp_references({ include_declaration = false })
+    Snacks.picker.lsp_references { include_declaration = false }
   end, vim.tbl_extend("force", opts, { desc = "Show references" }))
+
+  vim.keymap.set("n", "<C-RightMouse>", function()
+    move_to_mouse()
+    Snacks.picker.lsp_references { include_declaration = false }
+  end, vim.tbl_extend("force", opts, { desc = "Ctrl-right-click references" }))
 
   -- gi: implementations (useful for interfaces/abstract classes)
   vim.keymap.set("n", "gi", function()
@@ -37,7 +57,12 @@ return function(client, bufnr)
   end, vim.tbl_extend("force", opts, { desc = "Workspace symbols" }))
 
   -- ── Code actions ──────────────────────────────────────────────────────────
-  vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+  vim.keymap.set(
+    { "n", "v" },
+    "<leader>ca",
+    vim.lsp.buf.code_action,
+    vim.tbl_extend("force", opts, { desc = "Code action" })
+  )
 
   -- ── Rename ────────────────────────────────────────────────────────────────
   -- NOTE: <leader>rn is handled by inc-rename.nvim (refactoring.lua).

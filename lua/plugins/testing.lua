@@ -18,6 +18,8 @@ return {
       local dap = require "dap"
       local neotest = require "neotest"
 
+      require("user.dap.netcoredbg").setup_adapter(dap)
+
       local function project_command(local_bin, global_bin)
         local cwd = vim.fn.getcwd()
         local candidates = {
