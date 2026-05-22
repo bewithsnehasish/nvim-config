@@ -254,39 +254,9 @@ return {
       end
 
       -- 6. TypeScript Tools Setup
+      -- Mason integration is built-in since typescript-tools commit (2025) — no need to
+      -- resolve tsserver path manually; the plugin discovers it from Mason automatically.
       if typescript_tools_status then
-        -- Resolve tsserver from Mason's typescript-language-server bundle.
-        -- typescript-tools searches local node_modules + global npm, but NOT Mason.
-        -- This makes it work even when TypeScript is not installed globally.
-        local tsserver_candidates = {
-          vim.fs.joinpath(
-            vim.fn.stdpath "data",
-            "mason",
-            "packages",
-            "typescript-language-server",
-            "node_modules",
-            "typescript",
-            "bin",
-            "tsserver"
-          ),
-          vim.fs.joinpath(
-            vim.fn.stdpath "data",
-            "mason",
-            "packages",
-            "typescript-language-server",
-            "node_modules",
-            ".bin",
-            "tsserver.cmd"
-          ),
-        }
-        local tsserver_path = nil
-        for _, candidate in ipairs(tsserver_candidates) do
-          if vim.fn.filereadable(candidate) == 1 then
-            tsserver_path = candidate
-            break
-          end
-        end
-
         typescript_tools.setup {
           filetypes = {
             "typescript",
@@ -298,12 +268,11 @@ return {
           on_attach = custom_on_attach,
           flags = { debounce_text_changes = 150 },
           settings = {
-            tsserver_path = tsserver_path,
             separate_diagnostic_server = true,
             publish_diagnostic_on = "insert_leave",
             expose_as_code_action = "all",
             tsserver_file_preferences = {
-              -- "literals" only: shows hints for non-obvious params, not every single arg
+              -- "literals" only: hints for non-obvious params, not every single arg
               includeInlayParameterNameHints = "literals",
               includeInlayParameterNameHintsWhenArgumentMatchesName = false,
               includeInlayFunctionParameterTypeHints = false,
