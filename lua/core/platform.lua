@@ -32,10 +32,15 @@ end
 M.shell = detect_shell()
 
 function M.setup_clipboard()
-  -- Native Windows: Neovim handles clipboard via the win32 API automatically.
+  -- Native Windows: Neovim handles clipboard via the win32 API automatically — leave it alone.
   -- Native Linux/Mac: Neovim auto-detects xsel / xclip / wl-copy / pbcopy.
-  -- WSL: bridge to the Windows host via win32yank.exe.
-  if M.is_wsl then
+  -- WSL: bridge to the Windows host via win32yank.exe — but ONLY if it's actually installed.
+  --
+  -- The is_wsl + executable check is critical: if we set vim.g.clipboard to win32yank
+  -- on a system where the binary isn't on PATH, every yank to "+" throws
+  -- E475: Invalid value for argument cmd: 'win32yank.exe' is not executable.
+  -- That happens on native Windows too if has("wsl") ever misfires, hence the executable gate.
+  if M.is_wsl and vim.fn.executable "win32yank.exe" == 1 then
     vim.g.clipboard = {
       name = "win32yank-wsl",
       copy = {
@@ -48,6 +53,16 @@ function M.setup_clipboard()
       },
       cache_enabled = 0,
     }
+  elseif M.is_wsl then
+    -- On WSL but no win32yank installed: warn once so user knows clipboard won't reach Windows.
+    vim.schedule(function()
+      vim.notify(
+        "win32yank.exe not found on PATH. System clipboard bridge to Windows is disabled.\n"
+          .. "Install: cp /mnt/c/path/to/win32yank.exe ~/.local/bin/ && chmod +x ~/.local/bin/win32yank.exe",
+        vim.log.levels.WARN,
+        { title = "Clipboard" }
+      )
+    end)
   end
 end
 

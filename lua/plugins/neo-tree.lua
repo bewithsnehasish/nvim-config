@@ -221,7 +221,18 @@ return {
       }
 
       -- Keybindings
-      vim.keymap.set("n", "<leader>e", "<CMD>Neotree toggle right<CR>", { desc = "Toggle Neo-tree", noremap = true })
+      -- <leader>e behaviour:
+      --   * editor buffer + tree closed  → open tree on the right AND focus it
+      --   * editor buffer + tree open    → focus the open tree
+      --   * already inside tree          → close the tree
+      vim.keymap.set("n", "<leader>e", function()
+        if vim.bo.filetype == "neo-tree" then
+          vim.cmd "Neotree close"
+        else
+          vim.cmd "Neotree focus reveal right"
+        end
+      end, { desc = "Toggle Neo-tree (focus on open)", noremap = true })
+
       vim.keymap.set("n", "<leader>n", "<CMD>Neotree focus<CR>", { desc = "Focus Neo-tree", noremap = true })
       vim.keymap.set(
         "n",
@@ -234,18 +245,6 @@ return {
         "<leader>fs",
         "<CMD>Neotree filesystem reveal float<CR>",
         { desc = "Show filesystem in Neo-tree", noremap = true }
-      )
-      vim.keymap.set(
-        "n",
-        "<leader>dt",
-        "<CMD>Neotree toggle reveal dir=./templates<CR>",
-        { desc = "Show Django templates", noremap = true }
-      )
-      vim.keymap.set(
-        "n",
-        "<leader>dm",
-        "<CMD>Neotree toggle reveal dir=./migrations<CR>",
-        { desc = "Show Django migrations", noremap = true }
       )
       vim.keymap.set("n", "<leader>wp", function()
         require("window-picker").pick_window()

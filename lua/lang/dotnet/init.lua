@@ -23,7 +23,19 @@ function M.setup()
     local opts = { buffer = bufnr, noremap = true, silent = true }
 
     -- <leader>l namespace, kept clear of DAP's <leader>d.
-    vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts)
+    -- Open diagnostic float AND focus the cursor into it (so <C-y>, scrolling, etc. work).
+    vim.keymap.set("n", "<leader>ld", function()
+      local _, winid = vim.diagnostic.open_float(nil, {
+        scope = "cursor",
+        focusable = true,
+        close_events = {},
+        border = "rounded",
+        source = "if_many",
+      })
+      if winid then
+        vim.api.nvim_set_current_win(winid)
+      end
+    end, opts)
     vim.keymap.set("n", "]d", function()
       vim.diagnostic.jump { count = 1, float = true }
     end, opts)
