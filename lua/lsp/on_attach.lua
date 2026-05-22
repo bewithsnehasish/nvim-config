@@ -105,14 +105,24 @@ return function(client, bufnr)
 
   -- ── LSP management ────────────────────────────────────────────────────────
   vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>", vim.tbl_extend("force", opts, { desc = "Restart LSP" }))
-  vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>", vim.tbl_extend("force", opts, { desc = "LSP info" }))
-  vim.keymap.set("n", "<leader>lq", "<cmd>LspStop<CR>", vim.tbl_extend("force", opts, { desc = "Stop LSP (quit)" }))
-  vim.keymap.set(
-    "n",
-    "<leader>lS",
-    "<cmd>LspStart<CR>",
-    vim.tbl_extend("force", opts, { desc = "Start LSP" })
-  )
+  vim.keymap.set("n", "<leader>li", function()
+    local clients = vim.lsp.get_clients { bufnr = 0 }
+    if #clients == 0 then
+      vim.notify("No LSP attached to this buffer", vim.log.levels.WARN, { title = "LSP" })
+      return
+    end
+    local lines = { "LSP clients on buffer " .. vim.api.nvim_buf_get_name(0), "" }
+    for _, c in ipairs(clients) do
+      table.insert(lines, string.format("• %s (id=%d)", c.name, c.id))
+      table.insert(lines, "    root: " .. (c.root_dir or "—"))
+      table.insert(lines, "    cmd:  " .. (type(c.config.cmd) == "table" and table.concat(c.config.cmd, " ") or tostring(c.config.cmd)))
+    end
+    table.insert(lines, "")
+    table.insert(lines, "More: :checkhealth vim.lsp  |  :LspLog  |  :Mason")
+    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "LSP info" })
+  end, vim.tbl_extend("force", opts, { desc = "LSP info (active clients)" }))
+  vim.keymap.set("n", "<leader>lq", "<cmd>LspStop<CR>", vim.tbl_extend("force", opts, { desc = "Stop LSP" }))
+  vim.keymap.set("n", "<leader>lS", "<cmd>LspStart<CR>", vim.tbl_extend("force", opts, { desc = "Start LSP" }))
   vim.keymap.set("n", "<leader>lL", "<cmd>LspLog<CR>", vim.tbl_extend("force", opts, { desc = "Open LSP log" }))
   -- Built-in vim.lsp.buf actions exposed as quick keymaps:
   vim.keymap.set(
