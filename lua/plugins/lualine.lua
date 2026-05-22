@@ -46,7 +46,6 @@ return {
           theme = "horizon",
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
-          -- FIX 4: Added useful filetypes to disable lualine on
           disabled_filetypes = {
             statusline = { "alpha", "dashboard", "lazy", "mason" },
           },
@@ -56,13 +55,12 @@ return {
           lualine_a = { "mode" },
           lualine_b = { "branch", "diff", "diagnostics" },
 
-          -- FIX 5: Filename moved here where it has space and context
           lualine_c = {
             {
               "filename",
-              path = 1, -- show relative path (0 = just name, 2 = absolute)
+              path = 1, -- 0 = name only, 1 = relative, 2 = absolute
               symbols = {
-                modified = " ●", -- unsaved indicator
+                modified = " ●",
                 readonly = " ",
                 unnamed = "[No Name]",
               },
@@ -70,14 +68,12 @@ return {
           },
 
           lualine_x = {
-            -- FIX 6: Lazy.nvim pending updates
+            -- Lazy.nvim pending updates badge
             {
               lazy_ok and lazy_status.updates or nil,
               cond = lazy_ok and lazy_status.has_updates or nil,
               color = { fg = "#ffaa00" },
             },
-
-            -- FIX 2: copilot is already safe via its own plugin guard
             "copilot",
             "encoding",
             "fileformat",
@@ -85,8 +81,6 @@ return {
           },
 
           lualine_y = { "progress" },
-
-          -- FIX 5: Removed filename from here, only position info
           lualine_z = { "location" },
         },
         extensions = { "quickfix", "man", "fugitive", "nvim-tree" },

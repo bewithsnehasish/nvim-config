@@ -7,7 +7,7 @@ return {
     },
     config = function()
       local dap = require "dap"
-      require("user.dap.netcoredbg").setup_adapter(dap)
+      require("lang.dotnet.dap").setup_adapter(dap)
 
       local function find_dotnet_dll()
         local dlls = vim.fn.globpath(vim.fn.getcwd(), "**/bin/Debug/**/*.dll", false, true)
