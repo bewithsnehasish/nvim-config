@@ -54,17 +54,27 @@ end
 function M.setup_shell()
   -- Only Windows needs explicit shell configuration. WSL/Linux/Mac inherit
   -- a sensible $SHELL that already knows POSIX quoting.
+  -- Opt-out: set vim.g.use_pwsh_shell = false BEFORE require'core.options' to keep cmd.exe.
   if not M.is_windows then
+    return
+  end
+  if vim.g.use_pwsh_shell == false then
     return
   end
 
   if M.shell == "pwsh" or M.shell == "powershell" then
     vim.opt.shell = M.shell
-    vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned "
+    -- Per `:help shell-powershell` (Neovim 0.11+ recommended form, March 2025 update).
+    -- $PSStyle is PowerShell 7+ only — guard so we don't break on Windows PowerShell 5.1.
+    local pwsh7_only = M.shell == "pwsh" and "$PSStyle.OutputRendering='plaintext';" or ""
+    vim.opt.shellcmdflag = "-NoLogo -NonInteractive -NoProfile -ExecutionPolicy RemoteSigned "
       .. "-Command [Console]::InputEncoding=[Console]::OutputEncoding="
       .. "[System.Text.Encoding]::UTF8;"
+      .. pwsh7_only
+    -- Tee-Object (full cmdlet) is more reliable than the `tee` alias, which can be
+    -- shadowed or missing in stripped environments.
     vim.opt.shellredir = '2>&1 | %%{ "$_" } | Out-File %s; exit $LastExitCode'
-    vim.opt.shellpipe = '2>&1 | %%{ "$_" } | tee %s; exit $LastExitCode'
+    vim.opt.shellpipe = '2>&1 | %%{ "$_" } | Tee-Object -FilePath %s; exit $LastExitCode'
     vim.opt.shellquote = ""
     vim.opt.shellxquote = ""
   end

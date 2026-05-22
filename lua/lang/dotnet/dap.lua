@@ -14,13 +14,18 @@ function M.setup_adapter(dap)
   end
 
   local data = vim.fn.stdpath "data"
+  -- Search order covers: PATH-resolved, Mason bin shim (all 3 ext variants), and
+  -- raw extracted layouts under packages/ (Linux uses libexec/, Windows nests deeper).
   local netcoredbg = first_executable {
     vim.fn.exepath "netcoredbg",
+    vim.fn.exepath "netcoredbg.exe",
     vim.fs.joinpath(data, "mason", "bin", "netcoredbg"),
     vim.fs.joinpath(data, "mason", "bin", "netcoredbg.cmd"),
     vim.fs.joinpath(data, "mason", "bin", "netcoredbg.exe"),
     vim.fs.joinpath(data, "mason", "packages", "netcoredbg", "libexec", "netcoredbg", "netcoredbg"),
+    vim.fs.joinpath(data, "mason", "packages", "netcoredbg", "netcoredbg", "netcoredbg"),
     vim.fs.joinpath(data, "mason", "packages", "netcoredbg", "netcoredbg", "netcoredbg.exe"),
+    vim.fs.joinpath(data, "mason", "packages", "netcoredbg", "netcoredbg.exe"),
   }
 
   if not netcoredbg then
