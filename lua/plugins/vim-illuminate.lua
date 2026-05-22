@@ -28,8 +28,11 @@ return {
       require("illuminate").configure {
         delay = 300,
         modes_allowlist = { "n", "v" },
+        -- Drop "treesitter" provider: on Neovim 0.12 + nvim-treesitter master,
+        -- locals.lua:286 throws "attempt to call method 'parent' (a nil value)".
+        -- LSP + regex give the same UX for word-under-cursor highlighting.
         providers = {
-          "treesitter",
+          "lsp",
           "regex",
         },
         -- Skip illuminate on large files (set by the LargeFilePerf autocmd)

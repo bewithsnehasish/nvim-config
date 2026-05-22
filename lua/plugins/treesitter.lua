@@ -1,6 +1,12 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    -- Pinned to master branch for now. main branch requires a config rewrite
+    -- (no more nvim-treesitter.configs.setup{}; per-FT autocmd registration).
+    -- On Neovim 0.12 master throws a few non-fatal errors; we mitigate by:
+    --   * dropping illuminate's "treesitter" provider (see vim-illuminate.lua)
+    --   * lower file-size threshold for highlight (100KB) to skip giant files
+    branch = "master",
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
     dependencies = {
