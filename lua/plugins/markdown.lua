@@ -25,14 +25,20 @@ return {
   },
   {
     "iamcco/markdown-preview.nvim",
-    build = "cd app && npm install",
+    cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
     ft = { "markdown" },
-    config = function()
-      vim.g.mkdp_auto_start = 1
-      vim.cmd [[
-        autocmd FileType markdown nnoremap <buffer> <Leader>pm :MarkdownPreviewToggle<CR>
-        ]]
+    -- Use the plugin's bundled installer — downloads pre-built Go binaries,
+    -- doesn't mutate app/yarn.lock and so doesn't leave the repo dirty.
+    build = function()
+      vim.fn["mkdp#util#install"]()
     end,
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_auto_start = 0
+    end,
+    keys = {
+      { "<leader>pm", "<cmd>MarkdownPreviewToggle<CR>", ft = "markdown", desc = "Markdown preview toggle" },
+    },
   },
 
   -- Documentation and notes

@@ -32,5 +32,38 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require "core.options"
-require("lazy").setup "plugins"
+
+require("lazy").setup("plugins", {
+  ui = {
+    border = "rounded",
+    backdrop = 80,
+    icons = {
+      cmd = " ",
+      config = "",
+      event = " ",
+      ft = " ",
+      init = " ",
+      import = " ",
+      keys = " ",
+      lazy = "󰒲 ",
+      loaded = "●",
+      not_loaded = "○",
+      plugin = " ",
+      runtime = " ",
+      require = "󰢱 ",
+      source = " ",
+      start = " ",
+      task = "✔ ",
+    },
+  },
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "gzip", "matchit", "matchparen", "netrwPlugin", "tarPlugin",
+        "tohtml", "tutor", "zipPlugin", "2html_plugin", "logiPat", "rrhelper",
+      },
+    },
+  },
+})
+
 require "core.keymaps"
