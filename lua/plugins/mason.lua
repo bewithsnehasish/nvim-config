@@ -59,10 +59,6 @@ return {
         "jsonls",
         "biome",
 
-        -- Python
-        "pyright", -- FIXED: Removed duplicate
-        "ruff",
-
         -- Other Languages
         "lua_ls",
         "bashls",
@@ -79,8 +75,6 @@ return {
           local skip_servers = {
             "ts_ls", -- Handled by typescript-tools
             "typescript_tools", -- Custom setup
-            "pyright", -- Custom setup in lspconfig
-            "ruff", -- Custom setup in lspconfig
             "html", -- Custom setup in lspconfig
             "cssls", -- Custom setup in lspconfig
             "jsonls", -- Custom setup in lspconfig
@@ -119,25 +113,16 @@ return {
         "prettierd",
         "prettier",
         "stylua",
-        "black",
-        "isort",
         "csharpier",
-
-        -- Django (if you use it)
-        "djlint",
 
         -- Other
         "php-cs-fixer",
-        "google-java-format",
         "netcoredbg",
         "php-debug-adapter",
         "roslyn",
 
         -- JavaScript/TypeScript debugger
         "js-debug-adapter",
-
-        -- Python debugger
-        "debugpy",
       },
       auto_update = false,
       run_on_start = true,

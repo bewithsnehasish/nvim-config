@@ -10,21 +10,18 @@ vim.api.nvim_set_keymap("n", "<M-j>", ":m .+1<CR>==", opts)
 vim.api.nvim_set_keymap("i", "<M-j>", "<Esc>:m .+1<CR>==gi", opts)
 vim.api.nvim_set_keymap("v", "<M-j>", ":m '>+1<CR>gv=gv", opts)
 
--- Define the custom keybinding for deleting a word backward in insert mode
+-- Delete word backward in insert mode
 vim.api.nvim_set_keymap("i", "<C-b>", "<C-o>db", opts)
 
--- Word Wrapper
+-- Word wrap toggle
 vim.api.nvim_set_keymap("n", "<leader>wr", ":lua vim.wo.wrap = not vim.wo.wrap<CR>", opts)
 
--- Paste From System Clipboard
--- Normal mode
+-- Paste from system clipboard
 vim.api.nvim_set_keymap("n", "<C-v>", '"+p', opts)
--- Insert mode
 vim.api.nvim_set_keymap("i", "<C-v>", "<C-R>+", opts)
--- Visual mode
 vim.api.nvim_set_keymap("v", "<C-v>", '"+p', opts)
 
--- DAP (Debugger) keymaps
+-- DAP keymaps
 vim.api.nvim_set_keymap("n", "<leader>db", "<cmd>DapToggleBreakpoint<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dr", "<cmd>DapContinue<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dT", "<cmd>DapTerminate<CR>", opts)
@@ -32,7 +29,6 @@ vim.api.nvim_set_keymap("n", "<leader>dso", "<cmd>DapStepOver<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dsi", "<cmd>DapStepInto<CR>", opts)
 vim.api.nvim_set_keymap("n", "<leader>dsu", "<cmd>DapStepOut<CR>", opts)
 
--- DAP UI Widgets (using a function requires a different approach)
 vim.api.nvim_create_user_command("DapOpenSidebar", function()
   local widgets = require "dap.ui.widgets"
   local sidebar = widgets.sidebar(widgets.scopes)
@@ -40,17 +36,7 @@ vim.api.nvim_create_user_command("DapOpenSidebar", function()
 end, {})
 vim.api.nvim_set_keymap("n", "<leader>dus", "<cmd>DapOpenSidebar<CR>", opts)
 
--- Java-specific keymaps
-vim.keymap.set("n", "<leader>ji", ":JavaProjectImport<CR>", { desc = "Import Java project" })
-vim.keymap.set("n", "<leader>jc", ":JavaProjectCompile<CR>", { desc = "Compile Java project" })
-vim.keymap.set("n", "<leader>jt", ":JavaTest<CR>", { desc = "Run Java tests" })
-vim.keymap.set("n", "<leader>jr", ":JavaRun<CR>", { desc = "Run Java file" })
-
--- ==========================================
 -- Buffer & Tab Navigation (Bufferline)
--- ==========================================
-
--- Navigate between open buffers
 vim.keymap.set(
   "n",
   "<Tab>",
@@ -64,7 +50,6 @@ vim.keymap.set(
   { desc = "Go to previous buffer", noremap = true, silent = true }
 )
 
--- Buffer Management (Closing files)
 vim.keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "Close current buffer", noremap = true, silent = true })
 vim.keymap.set(
   "n",
@@ -73,7 +58,6 @@ vim.keymap.set(
   { desc = "Close all OTHER buffers", noremap = true, silent = true }
 )
 
--- Buffer Utility
 vim.keymap.set(
   "n",
   "<leader>bp",
@@ -87,7 +71,6 @@ vim.keymap.set(
   { desc = "Pick buffer by letter", noremap = true, silent = true }
 )
 
--- Clipboard Management
 vim.keymap.set("n", "<leader>c", '"+y', { desc = "Copy to system clipboard" })
 vim.keymap.set("v", "<leader>c", '"+y', { desc = "Copy selection to system clipboard" })
 vim.keymap.set("n", "<leader>cc", '"+yy', { desc = "Copy line to system clipboard" })

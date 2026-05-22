@@ -16,7 +16,7 @@ A fast, modular Neovim configuration for full-stack development: **React/TypeScr
 
 | Tool | Install |
 |---|---|
-| Neovim 0.11+ | `winget install Neovim.Neovim` or Scoop |
+| Neovim 0.12+ | `winget install Neovim.Neovim` or Scoop |
 | PowerShell 7 | `winget install Microsoft.PowerShell` |
 | Git for Windows | Required by lazy.nvim |
 | ripgrep | `winget install BurntSushi.ripgrep.MSVC` |
@@ -26,8 +26,8 @@ A fast, modular Neovim configuration for full-stack development: **React/TypeScr
 | .NET SDK | Required by Roslyn (C# LSP) — [dotnet.microsoft.com](https://dotnet.microsoft.com) |
 | Nerd Font | Set in your terminal for icons (e.g. JetBrainsMono Nerd Font) |
 
-Run `:ConfigHealth` after installation to verify Windows/WSL shell, clipboard,
-Mason, Roslyn, DAP, and treesitter prerequisites.
+Run `:ConfigHealth` after installation to verify Neovim version, .NET SDK,
+Windows/WSL shell, clipboard, Mason, Roslyn, DAP, and treesitter prerequisites.
 
 ### WSL2 Prerequisites
 
@@ -45,20 +45,27 @@ sudo apt install ripgrep fd-find
 
 ```text
 ~/.config/nvim/
-├── init.lua              # Bootstraps lazy.nvim; loads vim-options + keymaps
+├── init.lua                  # Bootstraps lazy.nvim, loads core/options + core/keymaps
 ├── lua/
-│   ├── vim-options.lua   # Core settings, OS detection flags, large-file guard
-│   ├── keymaps.lua       # Global keybindings (DAP, bufferline, clipboard)
-│   ├── plugins.lua       # Auto-loader: discovers all .lua files in plugins/
-│   ├── user/
-│   │   ├── icons.lua           # Shared icon table
-│   │   └── lsp/on_attach.lua   # Shared LSP keymaps (gd, gr, gi, K, …)
-│   └── plugins/          # One file per plugin (auto-loaded)
-│       └── extras/       # Optional plugins — enabled via vim.g.enabled_extra_plugins
+│   ├── core/                 # Platform detection, options, keymaps, health
+│   │   ├── platform.lua      # OS detection, native Windows shell, clipboard
+│   │   ├── options.lua       # Core vim options + large-file guard
+│   │   ├── keymaps.lua       # Global keymaps (DAP, buffers, clipboard)
+│   │   └── health.lua        # :ConfigHealth implementation
+│   ├── lsp/                  # LSP scaffolding
+│   │   ├── on_attach.lua     # Shared LSP keymaps (gd, gr, gi, K, …)
+│   │   └── servers/          # One file per server config (lua_ls, html, eslint, …)
+│   ├── lang/                 # Per-language modules
+│   │   └── dotnet/           # roslyn (init.lua) + netcoredbg (dap.lua) + neotest
+│   ├── user/icons.lua        # Shared icon table (used by cmp, telescope, navbuddy)
+│   ├── plugins.lua           # Auto-loader: discovers all .lua files in plugins/
+│   └── plugins/              # Lazy.nvim specs — config bodies delegate to core/lsp/lang
+│       └── extras/           # Optional plugins — vim.g.enabled_extra_plugins
 ```
 
 Any `.lua` file dropped into `lua/plugins/` is auto-loaded.
-Files in `lua/plugins/extras/` load only when listed in `vim.g.enabled_extra_plugins` inside `vim-options.lua`.
+Files in `lua/plugins/extras/` load only when listed in `vim.g.enabled_extra_plugins` inside `core/options.lua`.
+Adding a new LSP server is one new file in `lua/lsp/servers/` — the scanner in `plugins/lspconfig.lua` picks it up automatically.
 
 ---
 
@@ -76,7 +83,6 @@ Servers are tightly scoped — each filetype gets only what it needs:
 | `.blade.php` | intelephense · tailwindcss³ |
 | `.html` | html · tailwindcss³ |
 | `.css` / `.scss` | cssls · tailwindcss³ |
-| `.py` | pyright · ruff |
 | `.lua` | lua_ls |
 
 ¹ Only when `.eslintrc*` or `eslint.config.*` found in root  
@@ -254,7 +260,7 @@ Powered by LSP + treesitter. Folded blocks show a line count: `▶ public class 
 | `<leader>mf` | Toggle auto-format on save |
 
 Formatter priority per filetype: **Biome** (if `biome.json`) → **prettierd** → LSP fallback.
-PHP uses `php-cs-fixer`. Python uses `isort` + `black`. Lua uses `stylua`.
+PHP uses `php-cs-fixer`. Lua uses `stylua`.
 **C# / Razor / CSHTML** use `csharpier` (installed via Mason); falls back to Roslyn LSP if missing.
 
 ### Debugging (nvim-dap)
@@ -321,7 +327,7 @@ PHP uses `php-cs-fixer`. Python uses `isort` + `black`. Lua uses `stylua`.
 - **File watching**: Delegated to Roslyn server (`filewatching = "roslyn"`)
 - **Debugger**: `netcoredbg` via Mason + nvim-dap; `<leader>td` debugs nearest .NET test through neotest
 - **Razor / CSHTML**: Roslyn handles LSP; treesitter uses the Razor parser and autotag is enabled for Razor markup
-- **Version note**: newer upstream `roslyn.nvim` Razor co-hosting guidance targets Neovim 0.12+; this config currently runs on Neovim 0.11.x
+- **Razor co-hosting**: enabled by default on Neovim 0.12+ with current `roslyn-language-server` (≥ 5.8.0). Roslyn handles HTML + C# in `.razor` and `.cshtml` files; the deprecated `rzls.nvim` is no longer needed.
 
 ### PHP / CodeIgniter 4
 - **LSP**: `intelephense` — auto-indexes `vendor/` from `composer.json` root

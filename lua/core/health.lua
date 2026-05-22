@@ -1,3 +1,5 @@
+local platform = require "core.platform"
+
 local M = {}
 
 local function executable(name)
@@ -47,6 +49,37 @@ local function has_executable(tools)
   return false
 end
 
+local function dotnet_sdk_major()
+  if not executable "dotnet" then
+    return 0
+  end
+  local out = vim.fn.systemlist { "dotnet", "--list-sdks" }
+  if vim.v.shell_error ~= 0 then
+    return 0
+  end
+  local highest = 0
+  for _, line in ipairs(out) do
+    local major = tonumber(line:match "^(%d+)%.")
+    if major and major > highest then
+      highest = major
+    end
+  end
+  return highest
+end
+
+local function roslyn_version()
+  local manifest = mason_path("packages", "roslyn", "mason-receipt.json")
+  if not readable(manifest) then
+    return nil
+  end
+  local raw = table.concat(vim.fn.readfile(manifest), "\n")
+  local ok, parsed = pcall(vim.json.decode, raw)
+  if not ok or type(parsed) ~= "table" then
+    return nil
+  end
+  return parsed.primary_source and parsed.primary_source.id or nil
+end
+
 local function collect()
   local lines = {
     "Neovim Config Health",
@@ -54,11 +87,12 @@ local function collect()
     "",
     "Platform",
     "--------",
-    status_line("Native Windows", vim.g.is_windows == true),
-    status_line("WSL", vim.g.is_wsl == true),
+    status_line("Native Windows", platform.is_windows),
+    status_line("WSL", platform.is_wsl),
+    status_line("Linux (native)", platform.is_linux),
     status_line(
-      "Neovim >= 0.11",
-      vim.fn.has "nvim-0.11" == 1,
+      "Neovim >= 0.12",
+      vim.fn.has "nvim-0.12" == 1,
       vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch
     ),
     "",
@@ -77,13 +111,28 @@ local function collect()
     table.insert(lines, status_line(tool[1], executable(tool[1]), tool[2]))
   end
 
+  local sdk_major = dotnet_sdk_major()
+  table.insert(
+    lines,
+    status_line(
+      "dotnet SDK >= 8",
+      sdk_major >= 8,
+      sdk_major > 0 and ("highest installed: " .. sdk_major) or "no SDKs found"
+    )
+  )
+
   table.insert(lines, "")
   table.insert(lines, "Windows Shell / Clipboard")
   table.insert(lines, "-------------------------")
-  if vim.g.is_windows then
-    table.insert(lines, status_line("pwsh", executable "pwsh", "preferred ToggleTerm shell"))
-    table.insert(lines, status_line("powershell", executable "powershell", "fallback ToggleTerm shell"))
-  elseif vim.g.is_wsl then
+  if platform.is_windows then
+    table.insert(lines, status_line("pwsh", executable "pwsh", "PowerShell 7+ (preferred shell)"))
+    table.insert(lines, status_line("powershell", executable "powershell", "PowerShell 5 (fallback)"))
+    local shell = vim.opt.shell:get()
+    table.insert(
+      lines,
+      status_line("vim shell is pwsh", shell == "pwsh" or shell == "powershell", "current: " .. shell)
+    )
+  elseif platform.is_wsl then
     table.insert(
       lines,
       status_line("win32yank.exe", executable "win32yank.exe", "required for Windows clipboard bridge")
@@ -111,21 +160,23 @@ local function collect()
     mason_path("packages", "netcoredbg", "netcoredbg", "netcoredbg.exe"),
   }
   table.insert(lines, status_line("netcoredbg", netcoredbg_ok, netcoredbg_path or "debug nearest .NET test"))
+
   local csharpier_ok, csharpier_path = has_any {
     vim.fn.exepath "csharpier",
     mason_path("bin", "csharpier"),
     mason_path("bin", "csharpier.cmd"),
   }
-  local razor_ok, razor_path = has_any(parser_paths "razor")
   table.insert(lines, status_line("csharpier", csharpier_ok, csharpier_path or "C# formatter"))
-  table.insert(
-    lines,
-    status_line(
-      "roslyn package",
-      vim.fn.isdirectory(mason_path("packages", "roslyn")) == 1,
-      mason_path("packages", "roslyn")
-    )
-  )
+
+  local roslyn_dir_ok = vim.fn.isdirectory(mason_path("packages", "roslyn")) == 1
+  table.insert(lines, status_line("roslyn package", roslyn_dir_ok, mason_path("packages", "roslyn")))
+
+  local rv = roslyn_version()
+  if rv then
+    table.insert(lines, status_line("roslyn version", true, rv))
+  end
+
+  local razor_ok, razor_path = has_any(parser_paths "razor")
   table.insert(lines, status_line("razor parser", razor_ok, razor_path or "nvim-treesitter parser"))
 
   return lines

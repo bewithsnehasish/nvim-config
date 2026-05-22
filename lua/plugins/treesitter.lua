@@ -23,8 +23,6 @@ return {
 
       treesitter.setup {
         ensure_installed = {
-          "python",
-          "htmldjango",
           "javascript",
           "typescript",
           "tsx",
@@ -38,7 +36,6 @@ return {
           "markdown",
           "markdown_inline",
           "lua",
-          "java",
           "php",
           "bash",
           "dockerfile",
@@ -48,12 +45,11 @@ return {
           "vue",
           "graphql",
         },
-        ignore_install = { "ipynb" }, -- No treesitter parser exists for ipynb (notebooks are JSON)
         auto_install = true,
         sync_install = false,
         highlight = {
           enable = true,
-          additional_vim_regex_highlighting = { "htmldjango" }, -- Enhance Django template highlighting
+          additional_vim_regex_highlighting = false,
           disable = function(lang, buf)
             local max_filesize = 100 * 1024 -- 100 KB
             local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
@@ -70,7 +66,6 @@ return {
         },
         indent = {
           enable = true,
-          disable = { "htmldjango" }, -- Prevent hlchunk errors in Django templates
         },
         incremental_selection = {
           enable = true,
@@ -84,24 +79,6 @@ return {
       }
 
       vim.treesitter.language.register("razor", "cshtml")
-
-      -- Re-enable injections for Django template compatibility
-      local enabled_injections = { "javascript", "typescript", "tsx" }
-      for _, lang in ipairs(enabled_injections) do
-        pcall(vim.treesitter.query.set, lang, "injections", nil)
-      end
-
-      -- Filetype detection for Django templates
-      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        pattern = { "*.html", "*.djhtml" },
-        group = vim.api.nvim_create_augroup("DjangoFiletype", { clear = true }),
-        callback = function()
-          local path = vim.fn.expand "%:p"
-          if path:match "templates/" or path:match "%.djhtml$" then
-            vim.bo.filetype = "htmldjango"
-          end
-        end,
-      })
     end,
   },
   {
@@ -125,7 +102,6 @@ return {
         },
         filetypes = {
           "html",
-          "htmldjango", -- Support Django templates
           "javascript",
           "typescript",
           "javascriptreact",

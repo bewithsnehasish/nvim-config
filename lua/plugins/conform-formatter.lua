@@ -16,12 +16,6 @@ return {
 
       conform.setup {
         formatters_by_ft = {
-          -- Python
-          python = { "isort", "black" },
-
-          -- Django
-          htmldjango = { "djlint" },
-
           -- Web Development (React/React Native focused)
           -- biome first: if biome.json exists, use it. prettierd fallback is fast (daemon).
           javascript = { "biome", "prettierd", stop_after_first = true },
@@ -48,7 +42,6 @@ return {
 
           -- Other Languages
           lua = { "stylua" },
-          java = { "google-java-format" },
           php = { "php-cs-fixer" },
           prisma = { "prisma-format" },
         },
@@ -68,12 +61,6 @@ return {
               "avoid",
             },
           },
-          isort = {
-            prepend_args = { "--profile", "black" },
-          },
-          black = {
-            prepend_args = { "--line-length", "100" },
-          },
           stylua = {
             prepend_args = { "--indent-type", "Spaces", "--indent-width", "2" },
           },
@@ -81,11 +68,6 @@ return {
             command = "php-cs-fixer",
             args = { "fix", "$FILENAME" },
             stdin = false,
-          },
-          -- Override to always pass --stdin-path so csharpier resolves .csharpierrc
-          -- relative to the file regardless of whether it's a global or Mason install.
-          csharpier = {
-            args = { "format", "--stdin-path", "$FILENAME" },
           },
         },
 

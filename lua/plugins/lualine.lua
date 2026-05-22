@@ -35,12 +35,8 @@ return {
     dependencies = {
       "nvim-tree/nvim-web-devicons",
       "AndreM222/copilot-lualine",
-      "ajbucci/ipynb.nvim",
     },
     config = function()
-      -- Safe load for ipynb kernel statusline
-      local ipynb_ok, ipynb_kernel = pcall(require, "ipynb.kernel")
-
       -- Safe load for lazy updates badge
       local lazy_ok, lazy_status = pcall(require, "lazy.status")
 
@@ -80,15 +76,6 @@ return {
               cond = lazy_ok and lazy_status.has_updates or nil,
               color = { fg = "#ffaa00" },
             },
-
-            -- Notebook kernel status (only visible when a .ipynb is open)
-            ipynb_ok
-                and {
-                  ipynb_kernel.statusline,
-                  cond = ipynb_kernel.statusline_visible,
-                  color = ipynb_kernel.statusline_color,
-                }
-              or nil,
 
             -- FIX 2: copilot is already safe via its own plugin guard
             "copilot",

@@ -11,14 +11,13 @@ return {
       "olimorris/neotest-phpunit",
       "V13Axel/neotest-pest",
       "marilari88/neotest-vitest",
-      "nvim-neotest/neotest-python",
       "mfussenegger/nvim-dap",
     },
     config = function()
       local dap = require "dap"
       local neotest = require "neotest"
 
-      require("user.dap.netcoredbg").setup_adapter(dap)
+      require("lang.dotnet.dap").setup_adapter(dap)
 
       local function project_command(local_bin, global_bin)
         local cwd = vim.fn.getcwd()
@@ -41,13 +40,7 @@ return {
 
       neotest.setup {
         adapters = {
-          require "neotest-dotnet" {
-            discovery_root = "solution",
-            dap = {
-              justMyCode = false,
-              adapter_name = "netcoredbg",
-            },
-          },
+          require("lang.dotnet.neotest").adapter(),
           require "neotest-phpunit" {
             phpunit_cmd = function()
               return project_command(vim.fs.joinpath("vendor", "bin", "phpunit"), "phpunit")
@@ -59,10 +52,6 @@ return {
             dap = dap.configurations.php and dap.configurations.php[1] or nil,
           },
           require "neotest-vitest" {},
-          require "neotest-python" {
-            dap = { justMyCode = false },
-            runner = "pytest",
-          },
           require "neotest-pest" {
             pest_cmd = function()
               return project_command(vim.fs.joinpath("vendor", "bin", "pest"), "pest")

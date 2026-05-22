@@ -155,25 +155,6 @@ return {
             ["q"] = "close_window",
             ["R"] = "refresh",
             ["?"] = "show_help",
-            ["<leader>tm"] = {
-              function(state)
-                local node = state.tree:get_node()
-                if node.type == "directory" or node.type == "file" then
-                  local path = node:get_path()
-                  if path:match "templates/" or path:match "%.djhtml$" or path:match "%.html$" then
-                    vim.api.nvim_command("edit " .. vim.fn.fnameescape(path))
-                    vim.bo.filetype = "htmldjango"
-                  else
-                    vim.notify(
-                      "Not a Django template",
-                      vim.log.levels.WARN,
-                      { timeout = 1000, title = "Neo-tree", icon = "⚠️" }
-                    )
-                  end
-                end
-              end,
-              desc = "Open as Django template",
-            },
           },
         },
         filesystem = {
@@ -190,7 +171,7 @@ return {
           },
           -- WSL2 file watchers are slow on large repos, especially under /mnt/c.
           -- Native Windows handles libuv watchers better, so keep live refresh there.
-          use_libuv_file_watcher = vim.g.is_windows and not vim.g.is_wsl,
+          use_libuv_file_watcher = require("core.platform").is_windows,
           hijack_netrw_behavior = "open_default",
         },
         buffers = {
@@ -210,9 +191,6 @@ return {
                 vim.log.levels.INFO,
                 { timeout = 500, title = "Neo-tree", icon = "📂" }
               )
-              if file_path:match "%.html$" and (file_path:match "templates/" or file_path:match "%.djhtml$") then
-                vim.bo.filetype = "htmldjango"
-              end
               require("neo-tree.command").execute { action = "close" }
             end,
           },

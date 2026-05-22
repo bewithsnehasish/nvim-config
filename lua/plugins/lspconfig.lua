@@ -32,21 +32,7 @@ return {
         })
       end
 
-      local on_attach = require "user.lsp.on_attach"
-
-      local function find_local_python(root)
-        local candidates = {
-          root .. "/.venv/bin/python",
-          root .. "/.venv/Scripts/python.exe",
-          root .. "/.venv/Scripts/python",
-        }
-
-        for _, candidate in ipairs(candidates) do
-          if vim.fn.executable(candidate) == 1 then
-            return candidate
-          end
-        end
-      end
+      local on_attach = require "lsp.on_attach"
 
       -- 2. Lazydev Setup (must be before lspconfig for Lua LSP support)
       require("lazydev").setup {
@@ -138,34 +124,26 @@ return {
       vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { undercurl = true, sp = "#55aaff" })
       vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { undercurl = true, sp = "#55ff55" })
 
-      -- FIX 9: Replaced vim.lsp.with (deprecated in 0.11+) with plain handler functions
-      if vim.lsp.config then
-        vim.lsp.config("*", {
-          handlers = {
-            ["textDocument/hover"] = function(err, result, ctx, config)
-              return vim.lsp.handlers.hover(
-                err,
-                result,
-                ctx,
-                vim.tbl_extend("force", config or {}, { border = "rounded" })
-              )
-            end,
-            ["textDocument/signatureHelp"] = function(err, result, ctx, config)
-              return vim.lsp.handlers.signature_help(
-                err,
-                result,
-                ctx,
-                vim.tbl_extend("force", config or {}, { border = "rounded" })
-              )
-            end,
-          },
-        })
-      else
-        -- Fallback for Neovim < 0.11 (vim.lsp.with is NOT deprecated there)
-        vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-        vim.lsp.handlers["textDocument/signatureHelp"] =
-          vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-      end
+      vim.lsp.config("*", {
+        handlers = {
+          ["textDocument/hover"] = function(err, result, ctx, config)
+            return vim.lsp.handlers.hover(
+              err,
+              result,
+              ctx,
+              vim.tbl_extend("force", config or {}, { border = "rounded" })
+            )
+          end,
+          ["textDocument/signatureHelp"] = function(err, result, ctx, config)
+            return vim.lsp.handlers.signature_help(
+              err,
+              result,
+              ctx,
+              vim.tbl_extend("force", config or {}, { border = "rounded" })
+            )
+          end,
+        },
+      })
 
       -- 5. Enhanced On-Attach
       local custom_on_attach = function(client, bufnr)
@@ -255,27 +233,24 @@ return {
         end, vim.tbl_extend("force", opts, { desc = "Inspect raw diagnostics" }))
 
         -- Auto-hover on CursorHold (non-interactive, quick glance)
-        local filetype = vim.bo[bufnr].filetype
-        if filetype ~= "htmldjango" then
-          local group = vim.api.nvim_create_augroup("LspDiagnosticsHover_" .. bufnr, { clear = true })
-          vim.api.nvim_create_autocmd("CursorHold", {
-            buffer = bufnr,
-            group = group,
-            callback = function()
-              local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
-              local diags = vim.diagnostic.get(bufnr, { lnum = cursor_line })
-              if #diags > 0 then
-                vim.diagnostic.open_float(nil, {
-                  scope = "line",
-                  focusable = false,
-                  close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-                  border = "rounded",
-                  source = "if_many",
-                })
-              end
-            end,
-          })
-        end
+        local group = vim.api.nvim_create_augroup("LspDiagnosticsHover_" .. bufnr, { clear = true })
+        vim.api.nvim_create_autocmd("CursorHold", {
+          buffer = bufnr,
+          group = group,
+          callback = function()
+            local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
+            local diags = vim.diagnostic.get(bufnr, { lnum = cursor_line })
+            if #diags > 0 then
+              vim.diagnostic.open_float(nil, {
+                scope = "line",
+                focusable = false,
+                close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+                border = "rounded",
+                source = "if_many",
+              })
+            end
+          end,
+        })
       end
 
       -- 6. TypeScript Tools Setup
@@ -347,302 +322,40 @@ return {
         }
       end
 
-      -- 7. Server Configurations
-      local server_configs = {
-        -- FIX 6: Added missing lua_ls config (was absent despite lazydev being set up)
-        lua_ls = {
-          filetypes = { "lua" },
-          settings = {
-            Lua = {
-              diagnostics = {
-                globals = { "vim", "require", "P", "R" },
-              },
-              workspace = {
-                checkThirdParty = false,
-              },
-              telemetry = { enable = false },
-            },
-          },
-        },
+      -- 7. Server Configurations — one file per server under lua/lsp/servers/
+      local server_configs = {}
+      local servers_dir = vim.fs.joinpath(vim.fn.stdpath "config", "lua", "lsp", "servers")
+      for _, fname in ipairs(vim.fn.readdir(servers_dir, [[v:val =~ '\.lua$']])) do
+        local name = fname:gsub("%.lua$", "")
+        local ok, spec = pcall(require, "lsp.servers." .. name)
+        if ok then
+          server_configs[name] = spec
+        else
+          vim.notify(
+            "Failed to load LSP server config: " .. name .. "\n" .. tostring(spec),
+            vim.log.levels.ERROR
+          )
+        end
+      end
 
-        pyright = {
-          filetypes = { "python" },
-          settings = {
-            python = {
-              analysis = {
-                autoSearchPaths = true,
-                useLibraryCodeForTypes = true,
-                diagnosticMode = "openFilesOnly",
-                typeCheckingMode = "basic",
-              },
-            },
-          },
-          before_init = function(_, config)
-            local path = vim.fn.getcwd()
-            local venv = find_local_python(path)
-            if venv then
-              config.settings.python.pythonPath = venv
-            end
-          end,
-        },
 
-        ruff = {
-          filetypes = { "python" },
-          settings = {
-            ruff = { enable = true },
-          },
-          on_attach = function(client, bufnr)
-            client.server_capabilities.hoverProvider = false
-            custom_on_attach(client, bufnr)
-          end,
-        },
-
-        -- "razor"/"cshtml" removed: roslyn handles all Razor/CSHTML HTML editing.
-        -- "php" removed: intelephense understands embedded HTML inside PHP files.
-        html = { filetypes = { "html", "htmldjango", "blade" } },
-        cssls = {},
-        jsonls = {
-          -- on_new_config: defers schemastore require until the server actually starts,
-          -- so lazy-loading of schemastore.nvim is preserved.
-          on_new_config = function(new_config)
-            local ok, schemastore = pcall(require, "schemastore")
-            if ok then
-              new_config.settings = new_config.settings or {}
-              new_config.settings.json = new_config.settings.json or {}
-              new_config.settings.json.schemas = schemastore.json.schemas()
-              new_config.settings.json.validate = { enable = true }
-            end
-          end,
-        },
-        bashls = {},
-
-        tailwindcss = {
-          filetypes = {
-            "html",
-            "htmldjango",
-            "javascriptreact",
-            "javascript",
-            "typescript",
-            "typescriptreact",
-            "vue",
-            "svelte",
-            "astro",
-            "php",
-            "blade",
-            "razor",
-            "cshtml",
-          },
-          settings = {
-            tailwindCSS = {
-              classAttributes = { "class", "className", "classList", "ngClass" },
-              experimental = {
-                classRegex = {
-                  { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-                  { "cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-                },
-              },
-              lint = {
-                cssConflict = "warning",
-                invalidApply = "error",
-                invalidConfigPath = "error",
-                invalidScreen = "error",
-                invalidTailwindDirective = "error",
-                invalidVariant = "error",
-                recommendedVariantOrder = "warning",
-              },
-              validate = true,
-            },
-          },
-        },
-
-        prismals = {
-          settings = {
-            prisma = {
-              validate = true,
-              hover = true,
-              completions = { enabled = true },
-            },
-          },
-        },
-
-        emmet_ls = {
-          -- "javascriptreact"/"typescriptreact" removed: typescript-tools already
-          -- provides JSX completions and emmet_ls conflicts with its completion items.
-          -- Emmet tab expansion in JSX/TSX still works via cmp-emmet-vim.
-          filetypes = {
-            "html",
-            "htmldjango",
-            "css",
-            "scss",
-            "sass",
-            "svelte",
-            "vue",
-            "php",
-            "blade",
-          },
-          init_options = {
-            html = {
-              options = {
-                ["bem.enabled"] = true,
-                ["jsx.enabled"] = true,
-              },
-            },
-          },
-        },
-
-        -- FIX 7: Scoped by root_dir so eslint and biome don't both activate
-        --        on the same project simultaneously
-        eslint = {
-          root_dir = require("lspconfig.util").root_pattern(
-            ".eslintrc",
-            ".eslintrc.js",
-            ".eslintrc.json",
-            ".eslintrc.cjs",
-            "eslint.config.js",
-            "eslint.config.mjs",
-            "eslint.config.cjs",
-            "eslint.config.ts"
-          ),
-          filetypes = {
-            "javascript",
-            "javascriptreact",
-            "typescript",
-            "typescriptreact",
-            "vue",
-            "svelte",
-          },
-          settings = {
-            codeAction = {
-              disableRuleComment = { enable = true, location = "separateLine" },
-              showDocumentation = { enable = true },
-            },
-            codeActionOnSave = { enable = false, mode = "all" },
-            format = false,
-            nodePath = "",
-            onIgnoredFiles = "off",
-            packageManager = "npm",
-            quiet = false,
-            rulesCustomizations = {},
-            run = "onSave",
-            useESLintClass = false,
-            validate = "on",
-            workingDirectory = { mode = "auto" },
-          },
-        },
-
-        intelephense = {
-          filetypes = { "php", "blade" },
-          settings = {
-            intelephense = {
-              files = {
-                maxSize = 5000000,
-              },
-              -- CodeIgniter 4 is Composer-based; intelephense indexes vendor/ automatically.
-              -- These stubs cover PHP core + all standard extensions used in CI4 projects.
-              stubs = {
-                "apache",
-                "bcmath",
-                "bz2",
-                "calendar",
-                "Core",
-                "ctype",
-                "curl",
-                "date",
-                "dom",
-                "exif",
-                "fileinfo",
-                "filter",
-                "ftp",
-                "gd",
-                "gettext",
-                "gmp",
-                "hash",
-                "iconv",
-                "intl",
-                "json",
-                "libxml",
-                "mbstring",
-                "meta",
-                "mysqli",
-                "openssl",
-                "pcntl",
-                "pcre",
-                "PDO",
-                "pdo_mysql",
-                "pdo_pgsql",
-                "pdo_sqlite",
-                "pgsql",
-                "Phar",
-                "posix",
-                "readline",
-                "Reflection",
-                "session",
-                "SimpleXML",
-                "soap",
-                "sockets",
-                "sodium",
-                "SPL",
-                "sqlite3",
-                "standard",
-                "superglobals",
-                "tokenizer",
-                "xml",
-                "xmlreader",
-                "xmlwriter",
-                "xsl",
-                "zip",
-                "zlib",
-              },
-            },
-          },
-        },
-
-        graphql = {
-          cmd = { "graphql-lsp", "server", "-m", "stream" },
-          filetypes = { "graphql", "typescriptreact", "javascriptreact" },
-          root_dir = require("lspconfig.util").root_pattern(".graphqlrc*", ".graphql.config.*", "graphql.config.*"),
-        },
-
-        biome = {
-          root_dir = require("lspconfig.util").root_pattern("biome.json", "biome.jsonc"),
-          filetypes = {
-            "javascript",
-            "javascriptreact",
-            "typescript",
-            "typescriptreact",
-            "json",
-            "jsonc",
-          },
-        },
-      }
-
-      -- Apply each server config
+      -- Apply each server config (Neovim 0.12+ native API)
       for server_name, config in pairs(server_configs) do
         local default_config = {
           capabilities = capabilities,
           on_attach = config.on_attach or custom_on_attach,
           flags = { debounce_text_changes = 150 },
         }
-
         local final_config = vim.tbl_deep_extend("force", default_config, config)
-
-        if vim.lsp.config then
-          -- Neovim 0.11+ native API
-          vim.lsp.config(server_name, final_config)
-          vim.lsp.enable(server_name)
-        else
-          -- Fallback for Neovim < 0.11
-          require("lspconfig")[server_name].setup(final_config)
-        end
+        vim.lsp.config(server_name, final_config)
+        vim.lsp.enable(server_name)
       end
 
       -- 8. Omnifunc for specific filetypes
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
-          "python",
           "lua",
           "html",
-          "htmldjango",
           "javascript",
           "javascriptreact",
           "typescript",

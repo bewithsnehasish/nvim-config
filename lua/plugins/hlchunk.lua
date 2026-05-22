@@ -78,7 +78,6 @@ return {
           },
           exclude_filetypes = {
             ["neo-tree"] = true,
-            htmldjango = true, -- Prevent errors in Django templates
             terminal = true,
             help = true,
             [""] = true,
@@ -98,7 +97,6 @@ return {
           },
           exclude_filetypes = {
             ["neo-tree"] = true,
-            htmldjango = true, -- Prevent errors in Django templates
             terminal = true,
             help = true,
             [""] = true,
@@ -113,7 +111,6 @@ return {
           style = "#569cd6", -- Match your UI aesthetic
           exclude_filetypes = {
             ["neo-tree"] = true,
-            htmldjango = true, -- Prevent errors in Django templates
             terminal = true,
             help = true,
             [""] = true,
@@ -137,7 +134,7 @@ return {
           local ft = vim.bo[bufnr].filetype
           local bt = vim.bo[bufnr].buftype
           if
-            vim.tbl_contains({ "neo-tree", "htmldjango", "terminal", "help", "", "nofile", "prompt", "quickfix" }, ft)
+            vim.tbl_contains({ "neo-tree", "terminal", "help", "", "nofile", "prompt", "quickfix" }, ft)
             or bt ~= ""
           then
             vim.b[bufnr].hlchunk_disabled = true
@@ -157,8 +154,6 @@ return {
           "*.html",
           "*.css",
           "*.lua",
-          "*.py",
-          "*.java",
           "*.php",
         },
         callback = function(ev)
@@ -175,14 +170,6 @@ return {
         end,
       })
 
-      -- Explicitly disable hlchunk for htmldjango buffers
-      vim.api.nvim_create_autocmd("FileType", {
-        group = vim.api.nvim_create_augroup("HlchunkHtmldjangoExclude", { clear = true }),
-        pattern = "htmldjango",
-        callback = function(ev)
-          vim.b[ev.buf].hlchunk_disabled = true
-        end,
-      })
     end,
   },
 }
