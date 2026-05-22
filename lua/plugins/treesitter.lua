@@ -1,123 +1,62 @@
+local parsers = {
+  "javascript", "typescript", "tsx", "c_sharp", "razor",
+  "html", "css", "svelte", "json", "yaml",
+  "markdown", "markdown_inline", "lua", "php", "bash",
+  "dockerfile", "gitignore", "toml", "xml", "vue", "graphql",
+}
+
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    -- Pinned to master branch for now. main branch requires a config rewrite
-    -- (no more nvim-treesitter.configs.setup{}; per-FT autocmd registration).
-    -- On Neovim 0.12 master throws a few non-fatal errors; we mitigate by:
-    --   * dropping illuminate's "treesitter" provider (see vim-illuminate.lua)
-    --   * lower file-size threshold for highlight (100KB) to skip giant files
-    branch = "master",
-    event = { "BufReadPre", "BufNewFile" },
-    build = ":TSUpdate",
-    dependencies = {
-      "windwp/nvim-ts-autotag",
-    },
-    config = function()
-      local status, treesitter = pcall(require, "nvim-treesitter.configs")
-      if not status then
-        status, treesitter = pcall(require, "nvim-treesitter")
+    branch = "main",
+    lazy = false,
+    build = function()
+      local ok, ts = pcall(require, "nvim-treesitter")
+      if ok and type(ts.install) == "function" then
+        pcall(ts.install, parsers)
       end
-
-      if not status then
-        vim.notify(
-          "Failed to load nvim-treesitter: " .. tostring(treesitter),
-          vim.log.levels.ERROR,
-          { timeout = 2000, title = "Treesitter Error", icon = "❌" }
-        )
+    end,
+    config = function()
+      local ok, ts = pcall(require, "nvim-treesitter")
+      if not ok then
         return
       end
+      pcall(ts.setup, { install_dir = vim.fn.stdpath "data" .. "/site" })
 
-      treesitter.setup {
-        ensure_installed = {
-          "javascript",
-          "typescript",
-          "tsx",
-          "c_sharp",
-          "razor",
-          "html",
-          "css",
-          "svelte",
-          "json",
-          "yaml",
-          "markdown",
-          "markdown_inline",
-          "lua",
-          "php",
-          "bash",
-          "dockerfile",
-          "gitignore",
-          "toml",
-          "xml",
-          "vue",
-          "graphql",
-        },
-        auto_install = true,
-        sync_install = false,
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-          disable = function(lang, buf)
-            local max_filesize = 100 * 1024 -- 100 KB
-            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-            local disabled = { "neo-tree", "help", "terminal", "" }
-            if
-              vim.tbl_contains(disabled, lang)
-              or vim.b[buf].hlchunk_disabled
-              or (ok and stats and stats.size > max_filesize)
-            then
-              return true
-            end
-            return false
-          end,
-        },
-        indent = {
-          enable = true,
-        },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<leader>ss", -- Avoid terminal conflicts
-            node_incremental = "<leader>ss",
-            scope_incremental = "<leader>sS",
-            node_decremental = "<leader>sd",
-          },
-        },
-      }
+      pcall(vim.treesitter.language.register, "razor", "cshtml")
 
-      vim.treesitter.language.register("razor", "cshtml")
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("TreesitterStart", { clear = true }),
+        callback = function(args)
+          local bufnr = args.buf
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          local stat_ok, stat = pcall(vim.uv.fs_stat, fname)
+          -- 100 KB cap — bigger files freeze the highlighter
+          if (stat_ok and stat and stat.size > 100 * 1024) or vim.b[bufnr].large_file then
+            return
+          end
+          local lang = vim.treesitter.language.get_lang(vim.bo[bufnr].filetype)
+          if lang then
+            pcall(vim.treesitter.start, bufnr, lang)
+          end
+        end,
+      })
     end,
   },
+
   {
     "windwp/nvim-ts-autotag",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "InsertEnter",
     config = function()
-      local status, autotag = pcall(require, "nvim-ts-autotag")
-      if not status then
-        vim.notify(
-          "Failed to load nvim-ts-autotag: " .. tostring(autotag),
-          vim.log.levels.ERROR,
-          { timeout = 2000, title = "Autotag Error", icon = "❌" }
-        )
-        return
-      end
-      autotag.setup {
-        opts = {
-          enable_close = true,
-          enable_rename = true,
-          enable_close_on_slash = true,
-        },
-        filetypes = {
-          "html",
-          "javascript",
-          "typescript",
-          "javascriptreact",
-          "typescriptreact",
-          "svelte",
-          "vue",
-          "razor",
-          "cshtml",
-        },
-      }
+      pcall(function()
+        require("nvim-ts-autotag").setup {
+          opts = {
+            enable_close = true,
+            enable_rename = true,
+            enable_close_on_slash = true,
+          },
+        }
+      end)
     end,
   },
 }

@@ -1,6 +1,3 @@
--- Roslyn LSP setup for C# / Razor / CSHTML. Razor cohosting is enabled by default
--- on Neovim 0.12+ with roslyn-language-server >= 5.8.0-1.26262.10.
-
 local M = {}
 
 function M.setup()
@@ -22,8 +19,6 @@ function M.setup()
 
     local opts = { buffer = bufnr, noremap = true, silent = true }
 
-    -- <leader>l namespace, kept clear of DAP's <leader>d.
-    -- Open diagnostic float AND focus the cursor into it (so <C-y>, scrolling, etc. work).
     vim.keymap.set("n", "<leader>ld", function()
       local _, winid = vim.diagnostic.open_float(nil, {
         scope = "cursor",
@@ -58,7 +53,7 @@ function M.setup()
         group = group,
         callback = vim.lsp.codelens.refresh,
       })
-      -- Roslyn needs a few seconds to index the solution before codelens data is ready.
+      -- Roslyn needs ~4s to index before codelens data is available
       vim.defer_fn(vim.lsp.codelens.refresh, 4000)
     end
 
@@ -75,9 +70,7 @@ function M.setup()
     on_attach = roslyn_on_attach,
     settings = {
       ["csharp|background_analysis"] = {
-        -- openFiles keeps Roslyn from indexing the entire solution on attach —
-        -- fullSolution freezes Neovim for minutes on big repos. Flip temporarily
-        -- with :Roslyn restart after changing this.
+        -- openFiles keeps Roslyn from indexing the whole solution on attach
         dotnet_analyzer_diagnostics_scope = "openFiles",
         dotnet_compiler_diagnostics_scope = "openFiles",
       },
@@ -109,11 +102,7 @@ function M.setup()
   })
 
   require("roslyn").setup {
-    -- "roslyn": file watching delegated to the Roslyn server itself — more
-    -- efficient than libuv inotify, especially under WSL2 and on large solutions.
     filewatching = "roslyn",
-    -- Default to narrow solution discovery; flip to true only for repos where
-    -- projects live outside the solution root.
     broad_search = false,
     lock_target = false,
     silent = true,

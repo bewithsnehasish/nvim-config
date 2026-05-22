@@ -1,21 +1,19 @@
--- lua/plugins/illuminate.lua
 return {
   {
     "RRethy/vim-illuminate",
     event = "VeryLazy",
     config = function()
-      -- Define custom highlight groups with subtle styling to avoid clashing with diagnostics
       vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = "#3E4452", underline = false })
       vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#3E4452", underline = false })
       vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#3E4452", underline = false })
 
-      -- Jump between occurrences of the word under cursor
-      vim.keymap.set("n", "]r", function() require("illuminate").goto_next_reference() end,
-        { desc = "Next reference (illuminate)" })
-      vim.keymap.set("n", "[r", function() require("illuminate").goto_prev_reference() end,
-        { desc = "Prev reference (illuminate)" })
+      vim.keymap.set("n", "]r", function()
+        require("illuminate").goto_next_reference()
+      end, { desc = "Next reference (illuminate)" })
+      vim.keymap.set("n", "[r", function()
+        require("illuminate").goto_prev_reference()
+      end, { desc = "Prev reference (illuminate)" })
 
-      -- Toggle word-under-cursor highlighting globally
       vim.keymap.set("n", "<leader>ui", function()
         require("illuminate").toggle()
         vim.notify(
@@ -28,43 +26,20 @@ return {
       require("illuminate").configure {
         delay = 300,
         modes_allowlist = { "n", "v" },
-        -- Drop "treesitter" provider: on Neovim 0.12 + nvim-treesitter master,
-        -- locals.lua:286 throws "attempt to call method 'parent' (a nil value)".
-        -- LSP + regex give the same UX for word-under-cursor highlighting.
-        providers = {
-          "lsp",
-          "regex",
-        },
-        -- Skip illuminate on large files (set by the LargeFilePerf autocmd)
+        -- nvim-treesitter main branch doesn't expose `nvim-treesitter.locals`
+        -- that illuminate's treesitter provider depends on. lsp+regex covers the same UX.
+        providers = { "lsp", "regex" },
         predicate = function(buf)
           return not vim.b[buf].large_file
         end,
         filetypes_denylist = {
-          "mason",
-          "harpoon",
-          "DressingInput",
-          "NeogitCommitMessage",
-          "qf",
-          "dirvish",
-          "oil",
-          "minifiles",
-          "fugitive",
-          "alpha",
-          "NvimTree",
-          "lazy",
-          "NeogitStatus",
-          "Trouble",
-          "netrw",
-          "lir",
-          "DiffviewFiles",
-          "Outline",
-          "Jaq",
-          "spectre_panel",
-          "toggleterm",
-          "DressingSelect",
+          "mason", "harpoon", "DressingInput", "NeogitCommitMessage", "qf",
+          "dirvish", "oil", "minifiles", "fugitive", "alpha", "NvimTree",
+          "lazy", "NeogitStatus", "Trouble", "netrw", "lir", "DiffviewFiles",
+          "Outline", "Jaq", "spectre_panel", "toggleterm", "DressingSelect",
           "TelescopePrompt",
         },
-        under_cursor = true, -- Highlight word under cursor
+        under_cursor = true,
       }
     end,
   },

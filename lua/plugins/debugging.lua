@@ -4,10 +4,8 @@ return {
     event = "VeryLazy",
     dependencies = {
       "williamboman/mason.nvim",
-      -- nvim-dap-ui: scopes/watches/repl/stacks panes that open on debug start
       "rcarriga/nvim-dap-ui",
-      "nvim-neotest/nvim-nio", -- required by dap-ui
-      -- Inline virtual-text values next to variables while stepping
+      "nvim-neotest/nvim-nio",
       "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
@@ -15,9 +13,6 @@ return {
       local dapui = require "dapui"
       require("lang.dotnet.dap").setup_adapter(dap)
 
-      -- ── dap-ui layout ────────────────────────────────────────────────────────
-      -- Left column: scopes + breakpoints + stacks + watches
-      -- Bottom row : repl + console (toggle between)
       dapui.setup {
         icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
         controls = {
@@ -43,7 +38,7 @@ return {
               { id = "stacks", size = 0.20 },
               { id = "watches", size = 0.20 },
             },
-            size = 40, -- columns
+            size = 40,
             position = "left",
           },
           {
@@ -51,7 +46,7 @@ return {
               { id = "repl", size = 0.5 },
               { id = "console", size = 0.5 },
             },
-            size = 10, -- rows
+            size = 10,
             position = "bottom",
           },
         },
@@ -63,20 +58,18 @@ return {
         virt_text_pos = "eol",
       }
 
-      -- ── Auto-open / auto-focus on debug session start ─────────────────────────
+      local function focus_scopes()
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "dapui_scopes" then
+            vim.api.nvim_set_current_win(win)
+            return
+          end
+        end
+      end
+
       dap.listeners.before.attach.dapui_config = function()
         dapui.open()
-        -- Move cursor into the scopes pane (top of left column) so you can
-        -- expand variables / watches immediately without grabbing the mouse.
-        vim.schedule(function()
-          for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local buf = vim.api.nvim_win_get_buf(win)
-            if vim.bo[buf].filetype == "dapui_scopes" then
-              vim.api.nvim_set_current_win(win)
-              return
-            end
-          end
-        end)
+        vim.schedule(focus_scopes)
       end
       dap.listeners.before.launch.dapui_config = dap.listeners.before.attach.dapui_config
       dap.listeners.before.event_terminated.dapui_config = function()
@@ -89,14 +82,12 @@ return {
       local function find_dotnet_dll()
         local dlls = vim.fn.globpath(vim.fn.getcwd(), "**/bin/Debug/**/*.dll", false, true)
         local default = ""
-
         for _, dll in ipairs(dlls) do
           if not dll:match "testhost%.dll$" and not dll:match "ref[/\\]" then
             default = dll
             break
           end
         end
-
         return vim.fn.input("Path to dll: ", default, "file")
       end
 
@@ -121,25 +112,19 @@ return {
       { "<leader>dso", function() require("dap").step_over() end, desc = "DAP step over" },
       { "<leader>dsi", function() require("dap").step_into() end, desc = "DAP step into" },
       { "<leader>dsu", function() require("dap").step_out() end, desc = "DAP step out" },
-      { "<leader>de", function() require("dap").eval() end, desc = "DAP evaluate expression", mode = { "n", "v" } },
-
-      -- ── dap-ui controls ────────────────────────────────────────────────────
-      -- <leader>du  → toggle the full debug UI (scopes + breakpoints + repl + …)
-      -- <leader>df  → jump cursor INTO the scopes pane (works anytime the UI is open)
-      -- <leader>dh  → hover popup with the value under cursor
+      { "<leader>de", function() require("dap").eval() end, desc = "DAP evaluate", mode = { "n", "v" } },
       { "<leader>du", function() require("dapui").toggle() end, desc = "Toggle DAP UI" },
       {
         "<leader>df",
         function()
           for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local buf = vim.api.nvim_win_get_buf(win)
-            local ft = vim.bo[buf].filetype
+            local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
             if ft == "dapui_scopes" or ft == "dapui_watches" or ft == "dapui_stacks" then
               vim.api.nvim_set_current_win(win)
               return
             end
           end
-          vim.notify("DAP UI not open. Press <leader>du first.", vim.log.levels.WARN)
+          vim.notify("DAP UI not open", vim.log.levels.WARN)
         end,
         desc = "Focus DAP UI",
       },

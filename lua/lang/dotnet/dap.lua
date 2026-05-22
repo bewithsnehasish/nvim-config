@@ -14,8 +14,6 @@ function M.setup_adapter(dap)
   end
 
   local data = vim.fn.stdpath "data"
-  -- Search order covers: PATH-resolved, Mason bin shim (all 3 ext variants), and
-  -- raw extracted layouts under packages/ (Linux uses libexec/, Windows nests deeper).
   local netcoredbg = first_executable {
     vim.fn.exepath "netcoredbg",
     vim.fn.exepath "netcoredbg.exe",
@@ -29,7 +27,7 @@ function M.setup_adapter(dap)
   }
 
   if not netcoredbg then
-    vim.notify("netcoredbg is not executable; install it with :MasonInstall netcoredbg", vim.log.levels.WARN)
+    vim.notify("netcoredbg not found — install via :MasonInstall netcoredbg", vim.log.levels.WARN)
     return false
   end
 

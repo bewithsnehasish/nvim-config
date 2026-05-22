@@ -6,43 +6,36 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     config = function()
-      -- ── Pill helpers ──────────────────────────────────────────────────────
-      -- Round-end glyphs (Powerline range, present in any Nerd Font).
-      -- Written as UTF-8 byte escapes because the literal chars get stripped
-      -- by the editing pipeline.
-      local LROUND = "\xee\x82\xb6" -- U+E0B6 round left edge
-      local RROUND = "\xee\x82\xb4" -- U+E0B4 round right edge
+      -- U+E0B6 (round left) and U+E0B4 (round right) — Powerline glyphs.
+      -- Written as UTF-8 byte escapes; literal chars get stripped by some editing pipelines.
+      local LROUND = "\xee\x82\xb6"
+      local RROUND = "\xee\x82\xb4"
 
       local function pill()
         return { left = LROUND, right = RROUND }
       end
 
-      -- ── Make the bar background TRANSPARENT so gaps between pills are clear
       local function transparentize()
         vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
         vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
       end
       transparentize()
 
-      -- ── FIXED Catppuccin Mocha palette ────────────────────────────────────
-      -- Hardcoded so the statusline pills look identical no matter which
-      -- colorscheme is active (cyberdream / tokyonight / kanagawa / …).
-      -- Source: https://github.com/catppuccin/palette (Mocha flavour).
+      -- Catppuccin Mocha palette — hardcoded so pills look identical across colorschemes
       local p = {
-        base = "#1e1e2e", -- pill text fg when sitting on a bright bg (mode pill)
-        surface = "#313244", -- Surface0 — pill background for non-mode components
-        fg = "#cdd6f4", -- Text — default pill foreground
-        green = "#a6e3a1", -- mode NORMAL · diff added
-        yellow = "#f9e2af", -- mode COMMAND · diff modified · warn
-        red = "#f38ba8", -- mode REPLACE · diff removed · error
-        blue = "#89b4fa", -- mode INSERT · filename
-        mauve = "#cba6f7", -- mode VISUAL · branch · project · hint
-        sky = "#89dceb", -- mode TERMINAL · info
-        peach = "#fab387", -- wakatime · constants
-        lavender = "#b4befe", -- accents
+        base = "#1e1e2e",
+        surface = "#313244",
+        fg = "#cdd6f4",
+        green = "#a6e3a1",
+        yellow = "#f9e2af",
+        red = "#f38ba8",
+        blue = "#89b4fa",
+        mauve = "#cba6f7",
+        sky = "#89dceb",
+        peach = "#fab387",
+        lavender = "#b4befe",
       }
 
-      -- ── Mode-aware pill color ─────────────────────────────────────────────
       local function mode_pill_color()
         local m = vim.api.nvim_get_mode().mode
         local map = {
@@ -50,7 +43,7 @@ return {
           i = p.blue,
           v = p.mauve,
           V = p.mauve,
-          ["\22"] = p.mauve, -- C-V
+          ["\22"] = p.mauve,
           s = p.mauve,
           S = p.mauve,
           c = p.peach,
@@ -61,14 +54,10 @@ return {
         return { bg = map[m] or map[m:sub(1, 1)] or p.green, fg = p.base, gui = "bold" }
       end
 
-      -- ── Project root (folder name of cwd) ────────────────────────────────
       local function project_name()
         return vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
       end
 
-      -- ── Wakatime today (reads vim-wakatime's cached today value) ─────────
-      -- vim-wakatime writes to ~/.wakatime/today after each heartbeat. Falls
-      -- back to nothing if the file doesn't exist (e.g. wakatime offline).
       local function wakatime_today()
         local f = io.open(vim.fn.expand "~/.wakatime/today", "r")
         if not f then
@@ -79,14 +68,10 @@ return {
         return (s:gsub("[\r\n]", ""))
       end
 
-      -- ── Build the spec ────────────────────────────────────────────────────
       local function build_config()
         return {
           options = {
             icons_enabled = true,
-            -- Theme that paints sections with the transparent statusline bg —
-            -- so when a component DOESN'T override its color, it disappears
-            -- into the gap rather than showing a colored block.
             theme = {
               normal = {
                 a = { bg = "NONE", fg = p.fg },
@@ -105,8 +90,6 @@ return {
                 z = { bg = "NONE", fg = p.fg },
               },
             },
-            -- Empty global separators — every component carries its OWN
-            -- rounded separator via the `separator = pill()` field.
             component_separators = "",
             section_separators = "",
             disabled_filetypes = {
@@ -115,7 +98,6 @@ return {
             globalstatus = true,
           },
           sections = {
-            -- LEFT
             lualine_a = {
               {
                 "mode",
@@ -156,8 +138,6 @@ return {
               },
             },
             lualine_c = {},
-
-            -- RIGHT
             lualine_x = {
               {
                 "branch",
@@ -187,7 +167,7 @@ return {
               {
                 "filename",
                 file_status = true,
-                path = 0, -- name only; the breadcrumb (winbar) shows the full path
+                path = 0,
                 symbols = { modified = " ●", readonly = " ", unnamed = "[No Name]" },
                 separator = pill(),
                 color = { bg = p.surface, fg = p.blue },
@@ -209,7 +189,6 @@ return {
 
       require("lualine").setup(build_config())
 
-      -- Re-render on colorscheme change (palette is dynamic; transparent bg gets re-applied).
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("LualinePillsRefresh", { clear = true }),
         callback = function()
