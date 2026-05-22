@@ -36,9 +36,8 @@
 │   │   ├── keymaps.lua            # WAS keymaps.lua (loses dead Java keymaps)
 │   │   └── health.lua             # WAS user/health/config.lua (registered as vim.health.* too)
 │   ├── lsp/
-│   │   ├── init.lua               # NEW — capabilities + diagnostics + dispatcher
 │   │   ├── on_attach.lua          # WAS user/lsp/on_attach.lua
-│   │   └── servers/               # NEW — one file per server
+│   │   └── servers/               # NEW — one file per server config
 │   │       ├── lua_ls.lua
 │   │       ├── html.lua
 │   │       ├── cssls.lua
@@ -50,8 +49,8 @@
 │   │       ├── eslint.lua
 │   │       ├── intelephense.lua
 │   │       ├── graphql.lua
-│   │       ├── biome.lua
-│   │       └── typescript_tools.lua  # not strictly lspconfig; lives here for cohesion
+│   │       └── biome.lua          # typescript_tools stays inline in lspconfig.lua
+                                   # — it's not a regular lspconfig server
 │   ├── lang/
 │   │   └── dotnet/
 │   │       ├── init.lua           # roslyn.nvim setup (was plugins/dotnet.lua config body)
@@ -155,13 +154,15 @@ end
 
 `toggleterminal.lua` keeps its own `pick_shell()` (different concern: interactive REPL vs `:!` plumbing) but reads `vim.g.shell_kind` from `core.platform` to stay consistent.
 
-### 2. `lua/lsp/init.lua` (NEW)
+### 2. `lua/lsp/servers/<name>.lua` (NEW per-server files)
 
-Owns: capabilities construction, diagnostic config + highlights, the `custom_on_attach` builder (formatter handoff + diagnostic floats + CursorHold), and the server-list loader. Exports `M.setup()` which `plugins/lspconfig.lua` calls.
+Per-server configs split out of the 667-line `lspconfig.lua`. Each file returns a plain config table (filetypes, settings, root_dir, optional handlers). `plugins/lspconfig.lua` scans the directory at startup and registers each one via `vim.lsp.config(name, cfg) ; vim.lsp.enable(name)`.
 
-Each server file in `lua/lsp/servers/` returns `function(capabilities, on_attach) -> config_table`. `lsp/init.lua` iterates them and registers with `vim.lsp.config(name, cfg) ; vim.lsp.enable(name)`. **No `vim.lsp.config or fallback` branching** — Neovim 0.12+ baseline guarantees the native API.
+**No `vim.lsp.config or fallback` branching** — Neovim 0.12+ baseline guarantees the native API, so the existing fallback ladders in `lspconfig.lua` are removed.
 
-`typescript_tools.lua` is the one server file that doesn't follow the lspconfig pattern (it has its own `setup`); `lsp/init.lua` special-cases it.
+The LSP chassis — capabilities construction, diagnostic config + highlights, the `custom_on_attach` builder (formatter handoff + diagnostic floats + CursorHold), the `typescript-tools` special-case setup, the omnifunc autocmd — **stays inside `plugins/lspconfig.lua`'s `config` function**. Splitting it into a separate `lsp/init.lua` module would add an indirection layer with no second consumer and break the "plugin spec + its setup live together" rule. The win we're after is "touching a server config doesn't drag the whole 667-line file into context" — the per-server split achieves that.
+
+`typescript_tools` doesn't follow the regular lspconfig pattern (its own `setup{}` function), so it stays inline in `plugins/lspconfig.lua` rather than in `lsp/servers/`.
 
 ### 3. `lua/lang/dotnet/` (NEW module)
 
