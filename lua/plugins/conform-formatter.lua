@@ -43,7 +43,8 @@ return {
           -- Other Languages
           lua = { "stylua" },
           php = { "php-cs-fixer" },
-          prisma = { "prisma-format" },
+          -- prisma intentionally omitted: no `prisma-format` exists as a conform builtin.
+          -- prismals LSP handles formatting via lsp_format = "fallback".
         },
 
         formatters = {
