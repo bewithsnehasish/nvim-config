@@ -44,8 +44,13 @@ return {
         options = {
           icons_enabled = true,
           theme = "horizon",
-          component_separators = { left = "", right = "" },
-          section_separators = { left = "", right = "" },
+          -- Powerline glyphs (Nerd Font required):
+          --   \xee\x82\xb7 = U+E0B7 (thin round left, component divider)
+          --   \xee\x82\xb5 = U+E0B5 (thin round right, component divider)
+          --   \xee\x82\xb6 = U+E0B6 (full round left, section transition)
+          --   \xee\x82\xb4 = U+E0B4 (full round right, section transition)
+          component_separators = { left = "\xee\x82\xb7", right = "\xee\x82\xb5" },
+          section_separators = { left = "\xee\x82\xb6", right = "\xee\x82\xb4" },
           disabled_filetypes = {
             statusline = { "alpha", "dashboard", "lazy", "mason" },
           },
