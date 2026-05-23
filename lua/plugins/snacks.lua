@@ -19,11 +19,53 @@ return {
       vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = "#3E4452", underline = false })
     end,
     opts = {
-      bigfile = { enabled = true },
+      bigfile = {
+        enabled = true,
+        size = 500 * 1024, -- 500 KB (matching your previous LargeFilePerf threshold)
+        setup = function(ctx)
+          -- Custom large file disabling flags (from old options.lua autocommand)
+          vim.b[ctx.buf].large_file = true
+          vim.b[ctx.buf].hlchunk_disabled = true
+          vim.b[ctx.buf].miniindentscope_disable = true
+          vim.opt_local.spell = false
+          vim.opt_local.swapfile = false
+          vim.opt_local.undofile = false
+          vim.opt_local.signcolumn = "no"
+          vim.opt_local.colorcolumn = ""
+
+          -- Standard Snacks bigfile optimizations
+          if vim.fn.exists(":NoMatchParen") ~= 0 then
+            vim.cmd([[NoMatchParen]])
+          end
+          Snacks.util.wo(0, { foldmethod = "manual", statuscolumn = "", conceallevel = 0 })
+          vim.b.completion = false
+          vim.b.minianimate_disable = true
+          vim.b.minihipatterns_disable = true
+          vim.schedule(function()
+            if vim.api.nvim_buf_is_valid(ctx.buf) then
+              vim.bo[ctx.buf].syntax = ctx.ft
+            end
+          end)
+        end,
+      },
       quickfile = { enabled = true },
       scroll = { enabled = true }, -- smooth scrolling (replaces neoscroll)
       words = { enabled = true },  -- cursor word highlighting (replaces vim-illuminate)
       explorer = { replace_netrw = true }, -- file explorer (replaces neo-tree)
+      dashboard = {
+        enabled = true, -- startup dashboard (replaces alpha-nvim)
+        preset = {
+          header = [[
+                                                                     
+       ████ ██████           █████      ██                     
+      ███████████             █████                             
+      █████████ ███████████████████ ███   ███████████   
+     █████████  ███    █████████████ █████ ██████████████   
+    █████████ ██████████ █████████ █████ █████ ████ █████   
+  ███████████ ███    ███ █████████ █████ █████ ████ █████  
+ ██████  █████████████████████ ████ █████ █████ ████ ██████]],
+        },
+      },
       picker = {
         -- "default" = wide centered float with preview on the right.
         -- Override per-picker below for grep/references which benefit from "ivy" (bottom panel).
@@ -91,6 +133,7 @@ return {
     keys = {
       -- Buffers / files
       { "<leader>bb", function() Snacks.picker.buffers() end,        desc = "Find buffers" },
+      { "<leader>bd", function() Snacks.bufdelete() end,             desc = "Delete Buffer (layout safe)" },
       { "<leader>ff", function() Snacks.picker.files() end,          desc = "Find files" },
       { "<leader>fr", function() Snacks.picker.recent() end,         desc = "Recent files" },
       { "<leader>fg", function() Snacks.picker.grep() end,           desc = "Grep (live)" },

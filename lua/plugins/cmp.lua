@@ -2,15 +2,14 @@ return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
   dependencies = {
-    { "hrsh7th/cmp-nvim-lsp", event = "InsertEnter" }, -- LSP source
-    { "hrsh7th/cmp-emoji", event = "InsertEnter" }, -- Emoji source
-    { "hrsh7th/cmp-buffer", event = "InsertEnter" }, -- Buffer source
-    { "hrsh7th/cmp-path", event = "InsertEnter" }, -- Path source
-    { "hrsh7th/cmp-cmdline", event = "InsertEnter" }, -- Command-line source
-    { "saadparwaiz1/cmp_luasnip", event = "InsertEnter" }, -- LuaSnip integration
+    "hrsh7th/cmp-nvim-lsp", -- LSP source
+    "hrsh7th/cmp-emoji", -- Emoji source
+    "hrsh7th/cmp-buffer", -- Buffer source
+    "hrsh7th/cmp-path", -- Path source
+    "hrsh7th/cmp-cmdline", -- Command-line source
+    "saadparwaiz1/cmp_luasnip", -- LuaSnip integration
     {
       "L3MON4D3/LuaSnip",
-      event = "InsertEnter",
       dependencies = { "rafamadriz/friendly-snippets" }, -- Predefined snippets
     },
     { "hrsh7th/cmp-nvim-lua" }, -- Neovim Lua API source
