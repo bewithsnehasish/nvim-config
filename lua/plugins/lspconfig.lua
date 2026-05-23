@@ -145,113 +145,7 @@ return {
         },
       })
 
-      -- 5. Enhanced On-Attach
-      local custom_on_attach = function(client, bufnr)
-        -- Disable formatting if conform.nvim has a formatter for this buffer
-        local conform_status, conform = pcall(require, "conform")
-        if conform_status then
-          local formatters = conform.list_formatters(bufnr)
-          if formatters and #formatters > 0 then
-            client.server_capabilities.documentFormattingProvider = false
-            client.server_capabilities.documentRangeFormattingProvider = false
-          end
-        end
-
-        on_attach(client, bufnr)
-
-        local opts = { buffer = bufnr, noremap = true, silent = true }
-
-        -- 🔍 INTERACTIVE DIAGNOSTIC FLOAT — moved to <leader>ld (LSP namespace)
-        -- Reason: <leader>d was buffer-local and had higher priority than global
-        -- DAP keymaps (<leader>db, <leader>dr, etc.), causing them to fail.
-        vim.keymap.set("n", "<leader>ld", function()
-          local winid = vim.fn.win_getid()
-          local float_opts = {
-            scope = "cursor",
-            focusable = true,
-            close_events = {},
-            border = "rounded",
-            source = "if_many",
-            format = function(diagnostic)
-              local source = diagnostic.source and (" [" .. diagnostic.source .. "]") or ""
-              return string.format("%s%s", diagnostic.message, source)
-            end,
-          }
-
-          local float_bufnr, float_winid = vim.diagnostic.open_float(nil, float_opts)
-
-          if float_winid then
-            -- FIX 3: Focus float first, then set keymaps directly.
-            --        WinEnter already fired by the time the autocmd was registered,
-            --        so keymaps inside WinEnter callback were never being set.
-            vim.fn.win_gotoid(float_winid)
-
-            vim.keymap.set("n", "<C-y>", function()
-              vim.cmd "normal! ggVGy"
-              vim.notify("Diagnostic text yanked!", vim.log.levels.INFO, { title = "Yank" })
-            end, { buffer = float_bufnr, nowait = true })
-
-            vim.keymap.set("n", "<Esc>", function()
-              vim.api.nvim_win_close(float_winid, true)
-              vim.fn.win_gotoid(winid)
-            end, { buffer = float_bufnr, nowait = true })
-
-            vim.keymap.set("n", "<CR>", function()
-              vim.api.nvim_win_close(float_winid, true)
-              vim.fn.win_gotoid(winid)
-            end, { buffer = float_bufnr, nowait = true })
-
-            -- FIX 4: WinClosed with once=true handles cleanup and focus restore.
-            --        Replaced the named augroup (DiagnosticFloat_N) that was leaking
-            --        a new augroup on every <leader>d press without ever being deleted.
-            -- FIX 5: Removed the dead WinLeave autocmd that had a string/int type
-            --        mismatch on args.match and an empty body.
-            vim.api.nvim_create_autocmd("WinClosed", {
-              pattern = tostring(float_winid),
-              once = true,
-              callback = function()
-                vim.fn.win_gotoid(winid)
-              end,
-            })
-          else
-            vim.notify("No diagnostics at cursor", vim.log.levels.WARN)
-          end
-        end, opts)
-
-        -- Navigation
-        vim.keymap.set("n", "]d", function()
-          vim.diagnostic.jump { count = 1, float = true }
-        end, opts)
-        vim.keymap.set("n", "[d", function()
-          vim.diagnostic.jump { count = -1, float = true }
-        end, opts)
-
-        -- Raw diagnostic inspector (kept out of <leader>d DAP namespace)
-        vim.keymap.set("n", "<leader>lD", function()
-          local diags = vim.diagnostic.get(bufnr)
-          print(vim.inspect(#diags > 0 and diags or "No diagnostics"))
-        end, vim.tbl_extend("force", opts, { desc = "Inspect raw diagnostics" }))
-
-        -- Auto-hover on CursorHold (non-interactive, quick glance)
-        local group = vim.api.nvim_create_augroup("LspDiagnosticsHover_" .. bufnr, { clear = true })
-        vim.api.nvim_create_autocmd("CursorHold", {
-          buffer = bufnr,
-          group = group,
-          callback = function()
-            local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
-            local diags = vim.diagnostic.get(bufnr, { lnum = cursor_line })
-            if #diags > 0 then
-              vim.diagnostic.open_float(nil, {
-                scope = "line",
-                focusable = false,
-                close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-                border = "rounded",
-                source = "if_many",
-              })
-            end
-          end,
-        })
-      end
+      -- 5. Enhanced On-Attach is now consolidated in lua/lsp/on_attach.lua
 
       -- 6. TypeScript Tools Setup
       -- Mason integration is built-in since typescript-tools commit (2025) — no need to
@@ -265,7 +159,7 @@ return {
             "javascriptreact",
           },
           capabilities = capabilities,
-          on_attach = custom_on_attach,
+          on_attach = on_attach,
           flags = { debounce_text_changes = 150 },
           settings = {
             separate_diagnostic_server = true,
@@ -312,13 +206,14 @@ return {
       for server_name, config in pairs(server_configs) do
         local default_config = {
           capabilities = capabilities,
-          on_attach = config.on_attach or custom_on_attach,
+          on_attach = config.on_attach or on_attach,
           flags = { debounce_text_changes = 150 },
         }
         local final_config = vim.tbl_deep_extend("force", default_config, config)
         vim.lsp.config(server_name, final_config)
         vim.lsp.enable(server_name)
       end
+
 
       -- 8. Omnifunc for specific filetypes
       vim.api.nvim_create_autocmd("FileType", {

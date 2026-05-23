@@ -1,7 +1,7 @@
 return {
   "williamboman/mason-lspconfig.nvim",
   event = { "BufReadPre", "BufNewFile" },
-  cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUninstallAll", "MasonLog" },
+  cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUninstallAll", "MasonLog", "LspInstall", "LspUninstall" },
   dependencies = {
     "williamboman/mason.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -68,6 +68,9 @@ return {
         "graphql",
       },
       automatic_installation = true,
+      automatic_enable = {
+        exclude = { "csharp_ls", "omnisharp", "roslyn", "ts_ls" },
+      },
       handlers = {
         -- Default handler for servers NOT configured in lspconfig.lua
         function(server_name)
@@ -87,6 +90,9 @@ return {
             "prismals", -- Custom setup in lspconfig
             "intelephense", -- Custom setup in lspconfig
             "graphql", -- Custom setup in lspconfig
+            "csharp_ls", -- Handled by roslyn.nvim
+            "omnisharp", -- Handled by roslyn.nvim
+            "roslyn", -- Handled by roslyn.nvim
           }
 
           if vim.tbl_contains(skip_servers, server_name) then

@@ -190,4 +190,12 @@ function M.run()
   vim.api.nvim_set_current_buf(buf)
 end
 
+function M.check()
+  local health = vim.health or require("health")
+  health.start("Neovim Config Health")
+  for _, line in ipairs(collect()) do
+    health.info(line)
+  end
+end
+
 return M
