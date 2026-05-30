@@ -17,6 +17,13 @@ vim.cmd "set shiftwidth=2"
 vim.o.updatetime = 800
 
 vim.g.mapleader = " "
+
+-- Disable unused legacy providers to speed up startup time
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 vim.g.background = "light"
 vim.g.enabled_extra_plugins = {
   "bqf",

@@ -30,9 +30,9 @@ return {
     packageManager = "npm",
     quiet = false,
     rulesCustomizations = {},
-    run = "onSave",
+    run = "onType",
     useESLintClass = false,
     validate = "on",
-    workingDirectory = { mode = "auto" },
+    workingDirectories = { { mode = "auto" } },
   },
 }

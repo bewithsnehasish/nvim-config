@@ -1,0 +1,1347 @@
+
+==============================================================================
+conform:                                                                  5 ⚠️
+
+conform.nvim report ~
+- Log file: C:\Users\snehasish\AppData\Local\nvim-data\conform.log
+- ⚠️ WARNING biome unavailable: Condition failed
+- ⚠️ WARNING csharpier unavailable: Command 'csharpier' not found
+- ⚠️ WARNING php-cs-fixer unavailable: Command 'php-cs-fixer' not found
+- ⚠️ WARNING prettierd unavailable: Command 'prettierd.cmd' not found
+- ⚠️ WARNING stylua unavailable: Command 'stylua' not found
+
+==============================================================================
+core:                                                                       ✅
+
+Neovim Config Health ~
+- Neovim Config Health
+- ====================
+- 
+- Platform
+- --------
+- [OK  ] Native Windows
+- [MISS] WSL
+- [MISS] Linux (native)
+- [OK  ] Neovim >= 0.12               0.12.2
+- 
+- Core Tools
+- ----------
+- [OK  ] git                          required by lazy.nvim
+- [OK  ] rg                           required by grep pickers
+- [OK  ] fd                           recommended by file pickers
+- [OK  ] dotnet                       required by Roslyn
+- [OK  ] node                         required by JS tooling
+- [OK  ] npm                          required by JS tooling
+- [OK  ] dotnet SDK >= 8              highest installed: 10
+- 
+- Windows Shell / Clipboard
+- -------------------------
+- [OK  ] pwsh                         PowerShell 7+ (preferred shell)
+- [OK  ] powershell                   PowerShell 5 (fallback)
+- [OK  ] vim shell is pwsh            current: pwsh
+- 
+- Build Tools
+- -----------
+- [OK  ] cmake                        needed by some native plugins
+- [OK  ] C compiler                   cc
+- 
+- .NET / Mason
+- -------------
+- [OK  ] netcoredbg                   C:/Users/snehasish/AppData/Local/nvim-data/mason/bin/netcoredbg
+- [OK  ] csharpier                    C:/Users/snehasish/AppData/Local/nvim-data/mason/bin/csharpier
+- [OK  ] roslyn package               C:/Users/snehasish/AppData/Local/nvim-data/mason/packages/roslyn
+- [OK  ] razor parser                 C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-treesitter/parser/razor.so
+
+==============================================================================
+fidget:                                                                     ✅
+
+fidget.setup ~
+- ✅ OK All user-specified options are known and accounted for
+
+fidget.integration ~
+
+fidget.progress ~
+- ✅ OK Using LspProgress handler implementation
+- ✅ OK Option 'progress.lsp.progress_ringbuf_size' is 0, using default size
+
+fidget.notification ~
+- ℹ️ INFO vim.notify() is not set to fidget.notify()
+- ℹ️ INFO Rendering notifications for regular UI (e.g., nvim TUI)
+
+==============================================================================
+lazy:                                                               2 ⚠️  1 ❌
+
+lazy.nvim ~
+- {lazy.nvim} version `11.17.5`
+- ✅ OK {git} `version 2.53.0.windows.1`
+- ✅ OK no existing packages found by other package managers
+- ✅ OK packer_compiled.lua not found
+
+luarocks ~
+- checking `hererocks` installation
+- ✅ OK no plugins require `luarocks`, so you can ignore any warnings below
+- ✅ OK {python} `Python 3.14.3`
+- ❌ ERROR {C:/Users/snehasish/AppData/Local/nvim-data/lazy-rocks/hererocks/bin/luarocks} not installed
+- ⚠️ WARNING {C:/Users/snehasish/AppData/Local/nvim-data/lazy-rocks/hererocks/bin/lua} version `5.1` not installed
+- ⚠️ WARNING Lazy won't be able to install plugins that require `luarocks`.
+  Here's what you can do:
+   - fix your `luarocks` installation
+   - disable *hererocks* with `opts.rocks.hererocks = false`
+   - disable `luarocks` support completely with `opts.rocks.enabled = false`
+
+==============================================================================
+lspconfig:                                                                  ✅
+
+- Skipped. This healthcheck is redundant with `:checkhealth vim.lsp`.
+
+==============================================================================
+luasnip:                                                                  1 ⚠️
+
+luasnip ~
+- ⚠️ WARNING For Variable/Placeholder-transformations, luasnip requires
+      the jsregexp library. See `:help |luasnip-lsp-snippets-transformations`| for advice
+  
+
+==============================================================================
+mason:                                                                   13 ⚠️
+
+mason.nvim ~
+- ⚠️ WARNING mason.nvim version v2.2.1
+  - ADVICE:
+    - The latest version of mason.nvim is: v2.3.0
+- ✅ OK PATH: prepend
+- ✅ OK Providers: 
+    mason.providers.registry-api
+    mason.providers.client
+- ✅ OK neovim version >= 0.10.0
+
+mason.nvim [Registries] ~
+- ✅ OK Registry `SynthesizedRegistrySource` is installed.
+
+mason.nvim [Core utils] ~
+- ⚠️ WARNING unzip: not available
+  - ADVICE:
+    - spawn: unzip failed with exit code - and signal -. Could not find executable "unzip" in PATH.
+
+- ⚠️ WARNING wget: not available
+  - ADVICE:
+    - spawn: wget failed with exit code - and signal -. Could not find executable "wget" in PATH.
+
+- ✅ OK curl: `curl 8.19.0 (Windows) libcurl/8.19.0 Schannel zlib/1.3.1 WinIDN WinLDAP`
+- ⚠️ WARNING gzip: not available
+  - ADVICE:
+    - spawn: gzip failed with exit code - and signal -. Could not find executable "gzip" in PATH.
+
+- ✅ OK tar: `bsdtar 3.8.4 - libarchive 3.8.4 zlib/1.2.13.1-motley liblzma/5.8.1 bz2lib/1.0.8 libzstd/1.5.7 cng/2.0 libb2/bundled `
+- ✅ OK pwsh: `7.6.0 Microsoft Windows 10.0.26200 Win32NT`
+- ✅ OK 7z: `7-Zip 26.00 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-02-12`
+
+mason.nvim [Languages] ~
+- ⚠️ WARNING Go: not available
+  - ADVICE:
+    - spawn: go failed with exit code - and signal -. Could not find executable "go" in PATH.
+
+- ⚠️ WARNING Composer: not available
+  - ADVICE:
+    - spawn: composer failed with exit code - and signal -. Could not find executable "composer" in PATH.
+
+- ⚠️ WARNING cargo: not available
+  - ADVICE:
+    - spawn: cargo failed with exit code - and signal -. Could not find executable "cargo" in PATH.
+
+- ⚠️ WARNING luarocks: not available
+  - ADVICE:
+    - spawn: luarocks failed with exit code - and signal -. Could not find executable "luarocks" in PATH.
+
+- ⚠️ WARNING Ruby: not available
+  - ADVICE:
+    - spawn: ruby failed with exit code - and signal -. Could not find executable "ruby" in PATH.
+
+- ⚠️ WARNING javac: not available
+  - ADVICE:
+    - spawn: javac failed with exit code - and signal -. Could not find executable "javac" in PATH.
+
+- ⚠️ WARNING java: not available
+  - ADVICE:
+    - spawn: java failed with exit code - and signal -. Could not find executable "java" in PATH.
+
+- ⚠️ WARNING julia: not available
+  - ADVICE:
+    - spawn: julia failed with exit code - and signal -. Could not find executable "julia" in PATH.
+
+- ⚠️ WARNING RubyGem: not available
+  - ADVICE:
+    - spawn: gem failed with exit code - and signal -. Could not find executable "gem" in PATH.
+
+- ✅ OK PHP: `PHP 5.6.40 (cli) (built: Jan  9 2019 15:10:36) `
+- ✅ OK python: `Python 3.14.3`
+- ✅ OK node: `v25.8.0`
+- ✅ OK npm: `11.11.0`
+- ✅ OK pip: `pip 25.3 from C:\Python314\Lib\site-packages\pip (python 3.14)`
+- ✅ OK python venv: `Ok`
+
+==============================================================================
+nvim-treesitter:                                                            ✅
+
+Requirements ~
+- ✅ OK Neovim was compiled with tree-sitter runtime ABI version 15 (required >=13).
+- ✅ OK tree-sitter-cli 0.26.8 (C:\Users\snehasish\scoop\shims\tree-sitter.EXE)
+- ✅ OK tar 3.8.4 (C:\Windows\system32\tar.EXE)
+- ✅ OK curl 8.19.0 (C:\Windows\system32\curl.EXE)
+  curl 8.19.0 (Windows) libcurl/8.19.0 Schannel zlib/1.3.1 WinIDN WinLDAP
+  Release-Date: 2026-03-11
+  Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt mqtts pop3 pop3s smb smbs smtp smtps telnet tftp ws wss
+  Features: alt-svc AsynchDNS HSTS HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM SPNEGO SSL SSPI threadsafe Unicode UnixSockets
+
+OS Info ~
+- sysname: Windows_NT
+- machine: x86_64
+- version: Windows 11 Home Single Language
+- release: 10.0.26200
+
+Install directory for parsers and queries ~
+- C:/Users/snehasish/AppData/Local/nvim-data/site
+- ✅ OK is writable.
+- ✅ OK is in runtimepath.
+
+Installed languages     H L F I J ~
+
+  Legend: [H]ighlights, [L]ocals, [F]olds, [I]ndents, In[J]ections ~
+
+==============================================================================
+roslyn:                                                                   2 ⚠️
+
+roslyn.nvim: Requirements ~
+- ✅ OK Neovim >= 0.12
+- ✅ OK dotnet SDK >= 10 (found 10.0.204)
+
+roslyn.nvim: Roslyn Language Server ~
+- ✅ OK found C:/Users/snehasish/AppData/Local/nvim-data/mason/bin/roslyn-language-server.cmd
+
+roslyn.nvim: Roslyn extensions: ~
+- No roslyn extensions configured
+
+roslyn.nvim: Complementary language servers ~
+- ⚠️ WARNING vscode-html-language-server not found
+  - ADVICE:
+    - Razor/Blazor HTML support will be limited.
+    - Install the html-lsp package via Mason.
+- ✅ OK html-lsp client: configured
+
+roslyn.nvim: File Watching Configuration ~
+- ⚠️ WARNING Roslyn is not running. Cannot determine file watching configuration.
+
+roslyn.nvim: Solution Detection ~
+- No solution selected
+
+==============================================================================
+snacks:                                                             9 ⚠️  9 ❌
+
+Snacks ~
+- ✅ OK setup called
+
+Snacks.bigfile ~
+- ✅ OK setup {enabled}
+
+Snacks.dashboard ~
+- ✅ OK setup {enabled}
+- ❌ ERROR setup did not run
+
+Snacks.explorer ~
+- ✅ OK setup {enabled}
+- ✅ OK 'powershell' `At line:1 char:3`
+- ✅ OK System trash command found
+
+Snacks.image ~
+- ⚠️ WARNING setup {disabled}
+- ✅ OK 'wezterm' `wezterm 20240203-110809-5046fc22`
+- ❌ ERROR Tool not found: 'magick'
+- ❌ ERROR `magick` is required to convert images. Only PNG files will be displayed.
+- ✅ OK Terminal Dimensions:
+  - {size}: `720` x `432` pixels
+  - {scale}: `1.12`
+  - {cell}: `9` x `18` pixels
+- ❌ ERROR Tool not found: 'gs'
+- ⚠️ WARNING `gs` is required to render PDF files
+- ❌ ERROR None of the tools found: 'tectonic', 'pdflatex'
+- ⚠️ WARNING `tectonic` or `pdflatex` is required to render LaTeX math expressions
+- ❌ ERROR Tool not found: 'mmdc'
+- ⚠️ WARNING `mmdc` is required to render Mermaid diagrams
+- ❌ ERROR your terminal does not support the kitty graphics protocol
+- supported terminals: `kitty`, `wezterm`, `ghostty`
+
+Snacks.input ~
+- ⚠️ WARNING setup {disabled}
+
+Snacks.lazygit ~
+- ✅ OK {lazygit} installed
+
+Snacks.notifier ~
+- ⚠️ WARNING setup {disabled}
+- ❌ ERROR is not ready
+
+Snacks.picker ~
+- ✅ OK setup {enabled}
+- ❌ ERROR `vim.ui.select` is not set to `Snacks.picker.select`
+- ⚠️ WARNING Missing Treesitter languages:
+    `regex`
+- ✅ OK 'git' `git version 2.53.0.windows.1`
+- ✅ OK 'rg' `ripgrep 14.1.0 (rev e50df40a19)`
+- ✅ OK `Snacks.picker.grep()` is available
+- ✅ OK 'fd' `fd 10.4.2`
+- ✅ OK `Snacks.picker.files()` is available
+- ✅ OK `Snacks.picker.explorer()` is available
+- ✅ OK `SQLite3` is available
+
+Snacks.quickfile ~
+- ✅ OK setup {enabled}
+
+Snacks.scope ~
+- ⚠️ WARNING setup {disabled}
+
+Snacks.scroll ~
+- ✅ OK setup {enabled}
+
+Snacks.statuscolumn ~
+- ⚠️ WARNING setup {disabled}
+
+Snacks.terminal ~
+- ✅ OK shell configured
+  - `vim.o.shell`: pwsh
+  - `parsed`: { "pwsh" }
+
+Snacks.toggle ~
+- ✅ OK {which-key} is installed
+
+Snacks.words ~
+- ✅ OK setup {enabled}
+
+==============================================================================
+typescript-tools:                                                           ✅
+
+typescript-tools.nvim ~
+- ✅ OK Neovim 0.12.2 (>= 0.11 required)
+
+==============================================================================
+vim.deprecated:                                                           1 ⚠️
+
+ ~
+- ⚠️ WARNING vim.validate{<table>} is deprecated. Feature will be removed in Nvim 1.0
+  - ADVICE:
+    - use vim.validate(<params>) instead.
+    - stack traceback:
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/virt-column.nvim/lua/virt-column/config.lua:64
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/virt-column.nvim/lua/virt-column/config.lua:114
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/virt-column.nvim/lua/virt-column/init.lua:134
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:387
+        =[C]:-1
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/util.lua:135
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:395
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:362
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:197
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:127
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/init.lua:112
+        C:\Users\snehasish\AppData\Local\nvim\init.lua:36
+    - stack traceback:
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/virt-column.nvim/lua/virt-column/config.lua:73
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/virt-column.nvim/lua/virt-column/config.lua:114
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/virt-column.nvim/lua/virt-column/init.lua:134
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:387
+        =[C]:-1
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/util.lua:135
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:395
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:362
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:197
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/core/loader.lua:127
+        C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazy.nvim/lua/lazy/init.lua:112
+        C:\Users\snehasish\AppData\Local\nvim\init.lua:36
+
+==============================================================================
+vim.health:                                                                 ✅
+
+System Info ~
+- ✅ OK Up to date (0.12.2)
+- Nvim version: `v0.12.2` 
+- Operating system: Windows_NT 10.0.26200
+- Terminal: alacritty
+- $TERM: xterm-256color
+
+Configuration ~
+- ✅ OK no issues found
+
+Runtime ~
+- ✅ OK $VIMRUNTIME: C:\Users\snehasish\scoop\apps\neovim\current\share/nvim/runtime
+
+Performance ~
+- ✅ OK Build type: Release
+
+Remote Plugins ~
+- ✅ OK Up to date
+
+External Tools ~
+- ✅ OK ripgrep 14.1.0 (rev e50df40a19) (C:\ProgramData\chocolatey\bin\rg.EXE)
+- ✅ OK vim.ui.open: handler found (cmd.exe)
+- ✅ OK git version 2.53.0.windows.1 (C:\Program Files\Git\cmd\git.EXE)
+- ✅ OK curl 8.19.0 (C:\Windows\system32\curl.EXE)
+  curl 8.19.0 (Windows) libcurl/8.19.0 Schannel zlib/1.3.1 WinIDN WinLDAP
+  Release-Date: 2026-03-11
+  Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns ldap ldaps mqtt mqtts pop3 pop3s smb smbs smtp smtps telnet tftp ws wss
+  Features: alt-svc AsynchDNS HSTS HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM SPNEGO SSL SSPI threadsafe Unicode UnixSockets
+
+==============================================================================
+vim.lsp:                                                                  6 ⚠️
+
+- LSP log level : WARN
+- Log path: C:/Users/snehasish/AppData/Local/nvim-data/lsp.log
+- Log size: 27138 KB
+
+vim.lsp: Active Features ~
+
+vim.lsp: Active Clients ~
+- No active clients
+
+vim.lsp: Enabled Configurations ~
+- ⚠️ WARNING 'bash-language-server' is not executable. Configuration will not be used.
+- bashls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: { "bash-language-server", "start" }
+  - filetypes: bash, sh
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_markers: { ".git" }
+  - settings: {
+      bashIde = {
+        globPattern = "*@(.sh|.inc|.bash|.command)"
+      }
+    }
+
+- biome:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/biome.lua:18>
+  - filetypes: javascript, javascriptreact, typescript, typescriptreact, json, jsonc
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lua/lspconfig/util.lua:32>
+  - workspace_required: true
+
+- cssls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/cssls.lua:25>
+  - filetypes: css, scss, less
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - init_options: {
+      provideFormatter = true
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_markers: { "package.json", ".git" }
+  - settings: {
+      css = {
+        validate = true
+      },
+      less = {
+        validate = true
+      },
+      scss = {
+        validate = true
+      }
+    }
+
+- ⚠️ WARNING 'emmet-ls' is not executable. Configuration will not be used.
+- emmet_ls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: { "emmet-ls", "--stdio" }
+  - filetypes: html, css, scss, sass, svelte, vue, php, blade
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - init_options: {
+      html = {
+        options = {
+          ["bem.enabled"] = true,
+          ["jsx.enabled"] = true
+        }
+      }
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_markers: { ".git" }
+
+- eslint:
+  - before_init: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/eslint.lua:188>
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/eslint.lua:80>
+  - filetypes: javascript, javascriptreact, typescript, typescriptreact, vue, svelte
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["eslint/confirmESLintExecution"] = <function 1>,
+      ["eslint/noLibrary"] = <function 2>,
+      ["eslint/openDoc"] = <function 3>,
+      ["eslint/probeFailed"] = <function 4>,
+      ["textDocument/hover"] = <function 5>,
+      ["textDocument/signatureHelp"] = <function 6>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lua/lspconfig/util.lua:32>
+  - settings: {
+      codeAction = {
+        disableRuleComment = {
+          enable = true,
+          location = "separateLine"
+        },
+        showDocumentation = {
+          enable = true
+        }
+      },
+      codeActionOnSave = {
+        enable = false,
+        mode = "all"
+      },
+      experimental = {},
+      format = false,
+      nodePath = "",
+      onIgnoredFiles = "off",
+      packageManager = "npm",
+      problems = {
+        shortenToSingleLine = false
+      },
+      quiet = false,
+      rulesCustomizations = {},
+      run = "onSave",
+      useESLintClass = false,
+      validate = "on",
+      workingDirectory = {
+        mode = "auto"
+      }
+    }
+  - workspace_required: true
+
+- ⚠️ WARNING 'graphql-lsp' is not executable. Configuration will not be used.
+- graphql:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: { "graphql-lsp", "server", "-m", "stream" }
+  - filetypes: graphql, typescriptreact, javascriptreact
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lua/lspconfig/util.lua:32>
+
+- html:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/html.lua:27>
+  - filetypes: html, blade
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - init_options: {
+      configurationSection = { "html", "css", "javascript" },
+      embeddedLanguages = {
+        css = true,
+        javascript = true
+      },
+      provideFormatter = true
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_markers: { "package.json", ".git" }
+  - settings: {}
+
+- ⚠️ WARNING 'intelephense' is not executable. Configuration will not be used.
+- intelephense:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: { "intelephense", "--stdio" }
+  - filetypes: php, blade
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_markers: { ".git", "composer.json" }
+  - settings: {
+      intelephense = {
+        files = {
+          maxSize = 5000000
+        },
+        stubs = { "apache", "bcmath", "bz2", "calendar", "Core", "ctype", "curl", "date", "dom", "exif", "fileinfo", "filter", "ftp", "gd", "gettext", "gmp", "hash", "iconv", "intl", "json", "libxml", "mbstring", "meta", "mysqli", "openssl", "pcntl", "pcre", "PDO", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar", "posix", "readline", "Reflection", "session", "SimpleXML", "soap", "sockets", "sodium", "SPL", "sqlite3", "standard", "superglobals", "tokenizer", "xml", "xmlreader", "xmlwriter", "xsl", "zip", "zlib" },
+        telemetry = {
+          enabled = false
+        }
+      }
+    }
+
+- jsonls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/jsonls.lua:26>
+  - filetypes: json, jsonc
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - init_options: {
+      provideFormatter = true
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - on_new_config: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/servers/jsonls.lua:4>
+  - root_markers: { ".git" }
+
+- ⚠️ WARNING 'lua-language-server' is not executable. Configuration will not be used.
+- lua_ls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: { "lua-language-server" }
+  - filetypes: lua
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/lazydev.nvim/lua/lazydev/integrations/lspconfig.lua:10>
+  - root_markers: { { ".emmyrc.json", ".luarc.json", ".luarc.jsonc" }, { ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml" }, { ".git" } }
+  - settings: {
+      Lua = {
+        codeLens = {
+          enable = true
+        },
+        diagnostics = {
+          globals = { "vim", "require", "P", "R" }
+        },
+        hint = {
+          enable = true,
+          semicolon = "Disable"
+        },
+        telemetry = {
+          enable = false
+        },
+        workspace = {
+          checkThirdParty = false
+        }
+      }
+    }
+
+- ⚠️ WARNING 'prisma-language-server' is not executable. Configuration will not be used.
+- prismals:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: { "prisma-language-server", "--stdio" }
+  - filetypes: prisma
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_markers: { ".git", "package.json" }
+  - settings: {
+      prisma = {
+        completions = {
+          enabled = true
+        },
+        hover = true,
+        prismaFmtBinPath = "",
+        validate = true
+      }
+    }
+
+- roslyn:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1, 2 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "additionalTextEdits", "insertTextFormat", "insertTextMode", "command" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = false
+        }
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/roslyn.nvim/lsp/roslyn.lua:46>
+  - cmd_env: {
+      Configuration = "Debug"
+    }
+  - commands: {
+      ["roslyn.client.completionComplexEdit"] = <function 1>,
+      ["roslyn.client.fixAllCodeAction"] = <function 2>,
+      ["roslyn.client.nestedCodeAction"] = <function 3>
+    }
+  - filetypes: cs, razor
+  - handlers: {
+      ["client/registerCapability"] = <function 1>,
+      ["razor/log"] = <function 2>,
+      ["razor/updateHtml"] = <function 3>,
+      ["textDocument/colorPresentation"] = <function 4>,
+      ["textDocument/completion"] = <function 4>,
+      ["textDocument/definition"] = <function 4>,
+      ["textDocument/documentColor"] = <function 4>,
+      ["textDocument/documentHighlight"] = <function 4>,
+      ["textDocument/foldingRange"] = <function 4>,
+      ["textDocument/formatting"] = <function 4>,
+      ["textDocument/hover"] = <function 4>,
+      ["textDocument/implementation"] = <function 4>,
+      ["textDocument/onTypeFormatting"] = <function 4>,
+      ["textDocument/reference"] = <function 4>,
+      ["textDocument/signatureHelp"] = <function 4>,
+      ["workspace/projectInitializationComplete"] = <function 5>,
+      ["workspace/refreshSourceGeneratedDocument"] = <function 6>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lang/dotnet/init.lua:17>
+  - on_exit: { <function 1> }
+  - on_init: { <function 1> }
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/roslyn.nvim/lsp/roslyn.lua:58>
+  - settings: {
+      ["csharp|background_analysis"] = {
+        dotnet_analyzer_diagnostics_scope = "openFiles",
+        dotnet_compiler_diagnostics_scope = "openFiles"
+      },
+      ["csharp|code_lens"] = {
+        dotnet_enable_references_code_lens = true,
+        dotnet_enable_tests_code_lens = true
+      },
+      ["csharp|completion"] = {
+        dotnet_show_completion_items_from_unimported_namespaces = true,
+        dotnet_show_name_completion_suggestions = true
+      },
+      ["csharp|formatting"] = {
+        dotnet_organize_imports_on_format = true
+      },
+      ["csharp|inlay_hints"] = {
+        csharp_enable_inlay_hints_for_implicit_object_creation = true,
+        csharp_enable_inlay_hints_for_implicit_variable_types = true,
+        csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+        csharp_enable_inlay_hints_for_types = true,
+        dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+        dotnet_enable_inlay_hints_for_other_parameters = true,
+        dotnet_enable_inlay_hints_for_parameters = true,
+        dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true
+      },
+      ["csharp|symbol_search"] = {
+        dotnet_search_reference_assemblies = true
+      }
+    }
+
+- tailwindcss:
+  - before_init: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/tailwindcss.lua:119>
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      },
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = true
+        }
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/tailwindcss.lua:15>
+  - filetypes: html, javascriptreact, javascript, typescript, typescriptreact, vue, svelte, astro, php, blade, razor, cshtml
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/nvim-lspconfig/lsp/tailwindcss.lua:125>
+  - settings: {
+      tailwindCSS = {
+        classAttributes = { "class", "className", "classList", "ngClass" },
+        experimental = {
+          classRegex = { { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" }, { "cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" } }
+        },
+        includeLanguages = {
+          eelixir = "html-eex",
+          elixir = "phoenix-heex",
+          eruby = "erb",
+          heex = "phoenix-heex",
+          htmlangular = "html",
+          templ = "html"
+        },
+        lint = {
+          cssConflict = "warning",
+          invalidApply = "error",
+          invalidConfigPath = "error",
+          invalidScreen = "error",
+          invalidTailwindDirective = "error",
+          invalidVariant = "error",
+          recommendedVariantOrder = "warning"
+        },
+        validate = true
+      }
+    }
+  - workspace_required: true
+
+- typescript-tools:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = true,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            labelDetailsSupport = true,
+            preselectSupport = true,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          dynamicRegistration = false,
+          insertTextMode = 1
+        },
+        foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true
+        },
+        positionEncoding = "utf-16"
+      }
+    }
+  - cmd: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/typescript-tools.nvim/lua/typescript-tools/init.lua:31>
+  - filetypes: typescript, typescriptreact, javascript, javascriptreact
+  - flags: {
+      debounce_text_changes = 150
+    }
+  - handlers: {
+      ["textDocument/hover"] = <function 1>,
+      ["textDocument/signatureHelp"] = <function 2>
+    }
+  - on_attach: <function @C:/Users/snehasish/AppData/Local/nvim/lua/lsp/on_attach.lua:1>
+  - root_dir: <function @C:/Users/snehasish/AppData/Local/nvim-data/lazy/typescript-tools.nvim/lua/typescript-tools/init.lua:42>
+  - single_file_support: true
+
+
+vim.lsp: File Watcher ~
+- file watching "(workspace/didChangeWatchedFiles)" disabled on all clients
+
+vim.lsp: Position Encodings ~
+- No active clients
+
+==============================================================================
+vim.pack:                                                                   ✅
+
+vim.pack: basics ~
+- ✅ OK `vim.pack` is not used
+
+==============================================================================
+vim.provider:                                                             6 ⚠️
+
+Clipboard (optional) ~
+- ✅ OK Clipboard tool found: win32yank
+
+Node.js provider (optional) ~
+- Node.js: 25.8.0
+- ⚠️ WARNING Missing "neovim" npm (or yarn, pnpm) package.
+  - ADVICE:
+    - Run in shell: npm install -g neovim
+    - Run in shell (if you use yarn): yarn global add neovim
+    - Run in shell (if you use pnpm): pnpm install -g neovim
+    - You may disable this provider (and warning) by adding `let g:loaded_node_provider = 0` to your init.vim
+
+Perl provider (optional) ~
+- ⚠️ WARNING No perl executable found
+  - ADVICE:
+    - See :help |provider-perl| for more information.
+    - You can disable this provider (and warning) by adding `let g:loaded_perl_provider = 0` to your init.vim
+- ⚠️ WARNING No usable perl executable found
+
+Python 3 provider (optional) ~
+- pyenv: Path: C:\Users\snehasish\scoop\apps\pyenv\3.1.1\pyenv-win\bin\pyenv.bat
+- pyenv: Root: C:\Users\snehasish\scoop\apps\pyenv\3.1.1\pyenv-win
+- ⚠️ WARNING No Python executable found that can `import neovim`. Using the first available executable for diagnostics.
+- ⚠️ WARNING Could not load Python :
+  python3 not found in search path or not executable.
+  C:\ProgramData\chocolatey\bin\python3.14.EXE does not have the "neovim" module.
+  python3.13 not found in search path or not executable.
+  python3.12 not found in search path or not executable.
+  python3.11 not found in search path or not executable.
+  python3.10 not found in search path or not executable.
+  python3.9 not found in search path or not executable.
+  C:\Python314\python.EXE does not have the "neovim" module.
+  - ADVICE:
+    - See :help |provider-python| for more information.
+    - You can disable this provider (and warning) by adding `let g:loaded_python3_provider = 0` to your init.vim
+- Executable: Not found
+
+Python virtualenv ~
+- ✅ OK no $VIRTUAL_ENV
+
+Ruby provider (optional) ~
+- ⚠️ WARNING `ruby` and `gem` must be in $PATH.
+  - ADVICE:
+    - Install Ruby and verify that `ruby` and `gem` commands work.
+
+==============================================================================
+vim.treesitter:                                                             ✅
+
+Treesitter features ~
+- Treesitter ABI support: min 13, max 15
+- WASM parser support: false
+
+Treesitter parsers ~
+- ✅ OK Parser: bash                      ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\bash.so
+- ✅ OK Parser: c                         ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\c.dll
+- ✅ OK Parser: c_sharp                   ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\c_sharp.so
+- ✅ OK Parser: css                       ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\css.so
+- ✅ OK Parser: dockerfile                ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\dockerfile.so
+- ✅ OK Parser: gitignore                 ABI: 13, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\gitignore.so
+- ✅ OK Parser: graphql                   ABI: 13, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\graphql.so
+- ✅ OK Parser: html                      ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\html.so
+- ✅ OK Parser: htmldjango                ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\htmldjango.so
+- ✅ OK Parser: java                      ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\java.so
+- ✅ OK Parser: javascript                ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\javascript.so
+- ✅ OK Parser: json                      ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\json.so
+- ✅ OK Parser: lua                       ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\lua.dll
+- ✅ OK Parser: markdown                  ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\markdown.dll
+- ✅ OK Parser: markdown_inline           ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\markdown_inline.dll
+- ✅ OK Parser: php                       ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\php.so
+- ✅ OK Parser: python                    ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\python.so
+- ✅ OK Parser: query                     ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\query.dll
+- ✅ OK Parser: razor                     ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\razor.so
+- ✅ OK Parser: svelte                    ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\svelte.so
+- ✅ OK Parser: toml                      ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\toml.so
+- ✅ OK Parser: tsx                       ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\tsx.so
+- ✅ OK Parser: typescript                ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\typescript.so
+- ✅ OK Parser: vim                       ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\vim.dll
+- ✅ OK Parser: vimdoc                    ABI: 15, path: C:\Users\snehasish\scoop\apps\neovim\current\lib\nvim\parser\vimdoc.dll
+- ✅ OK Parser: vue                       ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\vue.so
+- ✅ OK Parser: xml                       ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\xml.so
+- ✅ OK Parser: yaml                      ABI: 14, path: C:\Users\snehasish\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\yaml.so
+
+Treesitter queries ~
+

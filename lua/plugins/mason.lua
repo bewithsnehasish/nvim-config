@@ -71,40 +71,6 @@ return {
       automatic_enable = {
         exclude = { "csharp_ls", "omnisharp", "roslyn", "ts_ls" },
       },
-      handlers = {
-        -- Default handler for servers NOT configured in lspconfig.lua
-        function(server_name)
-          -- Skip servers that are manually configured in lspconfig.lua
-          local skip_servers = {
-            "ts_ls", -- Handled by typescript-tools
-            "typescript_tools", -- Custom setup
-            "html", -- Custom setup in lspconfig
-            "cssls", -- Custom setup in lspconfig
-            "jsonls", -- Custom setup in lspconfig
-            "bashls", -- Custom setup in lspconfig
-            "eslint", -- Custom setup in lspconfig
-            "biome", -- Custom setup in lspconfig
-            "tailwindcss", -- Custom setup in lspconfig
-            "emmet_ls", -- Custom setup in lspconfig
-            "lua_ls", -- Custom setup in lspconfig
-            "prismals", -- Custom setup in lspconfig
-            "intelephense", -- Custom setup in lspconfig
-            "graphql", -- Custom setup in lspconfig
-            "csharp_ls", -- Handled by roslyn.nvim
-            "omnisharp", -- Handled by roslyn.nvim
-            "roslyn", -- Handled by roslyn.nvim
-          }
-
-          if vim.tbl_contains(skip_servers, server_name) then
-            return -- Let lspconfig.lua handle it
-          end
-
-          require("lspconfig")[server_name].setup {
-            capabilities = capabilities,
-            flags = { debounce_text_changes = 150 },
-          }
-        end,
-      },
     }
 
     local mason_tool_installer_status, mason_tool_installer = pcall(require, "mason-tool-installer")

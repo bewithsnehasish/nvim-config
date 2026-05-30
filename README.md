@@ -128,21 +128,19 @@ and per-keymap icons.
 | Key | Action |
 |---|---|
 | `<Tab>` / `<S-Tab>` | Next / previous buffer |
-| `<leader>x` | Close current buffer |
+| `<leader>x` | Close current buffer (standard) |
+| `<leader>bd` | Delete buffer (layout safe, via snacks) |
 | `<leader>X` | Close all other buffers |
 | `<leader>bp` | Toggle buffer pin |
 | `<leader>bo` | Pick buffer by letter |
 | `<leader>bb` | Fuzzy-find open buffers |
 
-### File Explorer (neo-tree)
+### File Explorer (snacks.explorer)
 
 | Key | Action |
 |---|---|
-| `<leader>e` | Toggle Neo-tree (right side) |
-| `<leader>n` | Focus Neo-tree |
-| `<leader>bf` | Buffers in floating Neo-tree |
-| `<leader>fs` | Filesystem in floating Neo-tree |
-| `<leader>wp` | Pick window |
+| `<leader>e` | Toggle File Explorer (right side) |
+| `<leader>n` | Focus File Explorer |
 
 ### Fuzzy Finding (snacks.nvim picker)
 
@@ -223,13 +221,14 @@ exclusive to gitsigns hunks.
 | `<leader>1` … `<leader>4` | Jump to slot 1–4 |
 | `<leader>jn` / `<leader>jp` | Cycle next / previous |
 
-### Reference Highlighting (vim-illuminate)
+### Reference Highlighting (snacks.words)
 
 Auto-highlights the word under the cursor and lets you jump between occurrences.
 
 | Key | Action |
 |---|---|
 | `]r` / `[r` | Next / previous reference of word under cursor |
+| `<leader>ui` | Toggle reference highlighting |
 
 ### C# / Roslyn
 
@@ -301,11 +300,10 @@ PHP uses `php-cs-fixer`. Lua uses `stylua`.
 | `<leader>hb` | Toggle line blame |
 | `<leader>hd` | Diff this file |
 
-### Terminal (ToggleTerm)
+### Terminal (snacks.terminal)
 
 | Key | Action |
 |---|---|
-| `<C-\>` | Toggle floating terminal |
 | `<M-1>` | Horizontal terminal |
 | `<M-2>` | Vertical terminal |
 | `<M-3>` | Floating terminal |

@@ -25,25 +25,6 @@ function M.setup()
 
     if client.server_capabilities.codeLensProvider then
       vim.lsp.codelens.enable(true, { bufnr = bufnr })
-
-      -- Refresh CodeLens when entering buffer, leaving insert mode, or stopping cursor movement
-      local codelens_group = vim.api.nvim_create_augroup("RoslynCodeLensRefresh_" .. bufnr, { clear = true })
-      vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave", "CursorHold" }, {
-        buffer = bufnr,
-        group = codelens_group,
-        callback = function()
-          if vim.api.nvim_buf_is_valid(bufnr) and vim.lsp.codelens.is_enabled({ bufnr = bufnr }) then
-            vim.lsp.codelens.refresh({ bufnr = bufnr })
-          end
-        end,
-      })
-
-      -- Initial deferred refresh after LSP attaches, ensuring CodeLens pulls after initial workspace load
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(bufnr) and vim.lsp.codelens.is_enabled({ bufnr = bufnr }) then
-          vim.lsp.codelens.refresh({ bufnr = bufnr })
-        end
-      end, 2000)
     end
 
     vim.keymap.set(
@@ -52,9 +33,6 @@ function M.setup()
       function()
         local is_enabled = vim.lsp.codelens.is_enabled({ bufnr = bufnr })
         vim.lsp.codelens.enable(not is_enabled, { bufnr = bufnr })
-        if not is_enabled then
-          vim.lsp.codelens.refresh({ bufnr = bufnr })
-        end
         vim.notify(
           "CodeLens " .. (is_enabled and "disabled" or "enabled"),
           vim.log.levels.INFO,
@@ -75,9 +53,9 @@ function M.setup()
       end
       local client = vim.lsp.get_client_by_id(data.client_id)
       if client and client.name == "roslyn" and data.params.value.kind == "end" then
-        for _, bufnr in ipairs(vim.lsp.get_buffers_by_client_id(data.client_id)) do
+        for bufnr, _ in pairs(client.attached_buffers) do
           if vim.api.nvim_buf_is_valid(bufnr) and vim.lsp.codelens.is_enabled({ bufnr = bufnr }) then
-            vim.lsp.codelens.refresh({ bufnr = bufnr })
+            vim.lsp.codelens.enable(true, { bufnr = bufnr })
           end
         end
       end
@@ -90,8 +68,8 @@ function M.setup()
     settings = {
       ["csharp|background_analysis"] = {
         -- fullSolution enables Roslyn to index the whole solution for cross-file references/definitions
-        dotnet_analyzer_diagnostics_scope = "fullSolution",
-        dotnet_compiler_diagnostics_scope = "fullSolution",
+        dotnet_analyzer_diagnostics_scope = "openFiles",
+        dotnet_compiler_diagnostics_scope = "openFiles",
       },
       ["csharp|code_lens"] = {
         dotnet_enable_references_code_lens = true,

@@ -48,6 +48,20 @@ return {
         },
 
         formatters = {
+          biome = {
+            command = function()
+              if vim.fn.has("win32") == 1 then
+                local exe = vim.fn.stdpath("data") .. "/mason/packages/biome/node_modules/@biomejs/biome/node_modules/@biomejs/cli-win32-x64/biome.exe"
+                if vim.fn.filereadable(exe) == 1 then
+                  return exe
+                end
+              end
+              return "biome"
+            end,
+            condition = function(self, ctx)
+              return vim.fs.find({ "biome.json" }, { path = ctx.filename, upward = true })[1] ~= nil
+            end,
+          },
           prettier = {
             prepend_args = {
               "--single-quote",
