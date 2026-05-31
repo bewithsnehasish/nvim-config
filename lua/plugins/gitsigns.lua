@@ -24,6 +24,7 @@ return {
         numhl = false,
         linehl = false,
         word_diff = false,
+        update_debounce = 250,
         watch_gitdir = { follow_files = true },
         attach_to_untracked = true,
         -- Inline blame shown at end-of-line; toggle with <leader>hb

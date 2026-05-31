@@ -58,14 +58,79 @@ return {
         return vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
       end
 
+      local wakatime_cache = ""
+
+      local function update_wakatime()
+        local path = vim.fn.expand("~/.wakatime/today")
+        vim.uv.fs_open(path, "r", 438, function(err, fd)
+          if err or not fd then
+            wakatime_cache = ""
+            return
+          end
+          vim.uv.fs_fstat(fd, function(err_stat, stat)
+            if err_stat or not stat or stat.size == 0 then
+              vim.uv.fs_close(fd, function() end)
+              wakatime_cache = ""
+              return
+            end
+            vim.uv.fs_read(fd, stat.size, 0, function(err_read, data)
+              vim.uv.fs_close(fd, function() end)
+              if err_read or not data then
+                wakatime_cache = ""
+                return
+              end
+              wakatime_cache = data:gsub("[\r\n]", "")
+            end)
+          end)
+        end)
+      end
+
+      -- Initial async fetch on startup
+      update_wakatime()
+
+      -- Refresh WakaTime cache once every 30 seconds
+      local waka_timer = vim.uv.new_timer()
+      if waka_timer then
+        waka_timer:start(30000, 30000, vim.schedule_wrap(update_wakatime))
+      end
+
       local function wakatime_today()
-        local f = io.open(vim.fn.expand "~/.wakatime/today", "r")
-        if not f then
+        return wakatime_cache
+      end
+
+      -- Custom Component: Macro Recording State Indicator
+      local function macro_recording()
+        local recording_register = vim.fn.reg_recording()
+        if recording_register == "" then
+          return ""
+        else
+          return "󰑋  Recording @" .. recording_register
+        end
+      end
+
+      -- Custom Component: Current Search count/index (e.g. 1/5)
+      local function search_result()
+        if vim.v.hlsearch == 0 then
           return ""
         end
-        local s = f:read "*a" or ""
-        f:close()
-        return (s:gsub("[\r\n]", ""))
+        local ok, result = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 500 })
+        if not ok or next(result) == nil or result.total == 0 then
+          return ""
+        end
+        return string.format(" %d/%d", result.current, result.total)
+      end
+
+      -- Custom Component: Current 24h system time
+      local function current_time()
+        return " " .. os.date("%R")
+      end
+
+      -- Custom Component: Spell check status
+      local function spell_status()
+        if vim.wo.spell then
+          return "󰓆 SPELL"
+        end
+        return ""
       end
 
       local function build_config()
@@ -108,10 +173,30 @@ return {
             },
             lualine_b = {
               {
+                macro_recording,
+                icon = "",
+                separator = pill(),
+                color = { bg = p.red, fg = p.base, gui = "bold" },
+                padding = { left = 1, right = 1 },
+                cond = function()
+                  return macro_recording() ~= ""
+                end,
+              },
+              {
+                search_result,
+                icon = "",
+                separator = pill(),
+                color = { bg = p.yellow, fg = p.base, gui = "bold" },
+                padding = { left = 1, right = 1 },
+                cond = function()
+                  return search_result() ~= ""
+                end,
+              },
+              {
                 "diagnostics",
                 sources = { "nvim_diagnostic" },
                 sections = { "error", "warn", "info", "hint" },
-                symbols = { error = " ", warn = " ", info = " ", hint = " " },
+                symbols = { error = " ", warn = "⚠ ", info = " ", hint = " " },
                 diagnostics_color = {
                   error = { fg = p.red, bg = p.surface },
                   warn = { fg = p.yellow, bg = p.surface },
@@ -137,18 +222,33 @@ return {
                 end,
               },
             },
-            lualine_c = {},
+            lualine_c = {
+              {
+                "navic",
+                color_correction = "dynamic",
+              },
+            },
             lualine_x = {
               {
-                "branch",
+                spell_status,
                 icon = "",
+                separator = pill(),
+                color = { bg = p.surface, fg = p.yellow },
+                padding = { left = 1, right = 1 },
+                cond = function()
+                  return spell_status() ~= ""
+                end,
+              },
+              {
+                "branch",
+                icon = "",
                 separator = pill(),
                 color = { bg = p.surface, fg = p.mauve },
                 padding = { left = 1, right = 1 },
               },
               {
                 "diff",
-                symbols = { added = " ", modified = " ", removed = " " },
+                symbols = { added = " ", modified = "󰏬 ", removed = " " },
                 diff_color = {
                   added = { fg = p.green, bg = p.surface },
                   modified = { fg = p.yellow, bg = p.surface },
@@ -167,8 +267,8 @@ return {
               {
                 "filename",
                 file_status = true,
-                path = 0,
-                symbols = { modified = " ●", readonly = " ", unnamed = "[No Name]" },
+                path = 1,
+                symbols = { modified = " ●", readonly = " ", unnamed = "[No Name]" },
                 separator = pill(),
                 color = { bg = p.surface, fg = p.blue },
                 padding = { left = 1, right = 1 },
@@ -177,9 +277,15 @@ return {
             lualine_z = {
               {
                 project_name,
-                icon = "",
+                icon = "󰉋",
                 separator = pill(),
                 color = { bg = p.surface, fg = p.mauve },
+                padding = { left = 1, right = 1 },
+              },
+              {
+                current_time,
+                separator = pill(),
+                color = { bg = p.surface, fg = p.lavender },
                 padding = { left = 1, right = 1 },
               },
             },
@@ -188,6 +294,35 @@ return {
       end
 
       require("lualine").setup(build_config())
+
+      -- Autocommands to refresh lualine instantly when macro recording starts/stops
+      vim.api.nvim_create_autocmd("RecordingEnter", {
+        group = vim.api.nvim_create_augroup("LualineMacroRefresh", { clear = true }),
+        pattern = "*",
+        callback = function()
+          require("lualine").refresh({ place = { "statusline" } })
+        end,
+      })
+      vim.api.nvim_create_autocmd("RecordingLeave", {
+        group = vim.api.nvim_create_augroup("LualineMacroRefreshLeave", { clear = true }),
+        pattern = "*",
+        callback = function()
+          local timer = vim.uv.new_timer()
+          if timer then
+            timer:start(50, 0, vim.schedule_wrap(function()
+              require("lualine").refresh({ place = { "statusline" } })
+            end))
+          end
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("OptionSet", {
+        group = vim.api.nvim_create_augroup("LualineSpellRefresh", { clear = true }),
+        pattern = "spell",
+        callback = function()
+          require("lualine").refresh({ place = { "statusline" } })
+        end,
+      })
 
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("LualinePillsRefresh", { clear = true }),

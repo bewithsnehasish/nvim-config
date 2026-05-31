@@ -33,47 +33,37 @@ return {
 
       -- 3. Capabilities Configuration (Using blink.cmp)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      local blink_status, blink = pcall(require, "blink.cmp")
-      if blink_status then
-        capabilities = blink.get_lsp_capabilities(capabilities)
-      end
-
       capabilities.textDocument.positionEncoding = "utf-16"
-      capabilities.textDocument.completion.completionItem = {
-        documentationFormat = { "markdown", "plaintext" },
-        snippetSupport = true,
-        preselectSupport = true,
-        insertReplaceSupport = true,
-        labelDetailsSupport = true,
-        deprecatedSupport = true,
-        commitCharactersSupport = true,
-        resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
-        tagSupport = { valueSet = { 1 } },
-      }
       capabilities.textDocument.foldingRange = {
         dynamicRegistration = false,
         lineFoldingOnly = true,
       }
 
+      local blink_status, blink = pcall(require, "blink.cmp")
+      if blink_status then
+        capabilities = blink.get_lsp_capabilities(capabilities)
+      end
+
+      local icons = require("user.icons")
       -- 4. UI / Diagnostic Configuration
       local diagnostic_config = {
         signs = {
           text = {
-            [vim.diagnostic.severity.ERROR] = "",
-            [vim.diagnostic.severity.WARN] = "",
-            [vim.diagnostic.severity.HINT] = "",
-            [vim.diagnostic.severity.INFO] = "",
+            [vim.diagnostic.severity.ERROR] = icons.diagnostics.Error,
+            [vim.diagnostic.severity.WARN] = icons.diagnostics.Warning,
+            [vim.diagnostic.severity.HINT] = icons.diagnostics.Hint,
+            [vim.diagnostic.severity.INFO] = icons.diagnostics.Information,
           },
         },
         virtual_text = {
           prefix = function(diagnostic)
-            local icons = {
-              [vim.diagnostic.severity.ERROR] = "",
-              [vim.diagnostic.severity.WARN] = "",
-              [vim.diagnostic.severity.HINT] = "",
-              [vim.diagnostic.severity.INFO] = "",
+            local diag_icons = {
+              [vim.diagnostic.severity.ERROR] = icons.diagnostics.Error,
+              [vim.diagnostic.severity.WARN] = icons.diagnostics.Warning,
+              [vim.diagnostic.severity.HINT] = icons.diagnostics.Hint,
+              [vim.diagnostic.severity.INFO] = icons.diagnostics.Information,
             }
-            return icons[diagnostic.severity] or "●"
+            return diag_icons[diagnostic.severity] or "●"
           end,
           spacing = 4,
           source = "if_many",

@@ -40,6 +40,55 @@ vim.opt.swapfile = false
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
+vim.opt.showtabline = 2
+
+local tabline_group = vim.api.nvim_create_augroup("TablineVisibility", { clear = true })
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "FileType" }, {
+  group = tabline_group,
+  pattern = "*",
+  callback = function()
+    local ft = vim.bo.filetype
+    if ft == "snacks_dashboard" or ft == "alpha" or ft == "lazy" or ft == "mason" then
+      vim.opt.showtabline = 0
+    else
+      vim.opt.showtabline = 2
+    end
+  end,
+})
+
+local dashboard_group = vim.api.nvim_create_augroup("DashboardOnEmpty", { clear = true })
+vim.api.nvim_create_autocmd("BufDelete", {
+  group = dashboard_group,
+  callback = function(ev)
+    local bufs = vim.tbl_filter(function(buf)
+      if not (vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted) then
+        return false
+      end
+      if buf == ev.buf then
+        return false
+      end
+      local ft = vim.bo[buf].filetype
+      if ft == "snacks_dashboard" or ft == "alpha" then
+        return false
+      end
+      local name = vim.api.nvim_buf_get_name(buf)
+      local modified = vim.bo[buf].modified
+      if name == "" and not modified and ft == "" then
+        return false
+      end
+      return true
+    end, vim.api.nvim_list_bufs())
+
+    if #bufs == 0 then
+      vim.schedule(function()
+        local cur_ft = vim.bo[vim.api.nvim_get_current_buf()].filetype
+        if cur_ft ~= "snacks_dashboard" and cur_ft ~= "alpha" then
+          require("snacks").dashboard.open()
+        end
+      end)
+    end
+  end,
+})
 
 platform.setup_clipboard()
 platform.setup_shell()

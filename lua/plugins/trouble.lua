@@ -12,13 +12,38 @@ return {
       { "<leader>xq", "<cmd>Trouble qflist toggle focus=true<cr>", desc = "Quickfix list" },
       { "<leader>xl", "<cmd>Trouble loclist toggle focus=true<cr>", desc = "Location list" },
     },
-    opts = {
-      modes = {
-        lsp_references = { params = { include_declaration = false } },
-        lsp = { win = { position = "right" } },
-      },
-      auto_jump = true,
-      focus = false,
-    },
+    opts = function()
+      local icons = require("user.icons")
+      return {
+        auto_jump = true,
+        focus = true,
+        -- Premium layout configuration using custom Nerd Font characters
+        icons = {
+          indent = {
+            top = "│ ",
+            middle = "├╴",
+            last = "└╴",
+            fold_open = " ",
+            fold_closed = " ",
+            ws = "  ",
+          },
+          folder_closed = icons.ui.Folder .. " ",
+          folder_open = icons.ui.FolderOpen .. " ",
+          kinds = icons.kind,
+        },
+        modes = {
+          lsp_references = { 
+            params = { include_declaration = false },
+            win = { position = "bottom", size = 12 }
+          },
+          lsp = { 
+            win = { position = "right", size = 0.3 } 
+          },
+          diagnostics = {
+            win = { position = "bottom", size = 12 }
+          }
+        },
+      }
+    end,
   },
 }

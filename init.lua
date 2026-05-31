@@ -4,7 +4,7 @@ vim.loader.enable()
 
 -- Disable vendored default plugins we don't use — saves rtp scan + sourcing time.
 local disabled_builtins = {
-  "netrwPlugin", "netrwSettings", "netrwFileHandlers", -- using neo-tree
+  "netrwPlugin", "netrwSettings", "netrwFileHandlers", -- using snacks explorer
   "gzip", "tarPlugin", "tar", "zipPlugin", "zip", -- using snacks for archives
   "matchparen", -- treesitter handles bracket matching
   "tutor", "rplugin", -- unused

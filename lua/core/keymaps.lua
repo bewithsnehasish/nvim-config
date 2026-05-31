@@ -42,14 +42,6 @@ vim.keymap.set("n", "<leader>dus", "<cmd>DapOpenSidebar<CR>", { desc = "DAP Open
 vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Go to next buffer", silent = true })
 vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Go to previous buffer", silent = true })
 
--- Close current buffer (layout safe using Snacks.bufdelete if available)
-vim.keymap.set("n", "<leader>x", function()
-  if pcall(require, "snacks") then
-    Snacks.bufdelete()
-  else
-    vim.cmd("bdelete")
-  end
-end, { desc = "Close current buffer (layout safe)", silent = true })
 
 vim.keymap.set("n", "<leader>X", "<cmd>BufferLineCloseOthers<CR>", { desc = "Close all OTHER buffers", silent = true })
 

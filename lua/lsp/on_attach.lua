@@ -228,15 +228,7 @@ return function(client, bufnr)
     local log_path = vim.lsp.log.get_filename()
     vim.cmd("tabnew " .. log_path)
   end, vim.tbl_extend("force", opts, { desc = "Open LSP log" }))
-  -- Built-in vim.lsp.buf actions exposed as quick keymaps:
-  vim.keymap.set(
-    "n",
-    "<leader>lf",
-    function()
-      vim.lsp.buf.format { async = false }
-    end,
-    vim.tbl_extend("force", opts, { desc = "Format buffer (LSP)" })
-  )
+
 
   -- ── Interactive Diagnostic Float ──────────────────────────────────────────
   vim.keymap.set("n", "<leader>ld", function()

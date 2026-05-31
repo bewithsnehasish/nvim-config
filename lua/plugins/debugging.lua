@@ -1,7 +1,7 @@
 return {
   {
     "mfussenegger/nvim-dap",
-    event = "VeryLazy",
+    lazy = true,
     dependencies = {
       "williamboman/mason.nvim",
       "rcarriga/nvim-dap-ui",
@@ -72,12 +72,9 @@ return {
         vim.schedule(focus_scopes)
       end
       dap.listeners.before.launch.dapui_config = dap.listeners.before.attach.dapui_config
-      dap.listeners.before.event_terminated.dapui_config = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited.dapui_config = function()
-        dapui.close()
-      end
+      -- Keep DAP UI open after execution finishes so REPL/console logs are readable:
+      -- dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
+      -- dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
 
       local function find_dotnet_dll()
         local dlls = vim.fn.globpath(vim.fn.getcwd(), "**/bin/Debug/**/*.dll", false, true)

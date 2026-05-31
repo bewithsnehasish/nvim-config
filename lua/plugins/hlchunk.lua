@@ -77,7 +77,7 @@ return {
             { fg = "#569cd6" }, -- Match your UI aesthetic
           },
           exclude_filetypes = {
-            ["neo-tree"] = true,
+            ["snacks_picker_list"] = true,
             terminal = true,
             help = true,
             [""] = true,
@@ -96,7 +96,7 @@ return {
             { fg = "#2D3640" },
           },
           exclude_filetypes = {
-            ["neo-tree"] = true,
+            ["snacks_picker_list"] = true,
             terminal = true,
             help = true,
             [""] = true,
@@ -110,7 +110,7 @@ return {
           use_treesitter = true,
           style = "#569cd6", -- Match your UI aesthetic
           exclude_filetypes = {
-            ["neo-tree"] = true,
+            ["snacks_picker_list"] = true,
             terminal = true,
             help = true,
             [""] = true,
@@ -123,52 +123,6 @@ return {
         -- In large files (hundreds of blank lines) this causes heavy scroll lag.
         blank = { enable = false },
       }
-
-      -- Disable hlchunk for non-code buffers and problematic filetypes
-      -- Removed TextChanged/TextChangedI: these fired on every keystroke,
-      -- running filetype checks constantly during active editing.
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-        group = vim.api.nvim_create_augroup("HlchunkDisable", { clear = true }),
-        callback = function(ev)
-          local bufnr = ev.buf
-          local ft = vim.bo[bufnr].filetype
-          local bt = vim.bo[bufnr].buftype
-          if
-            vim.tbl_contains({ "neo-tree", "terminal", "help", "", "nofile", "prompt", "quickfix" }, ft)
-            or bt ~= ""
-          then
-            vim.b[bufnr].hlchunk_disabled = true
-          end
-        end,
-      })
-
-      -- Validate Treesitter parser for supported filetypes
-      vim.api.nvim_create_autocmd("BufEnter", {
-        group = vim.api.nvim_create_augroup("HlchunkValidate", { clear = true }),
-        pattern = {
-          "*.js",
-          "*.ts",
-          "*.jsx",
-          "*.tsx",
-          "*.svelte",
-          "*.html",
-          "*.css",
-          "*.lua",
-          "*.php",
-        },
-        callback = function(ev)
-          local bufnr = ev.buf
-          local ft = vim.bo[bufnr].filetype
-          if not vim.treesitter.language.get_lang(ft) then
-            vim.b[bufnr].hlchunk_disabled = true
-            vim.notify(
-              "No Treesitter parser for " .. ft,
-              vim.log.levels.WARN,
-              { timeout = 2000, title = "Hlchunk Warning", icon = "⚠️" }
-            )
-          end
-        end,
-      })
 
     end,
   },

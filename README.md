@@ -139,7 +139,6 @@ Your autocomplete dropdown list (`blink.cmp`) and AI coder (`Supermaven`) are co
 | Key | Action |
 |---|---|
 | `<Tab>` / `<S-Tab>` | Next / previous buffer |
-| `<leader>x` | Close current buffer (standard) |
 | `<leader>bd` | Delete buffer (layout safe, via snacks) |
 | `<leader>X` | Close all other buffers |
 | `<leader>bp` | Toggle buffer pin |

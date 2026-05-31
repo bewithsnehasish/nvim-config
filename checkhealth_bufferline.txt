@@ -1,0 +1,6 @@
+
+==============================================================================
+bufferline:                                                               1 ❌
+
+- ❌ ERROR No healthcheck found for "bufferline" plugin.
+

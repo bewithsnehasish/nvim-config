@@ -17,35 +17,8 @@ return {
       context_commentstring.setup {
         enable_autocmd = false, -- Disable CursorHold updates for performance
         config = {
-          javascript = "// %s",
-          typescript = "// %s",
-          javascriptreact = "{/* %s */}",
-          typescriptreact = "{/* %s */}",
-          svelte = "<!-- %s -->", -- Default for Svelte HTML
-          html = "<!-- %s -->",
-          blade = "{{-- %s --}}",
-          css = "/* %s */",
-          lua = "-- %s",
-          python = "# %s",
-          java = "// %s",
-          php = "// %s",
-          -- Custom context for Svelte scripts
-          svelte_script = "{/* %s */}",
+          blade = "{{-- %s --}}", -- Custom Blade support
         },
-        -- Custom function to handle commentstring updates with error handling
-        update_commentstring = function()
-          local ok, commentstring = pcall(require("ts_context_commentstring.internal").calculate_commentstring)
-          if ok and type(commentstring) == "string" then
-            vim.bo.commentstring = commentstring
-          else
-            vim.notify(
-              "Failed to update commentstring: "
-                .. (type(commentstring) == "string" and commentstring or "Invalid format"),
-              vim.log.levels.WARN,
-              { timeout = 2000, title = "Comment Warning" }
-            )
-          end
-        end,
       }
     end,
   },
@@ -66,18 +39,6 @@ return {
 
       comment.setup {
         pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
-        mappings = {
-          basic = true, -- Enable gcc, gc, gbc
-          extra = true, -- Enable g>, g<, etc.
-        },
-        toggler = {
-          line = "gcc", -- Line comment
-          block = "gbc", -- Block comment
-        },
-        opleader = {
-          line = "gc", -- Visual mode line comment
-          block = "gb", -- Visual mode block comment
-        },
       }
     end,
   },

@@ -4,7 +4,18 @@ return {
     intelephense = {
       files = {
         maxSize = 5000000,
+        -- Exclude temporary/cache directories from indexing to boost performance
+        exclude = {
+          "**/vendor/**/tests/**",
+          "**/vendor/**/Tests/**",
+          "**/writable/**", -- CodeIgniter 4 writable logs/cache directory
+          "**/node_modules/**",
+          "**/bower_components/**",
+          "**/.git/**",
+        },
       },
+      -- Allow up to 2GB memory allocation for indexing larger projects
+      maxMemory = 2048,
       -- CodeIgniter 4 is Composer-based; intelephense indexes vendor/ automatically.
       -- These stubs cover PHP core + all standard extensions used in CI4 projects.
       stubs = {

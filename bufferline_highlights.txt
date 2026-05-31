@@ -1,0 +1,71 @@
+
+BufferLineOffsetSeparator xxx guifg=#3c4048
+BufferLinePickVisible xxx cterm=bold,italic gui=bold,italic guifg=#ff6e5e
+BufferLinePickSelected xxx cterm=bold,italic gui=bold,italic guifg=#ff6e5e
+BufferLineIndicatorVisible xxx cleared
+BufferLineIndicatorSelected xxx guifg=#3c4048
+BufferLineTabSeparatorSelected xxx cleared
+BufferLineTabSeparator xxx cleared
+BufferLineSeparatorVisible xxx cleared
+BufferLineSeparatorSelected xxx cleared
+BufferLineFill xxx guifg=#7b8496
+BufferLineDuplicateVisible xxx cterm=italic gui=italic guifg=#747d8e
+BufferLineDuplicateSelected xxx cterm=italic gui=italic guifg=#747d8e
+BufferLineModifiedSelected xxx guifg=#5eff6c
+BufferLineModifiedVisible xxx guifg=#5eff6c
+BufferLineErrorDiagnosticSelected xxx cterm=bold,italic gui=bold,italic
+                   guifg=#bf5246 guisp=#bf5246
+BufferLineErrorDiagnosticVisible xxx guifg=#5c6370
+BufferLineErrorDiagnostic xxx guifg=#5c6370 guisp=#bf5246
+BufferLineErrorSelected xxx cterm=bold,italic gui=bold,italic guifg=#ff6e5e
+                   guisp=#ff6e5e
+BufferLineErrorVisible xxx guifg=#7b8496
+BufferLineWarningDiagnosticSelected xxx cterm=bold,italic gui=bold,italic
+                   guifg=#b4bf46 guisp=#b4bf46
+BufferLineWarningDiagnosticVisible xxx guifg=#5c6370
+BufferLineWarningDiagnostic xxx guifg=#5c6370 guisp=#b4bf46
+BufferLineWarningSelected xxx cterm=bold,italic gui=bold,italic guifg=#f1ff5e
+                   guisp=#f1ff5e
+BufferLineWarningVisible xxx guifg=#7b8496
+BufferLineInfoDiagnosticSelected xxx cterm=bold,italic gui=bold,italic
+                   guifg=#4678bf guisp=#4678bf
+BufferLineInfoDiagnosticVisible xxx guifg=#5c6370
+BufferLineInfoDiagnostic xxx guifg=#5c6370 guisp=#4678bf
+BufferLineInfoSelected xxx cterm=bold,italic gui=bold,italic guifg=#5ea1ff
+                   guisp=#5ea1ff
+BufferLineInfoVisible xxx guifg=#7b8496
+BufferLineHintDiagnosticSelected xxx cterm=bold,italic gui=bold,italic
+                   guifg=#46b4bf guisp=#46b4bf
+BufferLineHintDiagnosticVisible xxx guifg=#5c6370
+BufferLineHintDiagnostic xxx guifg=#5c6370 guisp=#46b4bf
+BufferLineHintSelected xxx cterm=bold,italic gui=bold,italic guifg=#5ef1ff
+                   guisp=#5ef1ff
+BufferLineHintVisible xxx guifg=#7b8496
+BufferLineDiagnosticSelected xxx cterm=bold,italic gui=bold,italic
+                   guifg=#bfbfbf
+BufferLineDiagnosticVisible xxx guifg=#5c6370
+BufferLineNumbersVisible xxx guifg=#7b8496
+BufferLineNumbersSelected xxx cterm=bold,italic gui=bold,italic guifg=#ffffff
+BufferLineNumbers xxx guifg=#7b8496
+BufferLineBufferSelected xxx cterm=bold,italic gui=bold,italic guifg=#ffffff
+BufferLineBufferVisible xxx guifg=#7b8496
+BufferLineCloseButtonSelected xxx guifg=#ffffff
+BufferLineCloseButtonVisible xxx guifg=#7b8496
+BufferLineCloseButton xxx guifg=#7b8496
+BufferLineTabClose xxx guifg=#7b8496
+BufferLineHint xxx guifg=#7b8496 guisp=#5ef1ff
+BufferLineGroupLabel xxx guibg=#7b8496
+BufferLineGroupSeparator xxx guifg=#7b8496
+BufferLineTruncMarker xxx guifg=#7b8496
+BufferLineError xxx guifg=#7b8496 guisp=#ff6e5e
+BufferLineBuffer xxx guifg=#7b8496
+BufferLineWarning xxx guifg=#7b8496 guisp=#f1ff5e
+BufferLineDiagnostic xxx guifg=#5c6370
+BufferLineModified xxx guifg=#5eff6c
+BufferLineTabSelected xxx guifg=#3c4048
+BufferLineSeparator xxx cleared
+BufferLineBackground xxx guifg=#7b8496
+BufferLinePick xxx cterm=bold,italic gui=bold,italic guifg=#ff6e5e
+BufferLineTab  xxx guifg=#7b8496
+BufferLineInfo xxx guifg=#7b8496 guisp=#5ea1ff
+BufferLineDuplicate xxx cterm=italic gui=italic guifg=#747d8e

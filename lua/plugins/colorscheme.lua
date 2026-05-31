@@ -10,6 +10,15 @@ return {
         hide_fillchars = true,
         borderless_telescope = false,
         terminal_colors = true,
+        overrides = function(colors)
+          return {
+            BufferLineFill = { bg = "NONE" },
+            BufferLineBackground = { bg = "NONE" },
+            BufferLineSeparator = { fg = colors.bg, bg = "NONE" },
+            BufferLineSeparatorVisible = { fg = colors.bg, bg = "NONE" },
+            BufferLineSeparatorSelected = { fg = colors.bg, bg = "NONE" },
+          }
+        end,
       }
       vim.cmd.colorscheme(vim.g.default_colorscheme or "cyberdream")
     end,

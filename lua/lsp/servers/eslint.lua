@@ -27,7 +27,6 @@ return {
     format = false,
     nodePath = "",
     onIgnoredFiles = "off",
-    packageManager = "npm",
     quiet = false,
     rulesCustomizations = {},
     run = "onType",

@@ -8,6 +8,8 @@ return {
       new_config.settings.json = new_config.settings.json or {}
       new_config.settings.json.schemas = schemastore.json.schemas()
       new_config.settings.json.validate = { enable = true }
+      -- Prevent server from requesting global schema catalog over internet on startup
+      new_config.settings.json.schemaStore = { enable = false }
     end
   end,
 }

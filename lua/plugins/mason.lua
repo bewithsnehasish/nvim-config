@@ -47,7 +47,7 @@ return {
         "html",
         "cssls",
         "tailwindcss",
-        "emmet_ls",
+        "emmet_language_server",
         "eslint",
         "jsonls",
         "biome",
@@ -85,12 +85,16 @@ return {
         "netcoredbg",
         "php-debug-adapter",
         "roslyn",
+        "shellcheck",
+        "shfmt",
 
         -- JavaScript/TypeScript debugger
         "js-debug-adapter",
       },
       auto_update = false,
       run_on_start = true,
+      start_delay = 3000, -- Delay execution by 3 seconds to avoid startup lag
+      debounce_hours = 24, -- Check for updates at most once a day
     }
   end,
 }
