@@ -1,6 +1,23 @@
 return {
   -- Markdown support
   {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+    },
+    ft = { "markdown", "org" },
+    opts = {
+      heading = {
+        icons = { "󰎤 ", "󰎧 ", "󰎪 ", "󰎭 ", "󰎰 ", "󰎳 " },
+      },
+      checkbox = {
+        unchecked = { icon = "󰄱 " },
+        checked = { icon = "󰱒 " },
+      },
+    },
+  },
+  {
     "plasticboy/vim-markdown",
     ft = { "markdown" },
     config = function() end,

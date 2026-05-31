@@ -1,22 +1,15 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    -- Pinned to master branch for now. main branch requires a config rewrite
-    -- (no more nvim-treesitter.configs.setup{}; per-FT autocmd registration).
-    -- On Neovim 0.12 master throws a few non-fatal errors; we mitigate by:
-    --   * dropping illuminate's "treesitter" provider (see vim-illuminate.lua)
-    --   * lower file-size threshold for highlight (100KB) to skip giant files
-    branch = "master",
+    -- Migrated to the main branch for Neovim 0.12 compatibility
+    branch = "main",
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
     dependencies = {
       "windwp/nvim-ts-autotag",
     },
     config = function()
-      local status, treesitter = pcall(require, "nvim-treesitter.configs")
-      if not status then
-        status, treesitter = pcall(require, "nvim-treesitter")
-      end
+      local status, treesitter = pcall(require, "nvim-treesitter")
 
       if not status then
         vim.notify(
@@ -27,62 +20,77 @@ return {
         return
       end
 
-      treesitter.setup {
-        ensure_installed = {
-          "javascript",
-          "typescript",
-          "tsx",
-          "c_sharp",
-          "razor",
-          "html",
-          "css",
-          "svelte",
-          "json",
-          "yaml",
-          "php",
-          "bash",
-          "dockerfile",
-          "gitignore",
-          "toml",
-          "xml",
-          "vue",
-          "graphql",
-          "regex",
-        },
-        auto_install = true,
-        sync_install = false,
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-          disable = function(lang, buf)
-            local max_filesize = 100 * 1024 -- 100 KB
-            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-            local disabled = { "neo-tree", "help", "terminal", "" }
-            if
-              vim.tbl_contains(disabled, lang)
-              or vim.b[buf].hlchunk_disabled
-              or (ok and stats and stats.size > max_filesize)
-            then
-              return true
-            end
-            return false
-          end,
-        },
-        indent = {
-          enable = true,
-        },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<leader>ss", -- Avoid terminal conflicts
-            node_incremental = "<leader>ss",
-            scope_incremental = "<leader>sS",
-            node_decremental = "<leader>sd",
-          },
-        },
+      -- The main branch uses a basic setup call without feature tables
+      treesitter.setup()
+
+      -- Define parsers to ensure they are installed
+      local ensure_installed = {
+        "javascript",
+        "typescript",
+        "tsx",
+        "c_sharp",
+        "razor",
+        "html",
+        "css",
+        "svelte",
+        "json",
+        "yaml",
+        "php",
+        "bash",
+        "dockerfile",
+        "gitignore",
+        "toml",
+        "xml",
+        "vue",
+        "graphql",
+        "regex",
       }
 
+      -- Install missing parsers automatically
+      local function is_installed(lang)
+        return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) > 0
+      end
+
+      local to_install = vim.tbl_filter(function(lang)
+        return not is_installed(lang)
+      end, ensure_installed)
+
+      if #to_install > 0 then
+        pcall(treesitter.install, to_install)
+      end
+
+      -- Highlighting is native in Neovim 0.12+. We add a control autocommand to stop it 
+      -- for large files or specific disabled filetypes.
+      local max_filesize = 100 * 1024 -- 100 KB
+      local disabled_langs = { "neo-tree", "help", "terminal", "" }
+
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+        group = vim.api.nvim_create_augroup("TSHighlightControl", { clear = true }),
+        callback = function(args)
+          local buf = args.buf
+          local filename = vim.api.nvim_buf_get_name(buf)
+          
+          local ok, stats = pcall(vim.uv.fs_stat, filename)
+          if ok and stats and stats.size > max_filesize then
+            vim.treesitter.stop(buf)
+            return
+          end
+
+          local ft = vim.bo[buf].filetype
+          if vim.tbl_contains(disabled_langs, ft) or vim.b[buf].hlchunk_disabled then
+            vim.treesitter.stop(buf)
+            return
+          end
+        end,
+      })
+
+      -- Register cshtml to use razor parser
       vim.treesitter.language.register("razor", "cshtml")
+
+      -- Incremental selection (Neovim 0.12+ native)
+      vim.keymap.set("n", "<leader>ss", "van", { desc = "Init incremental selection (outward)", remap = true })
+      vim.keymap.set("v", "<leader>ss", "an", { desc = "Increment selection (outward)", remap = true })
+      vim.keymap.set("v", "<leader>sd", "in", { desc = "Decrement selection (inward)", remap = true })
     end,
   },
   {

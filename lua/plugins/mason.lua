@@ -5,7 +5,6 @@ return {
   dependencies = {
     "williamboman/mason.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    { "hrsh7th/cmp-nvim-lsp", optional = true },
   },
   config = function()
     local mason_status, mason = pcall(require, "mason")
@@ -31,13 +30,7 @@ return {
       max_concurrent_installers = 4,
     }
 
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument = capabilities.textDocument or {}
-    capabilities.textDocument.positionEncoding = "utf-16"
-    local cmp_lsp_status, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-    if cmp_lsp_status then
-      capabilities = vim.tbl_deep_extend("force", capabilities, cmp_lsp.default_capabilities())
-    end
+    -- Capabilities logic removed: this is handled centrally in lspconfig.lua
 
     local mason_lspconfig_status, mason_lspconfig = pcall(require, "mason-lspconfig")
     if not mason_lspconfig_status then

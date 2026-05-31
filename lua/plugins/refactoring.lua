@@ -33,6 +33,7 @@ return {
 				noremap = true,
 				silent = true,
 				expr = false,
+				desc = "Refactor selection",
 			},
 		},
 		opts = {},

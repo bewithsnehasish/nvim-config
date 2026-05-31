@@ -71,12 +71,8 @@ function M.config()
     close_fold_kinds = {},
     -- close_fold_kinds = { "imports", "comment" },
     provider_selector = function(bufnr, filetype, buftype)
-      -- if you prefer treesitter provider rather than lsp,
-      -- return ftMap[filetype] or {'treesitter', 'indent'}
-      return ftMap[filetype]
-      -- return { "treesitter", "indent" }
-
-      -- refer to ./doc/example.lua for detail
+      -- Use treesitter or indent-based folding as fallback to avoid heavy LSP queries
+      return ftMap[filetype] or { "treesitter", "indent" }
     end,
 
     preview = {

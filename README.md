@@ -113,15 +113,26 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 
 ### Discoverability (which-key)
 
-`which-key` shows all available keymaps grouped by namespace as you type `<leader>`.
-Uses the **modern** preset (clean bottom popup) with named groups (`Find`, `Git`, `LSP`, …)
-and per-keymap icons.
+`which-key` has been upgraded to **v3** (which automatically discovers native `vim.keymap.set` descriptions and dynamically resolves high-DPI Nerd Font icons). Uses the **modern** preset (snappy bottom-footer popup panel) with consolidated groups (`Find`, `Git`, `Code`, `Search`, etc.).
 
 | Key | Action |
 |---|---|
-| `<leader>` | Wait → see all leader groups |
+| `<leader>` | Wait 200ms → display semantic leader groups popup |
 | `<leader>?` | Show buffer-local keymaps only (LSP-attached buffers reveal `gd`, `gr`, …) |
-| `<leader>K` | Browse all leader keymaps (loop mode — keeps panel open) |
+| `<leader>k` / `<leader>K` | Browse all leader keymaps (loop mode — interactive panel stays open) |
+
+### Autocompletion & AI Suggestions (blink.cmp & Supermaven)
+
+Your autocomplete dropdown list (`blink.cmp`) and AI coder (`Supermaven`) are configured to work seamlessly without key conflicts:
+
+| Key | Mode | Action |
+|---|---|---|
+| `<C-j>` / `<C-k>` | Insert (Dropdown Open) | Navigate down / up the autocomplete popup list |
+| `<CR>` (Enter) | Insert (Dropdown Open) | **Safe Enter**: Accepts highlighted item *only* if manually selected; otherwise inserts a newline |
+| `<C-space>` | Insert | Trigger completion menu manually / Toggle docs pane |
+| `<C-e>` | Insert | Close/Hide completion list |
+| `<C-l>` | Insert | Accept inline AI ghost suggestion (Supermaven) |
+| `<M-l>` | Insert | Accept inline AI suggestion word-by-word |
 
 ### Buffer Navigation
 
@@ -261,6 +272,13 @@ Powered by LSP + treesitter. Folded blocks show a line count: `▶ public class 
 Formatter priority per filetype: **Biome** (if `biome.json`) → **prettierd** → LSP fallback.
 PHP uses `php-cs-fixer`. Lua uses `stylua`.
 **C# / Razor / CSHTML** use `csharpier` (installed via Mason); falls back to Roslyn LSP if missing.
+
+### Refactoring (refactoring.nvim & inc-rename.nvim)
+
+| Key | Mode | Action |
+|---|---|---|
+| `<leader>r` | Visual | Open refactoring choices popup (Extract function/var, etc.) |
+| `<leader>rn` | Normal | Project-wide incremental rename |
 
 ### Debugging (nvim-dap)
 

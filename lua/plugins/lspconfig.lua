@@ -4,24 +4,14 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "folke/lazydev.nvim",
-      "hrsh7th/cmp-nvim-lsp",
       "williamboman/mason.nvim",
-      "hrsh7th/nvim-cmp",
-      "hrsh7th/cmp-buffer",
       "stevearc/conform.nvim",
       "RRethy/vim-illuminate",
       "pmizio/typescript-tools.nvim",
+      "saghen/blink.cmp",
     },
     config = function()
-      -- 1. Imports
-      local cmp_nvim_lsp_status, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-      if not cmp_nvim_lsp_status then
-        vim.notify("Failed to load cmp-nvim-lsp, using base capabilities", vim.log.levels.WARN, {
-          timeout = 2000,
-          title = "LSP Warning",
-          icon = "⚠️",
-        })
-      end
+      -- Removed cmp_nvim_lsp imports as blink.cmp handles it directly
 
       local typescript_tools_status, typescript_tools = pcall(require, "typescript-tools")
       if not typescript_tools_status then
@@ -41,10 +31,12 @@ return {
         },
       }
 
-      -- 3. Capabilities Configuration
-      local capabilities = cmp_nvim_lsp_status
-          and cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-        or vim.lsp.protocol.make_client_capabilities()
+      -- 3. Capabilities Configuration (Using blink.cmp)
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local blink_status, blink = pcall(require, "blink.cmp")
+      if blink_status then
+        capabilities = blink.get_lsp_capabilities(capabilities)
+      end
 
       capabilities.textDocument.positionEncoding = "utf-16"
       capabilities.textDocument.completion.completionItem = {

@@ -92,4 +92,4 @@ vim.g.user_emmet_settings = {
   php = { extends = "html, javascript ,css" },
 }
 
-vim.api.nvim_set_keymap("i", "<C-y>,", "<Plug>(emmet-expand-abbr)", {})
+vim.keymap.set("i", "<C-y>,", "<Plug>(emmet-expand-abbr)", { desc = "Emmet: expand abbreviation" })

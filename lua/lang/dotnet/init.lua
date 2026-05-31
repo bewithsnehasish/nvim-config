@@ -9,10 +9,11 @@ function M.setup()
   }
 
   local on_attach = require "lsp.on_attach"
-  local cmp_nvim_lsp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-  local capabilities = cmp_nvim_lsp_ok
-      and cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-    or vim.lsp.protocol.make_client_capabilities()
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  local blink_status, blink = pcall(require, "blink.cmp")
+  if blink_status then
+    capabilities = blink.get_lsp_capabilities(capabilities)
+  end
 
   local function roslyn_on_attach(client, bufnr)
     on_attach(client, bufnr)
@@ -112,7 +113,6 @@ function M.setup()
     pattern = { "csharp:/*", "csharp://*" },
     callback = function(args)
       local uri = args.match
-      vim.bo[args.buf].modifiable = true
       vim.bo[args.buf].swapfile = false
       vim.bo[args.buf].filetype = "cs"
 
@@ -133,6 +133,9 @@ function M.setup()
         content = result and result.text or ""
         local normalized = string.gsub(content, "\r\n", "\n")
         local lines = vim.split(normalized, "\n", { plain = true })
+        
+        -- Ensure modifiable is true when writing, then set back to false
+        vim.bo[args.buf].modifiable = true
         vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, lines)
         vim.bo[args.buf].modifiable = false
         vim.bo[args.buf].modified = false
