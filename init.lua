@@ -1,6 +1,3 @@
--- Byte-compile + cache all Lua modules on first load. ~30ms off cold start,
--- bigger win on hot reloads. Must run BEFORE any require() call.
-vim.loader.enable()
 
 -- Disable vendored default plugins we don't use — saves rtp scan + sourcing time.
 local disabled_builtins = {

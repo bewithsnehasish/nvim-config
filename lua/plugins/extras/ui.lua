@@ -1,6 +1,7 @@
 return {
   {
     "lukas-reineke/virt-column.nvim",
+    event = { "BufReadPost", "BufNewFile" },
     opts = {
       char = { "┆" },
       virtcolumn = "130",
@@ -13,6 +14,7 @@ return {
   },
   {
     "j-hui/fidget.nvim",
+    event = "LspAttach",
     opts = {
       notification = {
         window = {
@@ -24,6 +26,7 @@ return {
   },
   {
     "rcarriga/nvim-notify",
+    event = "VeryLazy",
     opts = {
       timeout = 500,
       render = "compact",

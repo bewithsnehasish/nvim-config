@@ -90,7 +90,7 @@ return function(client, bufnr)
         if #unique_items == 1 then
           local item = unique_items[1]
           if item.user_data then
-            vim.lsp.util.jump_to_location(item.user_data, "utf-8", true)
+            vim.lsp.util.show_document(item.user_data, "utf-8", { focus = true })
           else
             vim.cmd("normal! m'")
             vim.cmd("edit " .. vim.fn.fnameescape(item.filename))

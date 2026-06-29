@@ -1,7 +1,7 @@
 return {
   {
     "seblyng/roslyn.nvim",
-    lazy = false,
+    ft = { "cs", "vb" },
     dependencies = {
       "neovim/nvim-lspconfig",
       "williamboman/mason.nvim",
@@ -11,8 +11,8 @@ return {
       require("lang.dotnet").setup()
     end,
     keys = {
-      { "<leader>ct", "<cmd>Roslyn target<cr>", desc = "Roslyn target" },
-      { "<leader>cR", "<cmd>Roslyn restart<cr>", desc = "Roslyn restart" },
+      { "<leader>pt", "<cmd>Roslyn target<cr>", desc = "Roslyn target" },
+      { "<leader>pr", "<cmd>Roslyn restart<cr>", desc = "Roslyn restart" },
     },
   },
 }

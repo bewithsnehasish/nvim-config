@@ -55,6 +55,7 @@ return {
         { "<leader>j", group = "Jump (Harpoon)",  icon = "󰛢" },
         { "<leader>l", group = "LSP" },
         { "<leader>m", group = "Format" },
+        { "<leader>p", group = "Project" },
         { "<leader>r", group = "Refactor" },
         { "<leader>s", group = "Search" },
         { "<leader>t", group = "Test",            icon = "󰙨" },

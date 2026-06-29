@@ -6,7 +6,6 @@ return {
       "folke/lazydev.nvim",
       "williamboman/mason.nvim",
       "stevearc/conform.nvim",
-      "RRethy/vim-illuminate",
       "pmizio/typescript-tools.nvim",
       "saghen/blink.cmp",
     },

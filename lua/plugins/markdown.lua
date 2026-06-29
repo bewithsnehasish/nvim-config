@@ -17,11 +17,7 @@ return {
       },
     },
   },
-  {
-    "plasticboy/vim-markdown",
-    ft = { "markdown" },
-    config = function() end,
-  },
+
   {
     "vim-pandoc/vim-pandoc",
     ft = { "markdown" },
@@ -61,7 +57,12 @@ return {
   -- Documentation and notes
   {
     "vimwiki/vimwiki",
-    config = function()
+    keys = {
+      { "<leader>ww", "<cmd>VimwikiIndex<cr>", desc = "Vimwiki Index" },
+      { "<leader>wt", "<cmd>VimwikiTabIndex<cr>", desc = "Vimwiki Tab Index" },
+      { "<leader>ws", "<cmd>VimwikiUISelect<cr>", desc = "Vimwiki UI Select" },
+    },
+    init = function()
       vim.g.vimwiki_list = {
         {
           path = "~/vimwiki/",
@@ -69,15 +70,10 @@ return {
           ext = ".md",
         },
       }
-      vim.cmd [[
-        nnoremap <Leader>ww :VimwikiIndex<CR>
-        nnoremap <Leader>wt :VimwikiTabIndex<CR>
-        nnoremap <Leader>ws :VimwikiUISelect<CR>
-      ]]
     end,
   },
   {
-    "kristijanhusak/orgmode.nvim",
+    "nvim-orgmode/orgmode",
     ft = { "org" },
     config = function()
       require("orgmode").setup {}

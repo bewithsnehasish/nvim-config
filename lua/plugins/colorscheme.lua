@@ -4,6 +4,16 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
+      -- Automatically override terminal colors to ensure high contrast for TUI tools 
+      -- (like lazygit and lazydotnet) on transparent/black backgrounds.
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("TerminalColorsOverride", { clear = true }),
+        callback = function()
+          vim.g.terminal_color_8 = "#7b8496" -- High-contrast grey for inactive tabs/items
+          vim.g.terminal_color_0 = "#16181a" -- Dark grey/black
+        end,
+      })
+
       require("cyberdream").setup {
         transparent = true,
         italic_comments = true,
@@ -17,6 +27,7 @@ return {
             BufferLineSeparator = { fg = colors.bg, bg = "NONE" },
             BufferLineSeparatorVisible = { fg = colors.bg, bg = "NONE" },
             BufferLineSeparatorSelected = { fg = colors.bg, bg = "NONE" },
+            SnacksPickerGitStatusUntracked = { fg = colors.cyan },
           }
         end,
       }

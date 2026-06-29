@@ -52,5 +52,17 @@ vim.keymap.set("n", "<leader>c", '"+y', { desc = "Copy to system clipboard" })
 vim.keymap.set("v", "<leader>c", '"+y', { desc = "Copy selection to system clipboard" })
 vim.keymap.set("n", "<leader>cc", '"+yy', { desc = "Copy line to system clipboard" })
 
+-- Copy current active file path
+vim.keymap.set("n", "yp", function()
+  local path = vim.api.nvim_buf_get_name(0)
+  if path and path ~= "" then
+    vim.fn.setreg("+", path)
+    vim.notify("Copied active file path: " .. path, vim.log.levels.INFO, { title = "Clipboard" })
+  else
+    vim.notify("No active file open", vim.log.levels.WARN, { title = "Clipboard" })
+  end
+end, { desc = "Copy active file path", silent = true })
+
+
 
 

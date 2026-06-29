@@ -21,7 +21,7 @@ return {
     opts = {
       bigfile = {
         enabled = true,
-        size = 500 * 1024, -- 500 KB (matching your previous LargeFilePerf threshold)
+        size = 1.5 * 1024 * 1024, -- 1.5 MB (allow larger C# and code files to load LSPs)
         setup = function(ctx)
           -- Custom large file disabling flags (from old options.lua autocommand)
           vim.b[ctx.buf].large_file = true
@@ -87,6 +87,18 @@ return {
         -- "default" = wide centered float with preview on the right.
         -- Override per-picker below for grep/references which benefit from "ivy" (bottom panel).
         layout = { preset = "default" },
+        actions = {
+          copy_path = function(picker, item)
+            if not item then return end
+            local path = item.path or item.file
+            if path then
+              vim.fn.setreg("+", path)
+              vim.notify("Copied path: " .. path, vim.log.levels.INFO, { title = "Snacks Picker" })
+            else
+              vim.notify("No path found to copy", vim.log.levels.WARN, { title = "Snacks Picker" })
+            end
+          end,
+        },
         formatters = {
           file = { filename_first = false, truncate = 80 },
         },
@@ -117,6 +129,7 @@ return {
             keys = {
               ["<C-j>"] = { "list_down", mode = { "i", "n" } },
               ["<C-k>"] = { "list_up", mode = { "i", "n" } },
+              ["yp"] = { "copy_path", mode = { "n" } },
             },
           },
         },
@@ -132,7 +145,6 @@ return {
           "vendor",
           "*.min.js",
           "*.lock",
-          "*.csv",
           "*.tsv",
           "*.sql",
           "*.map",
