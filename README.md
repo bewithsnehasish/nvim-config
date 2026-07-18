@@ -8,7 +8,7 @@ A fast, modular Neovim configuration for full-stack development: **React/TypeScr
 
 | Platform | Status | Notes |
 |---|---|---|
-| **Windows (native)** | Primary | Clipboard handled automatically; ToggleTerm uses PowerShell |
+| **Windows (native)** | Primary | Clipboard handled automatically; terminals (snacks.terminal) use PowerShell |
 | **WSL2** | Supported | Clipboard via `win32yank.exe`; shell inherits bash/zsh |
 | **Linux (native)** | Supported | Clipboard auto-detected (xsel / xclip / wl-copy) |
 
@@ -58,14 +58,15 @@ sudo apt install ripgrep fd-find
 │   ├── lang/                 # Per-language modules
 │   │   └── dotnet/           # roslyn (init.lua) + netcoredbg (dap.lua) + neotest
 │   ├── user/icons.lua        # Shared icon table (used by cmp, telescope, navbuddy)
-│   ├── plugins.lua           # Auto-loader: discovers all .lua files in plugins/
 │   └── plugins/              # Lazy.nvim specs — config bodies delegate to core/lsp/lang
-│       └── extras/           # Optional plugins — vim.g.enabled_extra_plugins
+│       └── extras/           # Cosmetic / optional plugin specs
 ```
 
-Any `.lua` file dropped into `lua/plugins/` is auto-loaded.
-Files in `lua/plugins/extras/` load only when listed in `vim.g.enabled_extra_plugins` inside `core/options.lua`.
+Any `.lua` file dropped into `lua/plugins/` or `lua/plugins/extras/` is auto-imported by lazy.nvim
+(`{ import = "plugins" }` in `init.lua`). To disable a plugin, set `enabled = false` in its spec.
 Adding a new LSP server is one new file in `lua/lsp/servers/` — the scanner in `plugins/lspconfig.lua` picks it up automatically.
+Plugin keymaps belong in the spec's `keys = {}` (lazy-load triggers); duplicating them in
+`core/keymaps.lua` overwrites lazy's handlers and breaks loading.
 
 ---
 
@@ -119,7 +120,7 @@ changing `dotnet_analyzer_diagnostics_scope` to `"fullSolution"` in `dotnet.lua`
 |---|---|
 | `<leader>` | Wait 200ms → display semantic leader groups popup |
 | `<leader>?` | Show buffer-local keymaps only (LSP-attached buffers reveal `gd`, `gr`, …) |
-| `<leader>k` / `<leader>K` | Browse all leader keymaps (loop mode — interactive panel stays open) |
+| `<leader>k` | Browse all leader keymaps (loop mode — interactive panel stays open) |
 
 ### Autocompletion & AI Suggestions (blink.cmp & Supermaven)
 
@@ -244,8 +245,9 @@ Auto-highlights the word under the cursor and lets you jump between occurrences.
 
 | Key | Action |
 |---|---|
-| `<leader>ct` | Select Roslyn solution target |
-| `<leader>cR` | Restart Roslyn |
+| `<leader>pt` | Select Roslyn solution target |
+| `<leader>pr` | Restart Roslyn |
+| `<leader>pd` / `<M-d>` | Toggle LazyDotnet TUI |
 
 ### Code Folding (nvim-ufo)
 
@@ -270,7 +272,8 @@ Powered by LSP + treesitter. Folded blocks show a line count: `▶ public class 
 
 Formatter priority per filetype: **Biome** (if `biome.json`) → **prettierd** → LSP fallback.
 PHP uses `php-cs-fixer`. Lua uses `stylua`.
-**C# / Razor / CSHTML** use `csharpier` (installed via Mason); falls back to Roslyn LSP if missing.
+**C#** uses `csharpier` (installed via Mason). **Razor / CSHTML** format through the Roslyn LSP
+fallback — csharpier does not support razor files.
 
 ### Refactoring (refactoring.nvim & inc-rename.nvim)
 
@@ -290,6 +293,10 @@ PHP uses `php-cs-fixer`. Lua uses `stylua`.
 | `<leader>dsi` | Step into |
 | `<leader>dsu` | Step out |
 | `<leader>de` | Evaluate expression |
+| `<leader>du` | Toggle DAP UI |
+| `<leader>df` | Focus DAP UI window |
+| `<leader>dh` | Hover / eval (floating) |
+| `<leader>dus` | Scopes sidebar |
 
 ### Testing (neotest)
 
@@ -333,7 +340,7 @@ PHP uses `php-cs-fixer`. Lua uses `stylua`.
 - **LSP**: `typescript-tools.nvim` — native tsserver API (no LSP adapter overhead)
 - **Formatting**: Biome (if `biome.json` present) → prettierd fallback
 - **Linting**: ESLint (projects with `.eslintrc*`) or Biome (projects with `biome.json`)
-- **Emmet**: Tab expansion works in JSX/TSX via `cmp-emmet-vim`; no separate emmet LSP attached
+- **Emmet**: `emmet_language_server` provides abbreviation completions in HTML/CSS/PHP/Blade (not JSX/TSX)
 
 ### C# / ASP.NET Core
 - **LSP**: `roslyn.nvim` — install server via `:MasonInstall roslyn`

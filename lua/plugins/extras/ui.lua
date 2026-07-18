@@ -9,10 +9,6 @@ return {
     },
   },
   {
-    "folke/noice.nvim",
-    enabled = false,
-  },
-  {
     "j-hui/fidget.nvim",
     event = "LspAttach",
     opts = {
@@ -25,30 +21,11 @@ return {
     },
   },
   {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
-    opts = {
-      timeout = 500,
-      render = "compact",
-      max_height = function()
-        return math.floor(vim.o.lines * 0.75)
-      end,
-      max_width = function()
-        return math.floor(vim.o.columns * 0.25)
-      end,
-      on_open = function(win)
-        vim.api.nvim_win_set_config(win, { zindex = 100 })
-      end,
-    },
-  },
-  -- filename
-  {
     "b0o/incline.nvim",
     event = "BufReadPre",
-    priority = 1200,
     config = function()
-      local devicons = require("nvim-web-devicons")
-      require("incline").setup({
+      local devicons = require "nvim-web-devicons"
+      require("incline").setup {
         highlight = {
           groups = {
             InclineNormal = { guibg = "#303270", guifg = "#a9b1d6" },
@@ -67,7 +44,7 @@ return {
 
           return { { icon, guifg = color }, { " " }, { filename } }
         end,
-      })
+      }
     end,
   },
 
@@ -75,7 +52,7 @@ return {
   {
     "akinsho/bufferline.nvim",
     config = function(_, opts)
-      local icons = require("user.icons")
+      local icons = require "user.icons"
 
       -- Fetch cyberdream colors or use default fallback palette
       local c = {
@@ -89,7 +66,7 @@ return {
         grey = "#7b8496",
         purple = "#bd5eff",
         red = "#ff6e5e",
-        yellow = "#f1ff5e"
+        yellow = "#f1ff5e",
       }
       local ok, cyberdream_colors = pcall(require, "cyberdream.colors")
       if ok then
@@ -107,10 +84,10 @@ return {
           bold = true,
           italic = true,
         },
-        
+
         -- Active indicator (vibrant cyan vertical line on the left)
         indicator_selected = { fg = c.cyan },
-        
+
         -- Bold & italic diagnostics on the active tab
         error_selected = { fg = c.red, bold = true, italic = true },
         warning_selected = { fg = c.yellow, bold = true, italic = true },
@@ -138,7 +115,10 @@ return {
         right = function()
           local result = {}
           if error_count > 0 then
-            table.insert(result, { text = " " .. icons.diagnostics.Error .. " " .. error_count .. " ", highlight = "BufferLineRightError" })
+            table.insert(
+              result,
+              { text = " " .. icons.diagnostics.Error .. " " .. error_count .. " ", highlight = "BufferLineRightError" }
+            )
           end
           return result
         end,

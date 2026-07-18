@@ -1,9 +1,9 @@
 return {
-  "williamboman/mason-lspconfig.nvim",
+  "mason-org/mason-lspconfig.nvim",
   event = { "BufReadPre", "BufNewFile" },
   cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUninstallAll", "MasonLog", "LspInstall", "LspUninstall" },
   dependencies = {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
   },
   config = function()
@@ -29,8 +29,6 @@ return {
       },
       max_concurrent_installers = 4,
     }
-
-    -- Capabilities logic removed: this is handled centrally in lspconfig.lua
 
     local mason_lspconfig_status, mason_lspconfig = pcall(require, "mason-lspconfig")
     if not mason_lspconfig_status then
@@ -60,7 +58,6 @@ return {
 
         "graphql",
       },
-      automatic_installation = true,
       automatic_enable = {
         exclude = { "csharp_ls", "omnisharp", "roslyn", "ts_ls" },
       },

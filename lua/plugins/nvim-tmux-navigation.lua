@@ -10,6 +10,6 @@ return {
     disable_when_zoomed = true, -- Prevents accidental navigation out of zoomed panes
   },
   config = function(_, opts)
-    require('nvim-tmux-navigation').setup(opts)
+    require("nvim-tmux-navigation").setup(opts)
   end,
 }

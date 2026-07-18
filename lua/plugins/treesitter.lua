@@ -1,29 +1,13 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    -- Migrated to the main branch for Neovim 0.12 compatibility
     branch = "main",
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
-    dependencies = {
-      "windwp/nvim-ts-autotag",
-    },
     config = function()
-      local status, treesitter = pcall(require, "nvim-treesitter")
-
-      if not status then
-        vim.notify(
-          "Failed to load nvim-treesitter: " .. tostring(treesitter),
-          vim.log.levels.ERROR,
-          { timeout = 2000, title = "Treesitter Error", icon = "❌" }
-        )
-        return
-      end
-
-      -- The main branch uses a basic setup call without feature tables
+      local treesitter = require "nvim-treesitter"
       treesitter.setup()
 
-      -- Define parsers to ensure they are installed
       local ensure_installed = {
         "javascript",
         "typescript",
@@ -46,48 +30,39 @@ return {
         "regex",
       }
 
-      -- Install missing parsers automatically
-      local function is_installed(lang)
-        return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) > 0
-      end
-
-      local to_install = vim.tbl_filter(function(lang)
-        return not is_installed(lang)
+      -- On main branch, install() COMPILES parsers into install_dir and links their
+      -- queries there. That compile is broken on this machine (toolchain selects a
+      -- non-working cl.exe instead of mingw gcc, and main exposes no compiler
+      -- override). We instead use the plugin's precompiled bundled parsers, whose
+      -- matching queries live in <plugin>/runtime/queries — same checkout, same
+      -- version. nvim only searches queries/ at rtp roots, and <plugin>/runtime is
+      -- not one, so expose it explicitly. If the compiler is ever fixed, replace
+      -- this with `treesitter.install(ensure_installed)` and drop the rtp append.
+      local ok_ts = vim.tbl_filter(function(lang)
+        return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".so", false) == 0
       end, ensure_installed)
-
-      if #to_install > 0 then
-        pcall(treesitter.install, to_install)
+      if #ok_ts > 0 then
+        pcall(treesitter.install, ok_ts) -- only try to build genuinely-missing parsers
       end
+      vim.opt.runtimepath:append(vim.fn.stdpath "data" .. "/lazy/nvim-treesitter/runtime")
 
-      -- Highlighting is native in Neovim 0.12+. We add a control autocommand to stop it 
-      -- for large files or specific disabled filetypes.
-      local max_filesize = 100 * 1024 -- 100 KB
-      local disabled_langs = { "neo-tree", "help", "terminal", "" }
-
-      vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
-        group = vim.api.nvim_create_augroup("TSHighlightControl", { clear = true }),
+      -- main branch does not auto-start highlighting; without this autocmd there is none
+      local max_filesize = 100 * 1024
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("TSHighlight", { clear = true }),
         callback = function(args)
           local buf = args.buf
-          local filename = vim.api.nvim_buf_get_name(buf)
-          
-          local ok, stats = pcall(vim.uv.fs_stat, filename)
+          if vim.b[buf].large_file or vim.b[buf].hlchunk_disabled then
+            return
+          end
+          local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
           if ok and stats and stats.size > max_filesize then
-            vim.treesitter.stop(buf)
             return
           end
-
-          local ft = vim.bo[buf].filetype
-          if vim.tbl_contains(disabled_langs, ft) or vim.b[buf].hlchunk_disabled then
-            vim.treesitter.stop(buf)
-            return
-          end
+          pcall(vim.treesitter.start, buf)
         end,
       })
 
-      -- Register cshtml to use razor parser
-      vim.treesitter.language.register("razor", "cshtml")
-
-      -- Incremental selection (Neovim 0.12+ native)
       vim.keymap.set("n", "<leader>ss", "van", { desc = "Init incremental selection (outward)", remap = true })
       vim.keymap.set("v", "<leader>ss", "an", { desc = "Increment selection (outward)", remap = true })
       vim.keymap.set("v", "<leader>sd", "in", { desc = "Decrement selection (inward)", remap = true })
@@ -105,37 +80,17 @@ return {
       "svelte",
       "vue",
       "razor",
-      "cshtml",
       "xml",
     },
-    config = function()
-      local status, autotag = pcall(require, "nvim-ts-autotag")
-      if not status then
-        vim.notify(
-          "Failed to load nvim-ts-autotag: " .. tostring(autotag),
-          vim.log.levels.ERROR,
-          { timeout = 2000, title = "Autotag Error", icon = "❌" }
-        )
-        return
-      end
-      autotag.setup {
-        opts = {
-          enable_close = true,
-          enable_rename = true,
-          enable_close_on_slash = true,
-        },
-        filetypes = {
-          "html",
-          "javascript",
-          "typescript",
-          "javascriptreact",
-          "typescriptreact",
-          "svelte",
-          "vue",
-          "razor",
-          "cshtml",
-        },
-      }
-    end,
+    opts = {
+      opts = {
+        enable_close = true,
+        enable_rename = true,
+        enable_close_on_slash = true,
+      },
+      aliases = {
+        razor = "html",
+      },
+    },
   },
 }

@@ -4,7 +4,7 @@ return {
     "SmiteshP/nvim-navic",
     dependencies = { "neovim/nvim-lspconfig" },
     config = function()
-      local icons = require("user.icons")
+      local icons = require "user.icons"
 
       require("nvim-navic").setup {
         icons = icons.kind,

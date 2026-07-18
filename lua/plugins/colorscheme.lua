@@ -4,7 +4,7 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
-      -- Automatically override terminal colors to ensure high contrast for TUI tools 
+      -- Automatically override terminal colors to ensure high contrast for TUI tools
       -- (like lazygit and lazydotnet) on transparent/black backgrounds.
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("TerminalColorsOverride", { clear = true }),

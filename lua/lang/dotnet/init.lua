@@ -1,13 +1,6 @@
 local M = {}
 
 function M.setup()
-  vim.filetype.add {
-    pattern = {
-      [".*%.razor"] = "razor",
-      [".*%.cshtml"] = "cshtml",
-    },
-  }
-
   local on_attach = require "lsp.on_attach"
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   local blink_status, blink = pcall(require, "blink.cmp")
@@ -28,20 +21,11 @@ function M.setup()
       vim.lsp.codelens.enable(true, { bufnr = bufnr })
     end
 
-    vim.keymap.set(
-      "n",
-      "<leader>lc",
-      function()
-        local is_enabled = vim.lsp.codelens.is_enabled({ bufnr = bufnr })
-        vim.lsp.codelens.enable(not is_enabled, { bufnr = bufnr })
-        vim.notify(
-          "CodeLens " .. (is_enabled and "disabled" or "enabled"),
-          vim.log.levels.INFO,
-          { title = "LSP" }
-        )
-      end,
-      { buffer = bufnr, noremap = true, silent = true, desc = "Toggle code lens" }
-    )
+    vim.keymap.set("n", "<leader>lc", function()
+      local is_enabled = vim.lsp.codelens.is_enabled { bufnr = bufnr }
+      vim.lsp.codelens.enable(not is_enabled, { bufnr = bufnr })
+      vim.notify("CodeLens " .. (is_enabled and "disabled" or "enabled"), vim.log.levels.INFO, { title = "LSP" })
+    end, { buffer = bufnr, noremap = true, silent = true, desc = "Toggle code lens" })
   end
 
   -- Global autocmd to refresh CodeLens when the Roslyn server finishes loading/indexing the project
@@ -55,7 +39,7 @@ function M.setup()
       local client = vim.lsp.get_client_by_id(data.client_id)
       if client and client.name == "roslyn" and data.params.value.kind == "end" then
         for bufnr, _ in pairs(client.attached_buffers) do
-          if vim.api.nvim_buf_is_valid(bufnr) and vim.lsp.codelens.is_enabled({ bufnr = bufnr }) then
+          if vim.api.nvim_buf_is_valid(bufnr) and vim.lsp.codelens.is_enabled { bufnr = bufnr } then
             vim.lsp.codelens.enable(true, { bufnr = bufnr })
           end
         end
@@ -68,7 +52,7 @@ function M.setup()
     on_attach = roslyn_on_attach,
     settings = {
       ["csharp|background_analysis"] = {
-        -- fullSolution enables Roslyn to index the whole solution for cross-file references/definitions
+        -- "fullSolution" gives solution-wide diagnostics but is heavy on large solutions
         dotnet_analyzer_diagnostics_scope = "openFiles",
         dotnet_compiler_diagnostics_scope = "openFiles",
       },
@@ -133,7 +117,7 @@ function M.setup()
         content = result and result.text or ""
         local normalized = string.gsub(content, "\r\n", "\n")
         local lines = vim.split(normalized, "\n", { plain = true })
-        
+
         -- Ensure modifiable is true when writing, then set back to false
         vim.bo[args.buf].modifiable = true
         vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, lines)

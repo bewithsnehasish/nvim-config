@@ -11,22 +11,14 @@ return {
     "php",
     "blade",
     "razor",
-    "cshtml",
   },
   settings = {
     tailwindCSS = {
       classAttributes = { "class", "className", "classList", "ngClass" },
-      -- High-performance native handler for completion in helper functions
       classFunctions = { "cva", "cx", "cn", "clsx", "twMerge", "twJoin" },
       experimental = {
+        -- tagged templates (twin.macro / styled-components) — classFunctions can't match these
         classRegex = {
-          { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-          { "cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-          { "clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-          { "twMerge\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-          { "twJoin\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-          { "cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-          -- CSS-in-JS / twin.macro / styled-components
           { "tw`([^`]*)", "tw.+(?:'|\"|`)?([^\"'`]*)(?:'|\"|`)?" },
           { "tw\\.[^`]+`([^`]*)", "tw\\.[^`]+.+`([^`]*)`" },
           { "tw\\([^)]*\\)`([^`]*)", "tw\\([^)]*\\).+`([^`]*)`" },

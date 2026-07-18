@@ -3,7 +3,7 @@ return {
     "mfussenegger/nvim-dap",
     lazy = true,
     dependencies = {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       "rcarriga/nvim-dap-ui",
       "nvim-neotest/nvim-nio",
       "theHamsta/nvim-dap-virtual-text",
@@ -103,14 +103,63 @@ return {
         }
     end,
     keys = {
-      { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Toggle breakpoint" },
-      { "<leader>dr", function() require("dap").continue() end, desc = "DAP continue" },
-      { "<leader>dT", function() require("dap").terminate() end, desc = "DAP terminate" },
-      { "<leader>dso", function() require("dap").step_over() end, desc = "DAP step over" },
-      { "<leader>dsi", function() require("dap").step_into() end, desc = "DAP step into" },
-      { "<leader>dsu", function() require("dap").step_out() end, desc = "DAP step out" },
-      { "<leader>de", function() require("dap").eval() end, desc = "DAP evaluate", mode = { "n", "v" } },
-      { "<leader>du", function() require("dapui").toggle() end, desc = "Toggle DAP UI" },
+      {
+        "<leader>db",
+        function()
+          require("dap").toggle_breakpoint()
+        end,
+        desc = "Toggle breakpoint",
+      },
+      {
+        "<leader>dr",
+        function()
+          require("dap").continue()
+        end,
+        desc = "DAP continue",
+      },
+      {
+        "<leader>dT",
+        function()
+          require("dap").terminate()
+        end,
+        desc = "DAP terminate",
+      },
+      {
+        "<leader>dso",
+        function()
+          require("dap").step_over()
+        end,
+        desc = "DAP step over",
+      },
+      {
+        "<leader>dsi",
+        function()
+          require("dap").step_into()
+        end,
+        desc = "DAP step into",
+      },
+      {
+        "<leader>dsu",
+        function()
+          require("dap").step_out()
+        end,
+        desc = "DAP step out",
+      },
+      {
+        "<leader>de",
+        function()
+          require("dap").eval()
+        end,
+        desc = "DAP evaluate",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>du",
+        function()
+          require("dapui").toggle()
+        end,
+        desc = "Toggle DAP UI",
+      },
       {
         "<leader>df",
         function()
@@ -125,7 +174,22 @@ return {
         end,
         desc = "Focus DAP UI",
       },
-      { "<leader>dh", function() require("dapui").eval(nil, { enter = true }) end, desc = "DAP hover/eval", mode = { "n", "v" } },
+      {
+        "<leader>dh",
+        function()
+          require("dapui").eval(nil, { enter = true })
+        end,
+        desc = "DAP hover/eval",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>dus",
+        function()
+          local widgets = require "dap.ui.widgets"
+          widgets.sidebar(widgets.scopes).open()
+        end,
+        desc = "DAP scopes sidebar",
+      },
     },
   },
 }

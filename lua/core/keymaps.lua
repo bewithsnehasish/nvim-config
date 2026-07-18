@@ -1,4 +1,4 @@
-local opts = { noremap = true, silent = true }
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 
 -- Move line up
 vim.keymap.set("n", "<M-k>", ":m .-2<CR>==", { desc = "Move line up", silent = true })
@@ -23,25 +23,11 @@ vim.keymap.set("n", "<C-v>", '"+p', { desc = "Paste from system clipboard", sile
 vim.keymap.set("i", "<C-v>", "<C-R>+", { desc = "Paste from system clipboard", silent = true })
 vim.keymap.set("v", "<C-v>", '"+p', { desc = "Paste selection from system clipboard", silent = true })
 
--- DAP keymaps
-vim.keymap.set("n", "<leader>db", "<cmd>DapToggleBreakpoint<CR>", { desc = "DAP Toggle Breakpoint", silent = true })
-vim.keymap.set("n", "<leader>dr", "<cmd>DapContinue<CR>", { desc = "DAP Continue", silent = true })
-vim.keymap.set("n", "<leader>dT", "<cmd>DapTerminate<CR>", { desc = "DAP Terminate", silent = true })
-vim.keymap.set("n", "<leader>dso", "<cmd>DapStepOver<CR>", { desc = "DAP Step Over", silent = true })
-vim.keymap.set("n", "<leader>dsi", "<cmd>DapStepInto<CR>", { desc = "DAP Step Into", silent = true })
-vim.keymap.set("n", "<leader>dsu", "<cmd>DapStepOut<CR>", { desc = "DAP Step Out", silent = true })
-
-vim.api.nvim_create_user_command("DapOpenSidebar", function()
-  local widgets = require "dap.ui.widgets"
-  local sidebar = widgets.sidebar(widgets.scopes)
-  sidebar.open()
-end, {})
-vim.keymap.set("n", "<leader>dus", "<cmd>DapOpenSidebar<CR>", { desc = "DAP Open Sidebar", silent = true })
+-- DAP keymaps live in plugins/debugging.lua — duplicating them here overwrites lazy's key handlers
 
 -- Buffer & Tab Navigation (Bufferline)
 vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Go to next buffer", silent = true })
 vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Go to previous buffer", silent = true })
-
 
 vim.keymap.set("n", "<leader>X", "<cmd>BufferLineCloseOthers<CR>", { desc = "Close all OTHER buffers", silent = true })
 
@@ -62,7 +48,3 @@ vim.keymap.set("n", "yp", function()
     vim.notify("No active file open", vim.log.levels.WARN, { title = "Clipboard" })
   end
 end, { desc = "Copy active file path", silent = true })
-
-
-
-

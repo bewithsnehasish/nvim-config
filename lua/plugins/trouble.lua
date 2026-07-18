@@ -13,7 +13,7 @@ return {
       { "<leader>xl", "<cmd>Trouble loclist toggle focus=true<cr>", desc = "Location list" },
     },
     opts = function()
-      local icons = require("user.icons")
+      local icons = require "user.icons"
       return {
         auto_jump = true,
         focus = true,
@@ -32,16 +32,16 @@ return {
           kinds = icons.kind,
         },
         modes = {
-          lsp_references = { 
+          lsp_references = {
             params = { include_declaration = false },
-            win = { position = "bottom", size = 12 }
+            win = { position = "bottom", size = 12 },
           },
-          lsp = { 
-            win = { position = "right", size = 0.3 } 
+          lsp = {
+            win = { position = "right", size = 0.3 },
           },
           diagnostics = {
-            win = { position = "bottom", size = 12 }
-          }
+            win = { position = "bottom", size = 12 },
+          },
         },
       }
     end,

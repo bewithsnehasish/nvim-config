@@ -6,18 +6,24 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     config = function()
-      -- U+E0B6 (round left) and U+E0B4 (round right) — Powerline glyphs.
-      -- Written as UTF-8 byte escapes; literal chars get stripped by some editing pipelines.
-      local LROUND = "\xee\x82\xb6"
-      local RROUND = "\xee\x82\xb4"
+      -- U+E0BE (upper-right triangle, left cap) and U+E0B8 (lower-left triangle,
+      -- right cap) — Powerline slant glyphs. As PER-COMPONENT caps each must fill
+      -- INWARD toward the segment, so both present a "/" hypotenuse and the segment
+      -- is a forward-slanting parallelogram. Written as UTF-8 byte escapes; literal
+      -- chars get stripped by some editing pipelines.
+      local LSLANT = "\xee\x82\xbe"
+      local RSLANT = "\xee\x82\xb8"
 
       local function pill()
-        return { left = LROUND, right = RROUND }
+        return { left = LSLANT, right = RSLANT }
       end
 
+      -- Subtle bar bg (Catppuccin Mantle) so the statusline reads as a distinct bar,
+      -- not blended into the editor. Pills still sit on top with their own colors.
+      local BAR_BG = "#181825"
       local function transparentize()
-        vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
-        vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
+        vim.api.nvim_set_hl(0, "StatusLine", { bg = BAR_BG })
+        vim.api.nvim_set_hl(0, "StatusLineNC", { bg = BAR_BG })
       end
       transparentize()
 
@@ -61,7 +67,7 @@ return {
       local wakatime_cache = ""
 
       local function update_wakatime()
-        local path = vim.fn.expand("~/.wakatime/today")
+        local path = vim.fn.expand "~/.wakatime/today"
         vim.uv.fs_open(path, "r", 438, function(err, fd)
           if err or not fd then
             wakatime_cache = ""
@@ -122,7 +128,7 @@ return {
 
       -- Custom Component: Current 24h system time
       local function current_time()
-        return " " .. os.date("%R")
+        return " " .. os.date "%R"
       end
 
       -- Custom Component: Spell check status
@@ -300,7 +306,7 @@ return {
         group = vim.api.nvim_create_augroup("LualineMacroRefresh", { clear = true }),
         pattern = "*",
         callback = function()
-          require("lualine").refresh({ place = { "statusline" } })
+          require("lualine").refresh { place = { "statusline" } }
         end,
       })
       vim.api.nvim_create_autocmd("RecordingLeave", {
@@ -309,9 +315,13 @@ return {
         callback = function()
           local timer = vim.uv.new_timer()
           if timer then
-            timer:start(50, 0, vim.schedule_wrap(function()
-              require("lualine").refresh({ place = { "statusline" } })
-            end))
+            timer:start(
+              50,
+              0,
+              vim.schedule_wrap(function()
+                require("lualine").refresh { place = { "statusline" } }
+              end)
+            )
           end
         end,
       })
@@ -320,7 +330,7 @@ return {
         group = vim.api.nvim_create_augroup("LualineSpellRefresh", { clear = true }),
         pattern = "spell",
         callback = function()
-          require("lualine").refresh({ place = { "statusline" } })
+          require("lualine").refresh { place = { "statusline" } }
         end,
       })
 

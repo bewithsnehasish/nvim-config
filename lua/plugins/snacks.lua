@@ -1,19 +1,14 @@
--- snacks.nvim picker — replaces Telescope.
--- Default layout is a wide floating window with preview, much more readable
--- than Telescope's "dropdown" theme used previously.
 return {
   {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
     init = function()
-      -- Terminal navigation mappings inside terminal buffers
       vim.keymap.set("t", "<M-h>", [[<C-\><C-n><C-w>h]], { silent = true, desc = "Navigate window left" })
       vim.keymap.set("t", "<M-j>", [[<C-\><C-n><C-w>j]], { silent = true, desc = "Navigate window down" })
       vim.keymap.set("t", "<M-k>", [[<C-\><C-n><C-w>k]], { silent = true, desc = "Navigate window up" })
       vim.keymap.set("t", "<M-l>", [[<C-\><C-n><C-w>l]], { silent = true, desc = "Navigate window right" })
 
-      -- Set word highlighting colors (from old vim-illuminate setup)
       vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#3E4452", underline = false })
       vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = "#3E4452", underline = false })
       vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = "#3E4452", underline = false })
@@ -21,9 +16,8 @@ return {
     opts = {
       bigfile = {
         enabled = true,
-        size = 1.5 * 1024 * 1024, -- 1.5 MB (allow larger C# and code files to load LSPs)
+        size = 1.5 * 1024 * 1024,
         setup = function(ctx)
-          -- Custom large file disabling flags (from old options.lua autocommand)
           vim.b[ctx.buf].large_file = true
           vim.b[ctx.buf].hlchunk_disabled = true
           vim.b[ctx.buf].miniindentscope_disable = true
@@ -49,11 +43,12 @@ return {
         end,
       },
       quickfile = { enabled = true },
-      scroll = { enabled = true }, -- smooth scrolling (replaces neoscroll)
-      words = { enabled = true }, -- cursor word highlighting (replaces vim-illuminate)
-      explorer = { replace_netrw = true }, -- file explorer (replaces neo-tree)
+      notifier = { enabled = true },
+      scroll = { enabled = true },
+      words = { enabled = true },
+      explorer = { replace_netrw = true },
       dashboard = {
-        enabled = true, -- startup dashboard (replaces alpha-nvim)
+        enabled = true,
         preset = {
           header = (function()
             local logo = {
@@ -84,12 +79,12 @@ return {
         },
       },
       picker = {
-        -- "default" = wide centered float with preview on the right.
-        -- Override per-picker below for grep/references which benefit from "ivy" (bottom panel).
         layout = { preset = "default" },
         actions = {
           copy_path = function(picker, item)
-            if not item then return end
+            if not item then
+              return
+            end
             local path = item.path or item.file
             if path then
               vim.fn.setreg("+", path)
@@ -103,20 +98,14 @@ return {
           file = { filename_first = false, truncate = 80 },
         },
         sources = {
-          -- Grep: ivy bottom panel, preview pane shows the matched file at the hit line
           grep = { layout = { preset = "ivy" } },
           grep_word = { layout = { preset = "ivy" } },
 
-          -- File Explorer: open on the right (matches previous Neo-tree setup)
           explorer = {
             layout = { layout = { position = "right" } },
-            ignored = true, -- Don't filter git-ignored files by default, so Shift+H reveals dotfiles like .env
+            ignored = true,
           },
 
-          -- LSP pickers: vertical split — top half = results list with file+line+code,
-          -- bottom half = live preview of the file at the selected reference.
-          -- "preview = main" was wrong: it replaced the preview with the editor window
-          -- instead of showing the reference content alongside the results list.
           lsp_references = { layout = { preset = "vertical" } },
           lsp_definitions = { layout = { preset = "vertical" } },
           lsp_implementations = { layout = { preset = "vertical" } },
@@ -133,7 +122,6 @@ return {
             },
           },
         },
-        -- Match the ignore patterns from the previous Telescope config
         exclude = {
           "node_modules",
           ".git",
@@ -242,7 +230,7 @@ return {
         desc = "Lazygit Log (All)",
       },
 
-      -- Terminals (replaces toggleterm)
+      -- Terminals
       {
         "<M-1>",
         function()
@@ -271,7 +259,7 @@ return {
         mode = { "n", "t" },
       },
 
-      -- File Explorer (replaces neo-tree)
+      -- File Explorer
       {
         "<leader>e",
         function()
@@ -287,7 +275,7 @@ return {
         desc = "Focus File Explorer",
       },
 
-      -- Words Reference Jump (replaces vim-illuminate)
+      -- Word reference jump
       {
         "]r",
         function()

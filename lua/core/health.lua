@@ -31,13 +31,8 @@ local function mason_path(...)
   return vim.fs.joinpath(vim.fn.stdpath "data", "mason", ...)
 end
 
-local function parser_paths(name)
-  local parser_dir = vim.fs.joinpath(vim.fn.stdpath "data", "lazy", "nvim-treesitter", "parser")
-  return {
-    vim.fs.joinpath(parser_dir, name .. ".so"),
-    vim.fs.joinpath(parser_dir, name .. ".dll"),
-    vim.fs.joinpath(parser_dir, name .. ".dylib"),
-  }
+local function parser_installed(name)
+  return vim.api.nvim_get_runtime_file("parser/" .. name .. ".*", false)[1]
 end
 
 local function has_executable(tools)
@@ -176,8 +171,8 @@ local function collect()
     table.insert(lines, status_line("roslyn version", true, rv))
   end
 
-  local razor_ok, razor_path = has_any(parser_paths "razor")
-  table.insert(lines, status_line("razor parser", razor_ok, razor_path or "nvim-treesitter parser"))
+  local razor_path = parser_installed "razor"
+  table.insert(lines, status_line("razor parser", razor_path ~= nil, razor_path or "nvim-treesitter parser"))
 
   return lines
 end
@@ -191,8 +186,8 @@ function M.run()
 end
 
 function M.check()
-  local health = vim.health or require("health")
-  health.start("Neovim Config Health")
+  local health = vim.health or require "health"
+  health.start "Neovim Config Health"
   for _, line in ipairs(collect()) do
     health.info(line)
   end

@@ -76,10 +76,22 @@ return {
           border = "rounded",
         },
       },
+      cmdline = {
+        keymap = {
+          preset = "cmdline",
+          ["<C-j>"] = { "select_next", "fallback" },
+          ["<C-k>"] = { "select_prev", "fallback" },
+          ["<CR>"] = { "accept_and_enter", "fallback" },
+        },
+        completion = {
+          menu = { auto_show = true }, -- show popup as you type in / ? :
+        },
+      },
     },
   },
   {
     "supermaven-inc/supermaven-nvim",
+    event = "InsertEnter",
     opts = {
       keymaps = {
         accept_suggestion = "<C-l>",
@@ -92,8 +104,8 @@ return {
         cterm = 244,
       },
       log_level = "info",
-      disable_inline_completion = false, -- Supermaven provides its own inline ghost text
-      disable_keymaps = false,
+      disable_inline_completion = true, -- blink-cmp-supermaven feeds the blink menu instead
+      disable_keymaps = true,
     },
   },
 }

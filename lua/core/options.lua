@@ -8,10 +8,10 @@ vim.filetype.add {
   },
 }
 
-vim.cmd "set expandtab"
-vim.cmd "set tabstop=2"
-vim.cmd "set softtabstop=2"
-vim.cmd "set shiftwidth=2"
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
 
 -- 800ms: balances CursorHold diagnostic float responsiveness vs constant firing
 vim.o.updatetime = 800
@@ -24,22 +24,17 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 
-vim.g.background = "light"
-vim.g.enabled_extra_plugins = {
-  "bqf",
-  "cellular-automaton",
-  "eyeliner",
-  "mini-animate",
-  "navbuddy",
-  "neotab",
-  "ufo",
-  "ui",
-}
-
 vim.opt.swapfile = false
+vim.opt.undofile = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.signcolumn = "yes"
+vim.opt.laststatus = 3 -- pin global statusline (matches lualine globalstatus) so terminal splits don't glitch it mid-screen
+vim.opt.equalalways = false -- don't auto-resize existing windows when a split opens/closes
+vim.opt.winborder = "rounded"
 vim.opt.showtabline = 2
 
 local tabline_group = vim.api.nvim_create_augroup("TablineVisibility", { clear = true })
@@ -93,8 +88,6 @@ vim.api.nvim_create_autocmd("BufDelete", {
 platform.setup_clipboard()
 platform.setup_shell()
 
-
-
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = vim.api.nvim_create_augroup("Osc52YankNotify", { clear = true }),
   callback = function()
@@ -128,17 +121,3 @@ vim.api.nvim_create_user_command("LspInfo", function()
   end
   vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "LspInfo" })
 end, { desc = "List active LSP clients on this buffer" })
-
-vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
-vim.wo.number = true
-
-vim.g.user_emmet_settings = {
-  javascript = { extends = "html" },
-  typescriptreact = { extends = "html" },
-  javascriptreact = { extends = "html" },
-  blade = { extends = "html, php" },
-  ejs = { extends = "html, javascript" },
-  php = { extends = "html, javascript ,css" },
-}
-
-vim.keymap.set("i", "<C-y>,", "<Plug>(emmet-expand-abbr)", { desc = "Emmet: expand abbreviation" })

@@ -1,51 +1,3 @@
--- return {
---   "shellRaining/hlchunk.nvim",
---   event = { "UIEnter" },
---   config = function()
---     require("hlchunk").setup {
---       chunk = {
---         enable = true,
---         use_treesitter = true,
---         notify = false, -- set to false to disable notifications
---         chars = {
---           horizontal_line = "─",
---           vertical_line = "│",
---           left_top = "╭",
---           left_bottom = "╰",
---           right_arrow = ">",
---         },
---         style = {
---           { fg = "#806d9c" },
---         },
---       },
---       indent = {
---         enable = true,
---         use_treesitter = true,
---         chars = {
---           "│",
---         },
---         style = {
---           { fg = "#2D3640" },
---         },
---       },
---       line_num = {
---         enable = true,
---         use_treesitter = true,
---         style = "#806d9c",
---       },
---       blank = {
---         enable = true,
---         chars = {
---           "․",
---         },
---         style = {
---           { fg = "#2D3640" },
---         },
---       },
---     }
---   end,
--- }
-
 return {
   {
     "shellRaining/hlchunk.nvim",
@@ -74,7 +26,7 @@ return {
             right_arrow = ">",
           },
           style = {
-            { fg = "#569cd6" }, -- Match your UI aesthetic
+            { fg = "#569cd6" },
           },
           exclude_filetypes = {
             ["snacks_picker_list"] = true,
@@ -108,7 +60,7 @@ return {
         line_num = {
           enable = true,
           use_treesitter = true,
-          style = "#569cd6", -- Match your UI aesthetic
+          style = "#569cd6",
           exclude_filetypes = {
             ["snacks_picker_list"] = true,
             terminal = true,
@@ -123,7 +75,6 @@ return {
         -- In large files (hundreds of blank lines) this causes heavy scroll lag.
         blank = { enable = false },
       }
-
     end,
   },
 }

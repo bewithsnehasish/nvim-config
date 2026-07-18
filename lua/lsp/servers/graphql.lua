@@ -1,4 +1,2 @@
-return {
-  cmd = { "graphql-lsp", "server", "-m", "stream" },
-  filetypes = { "graphql", "typescriptreact", "javascriptreact" },
-}
+-- file presence enables the server; upstream defaults suffice
+return {}

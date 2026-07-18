@@ -1,10 +1,10 @@
 return {
   {
     "seblyng/roslyn.nvim",
-    ft = { "cs", "vb" },
+    ft = { "cs", "razor" },
     dependencies = {
       "neovim/nvim-lspconfig",
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       "saghen/blink.cmp",
     },
     config = function()
@@ -12,7 +12,7 @@ return {
     end,
     keys = {
       { "<leader>pt", "<cmd>Roslyn target<cr>", desc = "Roslyn target" },
-      { "<leader>pr", "<cmd>Roslyn restart<cr>", desc = "Roslyn restart" },
+      { "<leader>pr", "<cmd>lsp restart roslyn<cr>", desc = "Roslyn restart" },
     },
   },
 }

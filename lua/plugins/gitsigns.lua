@@ -43,14 +43,22 @@ return {
 
           -- Navigation: jump between hunks
           vim.keymap.set("n", "]h", function()
-            if vim.wo.diff then return "]c" end
-            vim.schedule(gs.next_hunk)
+            if vim.wo.diff then
+              return "]c"
+            end
+            vim.schedule(function()
+              gs.nav_hunk "next"
+            end)
             return "<Ignore>"
           end, vim.tbl_extend("force", opts, { expr = true, desc = "Next hunk" }))
 
           vim.keymap.set("n", "[h", function()
-            if vim.wo.diff then return "[c" end
-            vim.schedule(gs.prev_hunk)
+            if vim.wo.diff then
+              return "[c"
+            end
+            vim.schedule(function()
+              gs.nav_hunk "prev"
+            end)
             return "<Ignore>"
           end, vim.tbl_extend("force", opts, { expr = true, desc = "Prev hunk" }))
 
@@ -69,7 +77,12 @@ return {
           vim.keymap.set("n", "<leader>hR", gs.reset_buffer, vim.tbl_extend("force", opts, { desc = "Reset buffer" }))
 
           -- Undo last stage
-          vim.keymap.set("n", "<leader>hu", gs.undo_stage_hunk, vim.tbl_extend("force", opts, { desc = "Undo stage hunk" }))
+          vim.keymap.set(
+            "n",
+            "<leader>hu",
+            gs.undo_stage_hunk,
+            vim.tbl_extend("force", opts, { desc = "Undo stage hunk" })
+          )
 
           -- Preview hunk inline
           vim.keymap.set("n", "<leader>hp", gs.preview_hunk, vim.tbl_extend("force", opts, { desc = "Preview hunk" }))

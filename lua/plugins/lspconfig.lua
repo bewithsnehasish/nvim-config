@@ -4,14 +4,12 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "folke/lazydev.nvim",
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       "stevearc/conform.nvim",
       "pmizio/typescript-tools.nvim",
       "saghen/blink.cmp",
     },
     config = function()
-      -- Removed cmp_nvim_lsp imports as blink.cmp handles it directly
-
       local typescript_tools_status, typescript_tools = pcall(require, "typescript-tools")
       if not typescript_tools_status then
         vim.notify("Failed to load typescript-tools", vim.log.levels.WARN, {
@@ -23,16 +21,13 @@ return {
 
       local on_attach = require "lsp.on_attach"
 
-      -- 2. Lazydev Setup (must be before lspconfig for Lua LSP support)
       require("lazydev").setup {
         library = {
           { path = "${3rd}/luv/library", words = { "vim%.uv" } },
         },
       }
 
-      -- 3. Capabilities Configuration (Using blink.cmp)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities.textDocument.positionEncoding = "utf-16"
       capabilities.textDocument.foldingRange = {
         dynamicRegistration = false,
         lineFoldingOnly = true,
@@ -43,8 +38,7 @@ return {
         capabilities = blink.get_lsp_capabilities(capabilities)
       end
 
-      local icons = require("user.icons")
-      -- 4. UI / Diagnostic Configuration
+      local icons = require "user.icons"
       local diagnostic_config = {
         signs = {
           text = {
@@ -105,32 +99,6 @@ return {
       vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { undercurl = true, sp = "#55aaff" })
       vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { undercurl = true, sp = "#55ff55" })
 
-      vim.lsp.config("*", {
-        handlers = {
-          ["textDocument/hover"] = function(err, result, ctx, config)
-            return vim.lsp.handlers.hover(
-              err,
-              result,
-              ctx,
-              vim.tbl_extend("force", config or {}, { border = "rounded" })
-            )
-          end,
-          ["textDocument/signatureHelp"] = function(err, result, ctx, config)
-            return vim.lsp.handlers.signature_help(
-              err,
-              result,
-              ctx,
-              vim.tbl_extend("force", config or {}, { border = "rounded" })
-            )
-          end,
-        },
-      })
-
-      -- 5. Enhanced On-Attach is now consolidated in lua/lsp/on_attach.lua
-
-      -- 6. TypeScript Tools Setup
-      -- Mason integration is built-in since typescript-tools commit (2025) — no need to
-      -- resolve tsserver path manually; the plugin discovers it from Mason automatically.
       if typescript_tools_status then
         typescript_tools.setup {
           filetypes = {
@@ -141,7 +109,6 @@ return {
           },
           capabilities = capabilities,
           on_attach = on_attach,
-          flags = { debounce_text_changes = 150 },
           settings = {
             separate_diagnostic_server = true,
             publish_diagnostic_on = "insert_leave",
@@ -166,7 +133,7 @@ return {
         }
       end
 
-      -- 7. Server Configurations — one file per server under lua/lsp/servers/
+      -- One file per server under lua/lsp/servers/ — file presence enables the server
       local server_configs = {}
       local servers_dir = vim.fs.joinpath(vim.fn.stdpath "config", "lua", "lsp", "servers")
       for _, fname in ipairs(vim.fn.readdir(servers_dir, [[v:val =~ '\.lua$']])) do
@@ -175,51 +142,19 @@ return {
         if ok then
           server_configs[name] = spec
         else
-          vim.notify(
-            "Failed to load LSP server config: " .. name .. "\n" .. tostring(spec),
-            vim.log.levels.ERROR
-          )
+          vim.notify("Failed to load LSP server config: " .. name .. "\n" .. tostring(spec), vim.log.levels.ERROR)
         end
       end
 
-
-      -- Apply each server config (Neovim 0.12+ native API)
       for server_name, config in pairs(server_configs) do
         local default_config = {
           capabilities = capabilities,
           on_attach = config.on_attach or on_attach,
-          flags = { debounce_text_changes = 150 },
         }
         local final_config = vim.tbl_deep_extend("force", default_config, config)
         vim.lsp.config(server_name, final_config)
         vim.lsp.enable(server_name)
       end
-
-
-      -- 8. Omnifunc for specific filetypes
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = {
-          "lua",
-          "html",
-          "javascript",
-          "javascriptreact",
-          "typescript",
-          "typescriptreact",
-          "vue",
-          "svelte",
-          "astro",
-          "php",
-          "blade",
-          "cs",
-          "razor",
-          "cshtml",
-          "graphql",
-        },
-        group = vim.api.nvim_create_augroup("LspOmnifunc", { clear = true }),
-        callback = function()
-          vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
-        end,
-      })
     end,
   },
 }

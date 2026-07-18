@@ -14,7 +14,9 @@ return function(client, bufnr)
 
   -- ── Navigation (Smart Definition Jumps) ───────────────────────────────────
   local function is_import_or_using_line(line)
-    if not line then return false end
+    if not line then
+      return false
+    end
     local trimmed = string.gsub(line, "^%s+", "")
     return string.match(trimmed, "^import%s")
       or string.match(trimmed, "^using%s")
@@ -23,7 +25,7 @@ return function(client, bufnr)
   end
 
   local function smart_definition()
-    vim.lsp.buf.definition({
+    vim.lsp.buf.definition {
       on_list = function(options)
         local items = options.items
         if not items or #items == 0 then
@@ -92,7 +94,7 @@ return function(client, bufnr)
           if item.user_data then
             vim.lsp.util.show_document(item.user_data, "utf-8", { focus = true })
           else
-            vim.cmd("normal! m'")
+            vim.cmd "normal! m'"
             vim.cmd("edit " .. vim.fn.fnameescape(item.filename))
             vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
           end
@@ -109,14 +111,14 @@ return function(client, bufnr)
           })
         end
 
-        Snacks.picker.pick({
+        Snacks.picker.pick {
           title = "LSP Definitions",
           items = snacks_items,
           layout = { preset = "vertical" },
           format = "file",
-        })
-      end
-    })
+        }
+      end,
+    }
   end
 
   -- gd: go to definition. Jumps directly if single result (bypassing import/using lines & type declaration files).
@@ -136,7 +138,6 @@ return function(client, bufnr)
     move_to_mouse()
     smart_definition()
   end, vim.tbl_extend("force", opts, { desc = "Ctrl-click definition" }))
-
 
   -- gD: go to declaration (e.g. header files in C, interface in TS)
   vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
@@ -221,14 +222,18 @@ return function(client, bufnr)
 
   -- ── LSP management (Neovim 0.12 native commands) ──────────────────────────
   vim.keymap.set("n", "<leader>lr", "<cmd>lsp restart<CR>", vim.tbl_extend("force", opts, { desc = "Restart LSP" }))
-  vim.keymap.set("n", "<leader>li", "<cmd>checkhealth vim.lsp<CR>", vim.tbl_extend("force", opts, { desc = "LSP info" }))
+  vim.keymap.set(
+    "n",
+    "<leader>li",
+    "<cmd>checkhealth vim.lsp<CR>",
+    vim.tbl_extend("force", opts, { desc = "LSP info" })
+  )
   vim.keymap.set("n", "<leader>lq", "<cmd>lsp stop<CR>", vim.tbl_extend("force", opts, { desc = "Stop LSP" }))
   vim.keymap.set("n", "<leader>lS", "<cmd>lsp enable<CR>", vim.tbl_extend("force", opts, { desc = "Start LSP" }))
   vim.keymap.set("n", "<leader>lL", function()
     local log_path = vim.lsp.log.get_filename()
     vim.cmd("tabnew " .. log_path)
   end, vim.tbl_extend("force", opts, { desc = "Open LSP log" }))
-
 
   -- ── Interactive Diagnostic Float ──────────────────────────────────────────
   vim.keymap.set("n", "<leader>ld", function()

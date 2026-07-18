@@ -35,10 +35,8 @@ return {
           markdown = { "prettierd", stop_after_first = true },
           graphql = { "prettierd", stop_after_first = true },
 
-          -- C# / .NET
-          cs     = { "csharpier" },
-          razor  = { "csharpier" },
-          cshtml = { "csharpier" },
+          -- razor unmapped on purpose: csharpier can't format it, Roslyn LSP fallback does
+          cs = { "csharpier" },
 
           -- Other Languages
           lua = { "stylua" },
@@ -50,8 +48,9 @@ return {
         formatters = {
           biome = {
             command = function()
-              if vim.fn.has("win32") == 1 then
-                local exe = vim.fn.stdpath("data") .. "/mason/packages/biome/node_modules/@biomejs/biome/node_modules/@biomejs/cli-win32-x64/biome.exe"
+              if vim.fn.has "win32" == 1 then
+                local exe = vim.fn.stdpath "data"
+                  .. "/mason/packages/biome/node_modules/@biomejs/biome/node_modules/@biomejs/cli-win32-x64/biome.exe"
                 if vim.fn.filereadable(exe) == 1 then
                   return exe
                 end
