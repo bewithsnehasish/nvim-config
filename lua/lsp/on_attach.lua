@@ -199,26 +199,9 @@ return function(client, bufnr)
     )
   end, vim.tbl_extend("force", opts, { desc = "Toggle inlay hints" }))
 
-  -- ── Yank diagnostic at cursor to clipboard (no UI, single keystroke) ─────
-  vim.keymap.set("n", "<leader>ly", function()
-    local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local diags = vim.diagnostic.get(bufnr, { lnum = lnum })
-    if #diags == 0 then
-      vim.notify("No diagnostic on this line", vim.log.levels.WARN, { title = "LSP" })
-      return
-    end
-    local lines = {}
-    for _, d in ipairs(diags) do
-      local src = d.source and (" [" .. d.source .. "]") or ""
-      local code = d.code and (" (" .. tostring(d.code) .. ")") or ""
-      table.insert(lines, d.message .. src .. code)
-    end
-    local text = table.concat(lines, "\n")
-    vim.fn.setreg("+", text) -- system clipboard
-    vim.fn.setreg('"', text) -- default register
-    local preview = text:sub(1, 60) .. (#text > 60 and "…" or "")
-    vim.notify("Yanked: " .. preview, vim.log.levels.INFO, { title = "LSP", timeout = 1500 })
-  end, vim.tbl_extend("force", opts, { desc = "Yank diagnostic(s) at cursor to clipboard" }))
+  -- NOTE: diagnostic keymaps (<leader>ld/lD/ly, ]d, [d) and the CursorHold float
+  -- live in core/keymaps.lua as GLOBAL maps — vim.diagnostic needs no LSP client,
+  -- and buffer-local maps here silently vanish in buffers with no server attached.
 
   -- ── LSP management (Neovim 0.12 native commands) ──────────────────────────
   vim.keymap.set("n", "<leader>lr", "<cmd>lsp restart<CR>", vim.tbl_extend("force", opts, { desc = "Restart LSP" }))
@@ -234,91 +217,6 @@ return function(client, bufnr)
     local log_path = vim.lsp.log.get_filename()
     vim.cmd("tabnew " .. log_path)
   end, vim.tbl_extend("force", opts, { desc = "Open LSP log" }))
-
-  -- ── Interactive Diagnostic Float ──────────────────────────────────────────
-  vim.keymap.set("n", "<leader>ld", function()
-    local winid = vim.fn.win_getid()
-    local float_opts = {
-      scope = "cursor",
-      focusable = true,
-      close_events = {},
-      border = "rounded",
-      source = "if_many",
-      format = function(diagnostic)
-        local source = diagnostic.source and (" [" .. diagnostic.source .. "]") or ""
-        return string.format("%s%s", diagnostic.message, source)
-      end,
-    }
-
-    local float_bufnr, float_winid = vim.diagnostic.open_float(nil, float_opts)
-
-    if float_winid then
-      -- Focus float first, then set keymaps directly.
-      vim.fn.win_gotoid(float_winid)
-
-      vim.keymap.set("n", "<C-y>", function()
-        vim.cmd "normal! ggVGy"
-        vim.notify("Diagnostic text yanked!", vim.log.levels.INFO, { title = "Yank" })
-      end, { buffer = float_bufnr, nowait = true })
-
-      vim.keymap.set("n", "<Esc>", function()
-        vim.api.nvim_win_close(float_winid, true)
-        vim.fn.win_gotoid(winid)
-      end, { buffer = float_bufnr, nowait = true })
-
-      vim.keymap.set("n", "<CR>", function()
-        vim.api.nvim_win_close(float_winid, true)
-        vim.fn.win_gotoid(winid)
-      end, { buffer = float_bufnr, nowait = true })
-
-      vim.api.nvim_create_autocmd("WinClosed", {
-        pattern = tostring(float_winid),
-        once = true,
-        callback = function()
-          vim.fn.win_gotoid(winid)
-        end,
-      })
-    else
-      vim.notify("No diagnostics at cursor", vim.log.levels.WARN)
-    end
-  end, vim.tbl_extend("force", opts, { desc = "Interactive diagnostic float" }))
-
-  -- ── Jump Diagnostics ──────────────────────────────────────────────────────
-  vim.keymap.set("n", "]d", function()
-    vim.diagnostic.jump { count = 1 }
-    vim.diagnostic.open_float(nil, { focusable = false })
-  end, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
-
-  vim.keymap.set("n", "[d", function()
-    vim.diagnostic.jump { count = -1 }
-    vim.diagnostic.open_float(nil, { focusable = false })
-  end, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
-
-  -- Raw diagnostic inspector
-  vim.keymap.set("n", "<leader>lD", function()
-    local diags = vim.diagnostic.get(bufnr)
-    print(vim.inspect(#diags > 0 and diags or "No diagnostics"))
-  end, vim.tbl_extend("force", opts, { desc = "Inspect raw diagnostics" }))
-
-  -- ── Auto-hover Diagnostics on CursorHold (non-interactive, quick glance) ──
-  local hover_group = vim.api.nvim_create_augroup("LspDiagnosticsHover_" .. bufnr, { clear = true })
-  vim.api.nvim_create_autocmd("CursorHold", {
-    buffer = bufnr,
-    group = hover_group,
-    callback = function()
-      local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
-      local diags = vim.diagnostic.get(bufnr, { lnum = cursor_line })
-      if #diags > 0 then
-        vim.diagnostic.open_float(nil, {
-          scope = "line",
-          focusable = false,
-          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-          border = "rounded",
-          source = "if_many",
-        })
-      end
-    end,
-  })
 
   -- Enable completion triggered by <c-x><c-o>
   vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"

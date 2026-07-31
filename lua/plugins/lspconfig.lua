@@ -64,6 +64,16 @@ return {
         update_in_insert = false,
         underline = true,
         severity_sort = true,
+        -- Peek float on arrival for the built-in ]d [d ]D [D motions.
+        -- JumpOpts has no `float` field — `on_jump` is the sanctioned hook (:h vim.diagnostic.Opts.Jump).
+        jump = {
+          on_jump = function(diagnostic, _)
+            if not diagnostic then
+              return
+            end
+            vim.diagnostic.open_float { scope = "cursor", focusable = false }
+          end,
+        },
         float = {
           focusable = true,
           style = "minimal",

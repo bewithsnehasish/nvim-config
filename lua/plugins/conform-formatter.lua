@@ -58,7 +58,7 @@ return {
               return "biome"
             end,
             condition = function(self, ctx)
-              return vim.fs.find({ "biome.json" }, { path = ctx.filename, upward = true })[1] ~= nil
+              return vim.fs.find({ "biome.json", "biome.jsonc" }, { path = ctx.filename, upward = true })[1] ~= nil
             end,
           },
           prettier = {
