@@ -26,28 +26,63 @@ end
 
 M.shell = detect_shell()
 
+-- OSC 52 write-only provider. Paste reads the last yank instead of querying the
+-- terminal: most emulators never answer an OSC 52 read, and a query that gets no
+-- reply blocks the UI. See :h clipboard-osc52.
+local function osc52_provider()
+  local osc52 = require "vim.ui.clipboard.osc52"
+  local function from_unnamed()
+    return vim.split(vim.fn.getreg '"' or "", "\n")
+  end
+  return {
+    name = "osc52-copy-only",
+    copy = { ["+"] = osc52.copy "+", ["*"] = osc52.copy "*" },
+    paste = { ["+"] = from_unnamed, ["*"] = from_unnamed },
+  }
+end
+
 function M.setup_clipboard()
-  if M.is_wsl and vim.fn.executable "win32yank.exe" == 1 then
-    vim.g.clipboard = {
-      name = "win32yank-wsl",
-      copy = {
-        ["+"] = "win32yank.exe -i --crlf",
-        ["*"] = "win32yank.exe -i --crlf",
-      },
-      paste = {
-        ["+"] = "win32yank.exe -o --lf",
-        ["*"] = "win32yank.exe -o --lf",
-      },
-      cache_enabled = 0,
-    }
-  elseif M.is_wsl then
-    vim.schedule(function()
-      vim.notify(
-        "win32yank.exe not found — Windows clipboard bridge disabled",
-        vim.log.levels.WARN,
-        { title = "Clipboard" }
-      )
-    end)
+  -- Native provider already works (pbcopy / wl-copy / xclip / win32yank on real
+  -- Windows). Only WSL and SSH need help, and both must be set before providers init.
+  if M.is_wsl then
+    if vim.fn.executable "win32yank.exe" == 1 then
+      vim.g.clipboard = {
+        name = "win32yank-wsl",
+        copy = {
+          ["+"] = "win32yank.exe -i --crlf",
+          ["*"] = "win32yank.exe -i --crlf",
+        },
+        paste = {
+          ["+"] = "win32yank.exe -o --lf",
+          ["*"] = "win32yank.exe -o --lf",
+        },
+        cache_enabled = 0,
+      }
+    elseif vim.fn.executable "clip.exe" == 1 then
+      -- Ships with Windows, no install needed. clip.exe writes; powershell reads.
+      -- tr -d '\r' strips the CRs powershell emits (win32yank's --lf equivalent).
+      vim.g.clipboard = {
+        name = "wsl-clip.exe",
+        copy = { ["+"] = "clip.exe", ["*"] = "clip.exe" },
+        paste = {
+          ["+"] = 'powershell.exe -NoProfile -NoLogo -Command "Get-Clipboard -Raw" | tr -d "\r"',
+          ["*"] = 'powershell.exe -NoProfile -NoLogo -Command "Get-Clipboard -Raw" | tr -d "\r"',
+        },
+        cache_enabled = 0,
+      }
+    else
+      -- No Windows interop at all (interop disabled in /etc/wsl.conf) — OSC 52
+      -- still reaches the host terminal.
+      vim.g.clipboard = osc52_provider()
+    end
+    return
+  end
+
+  -- SSH: Nvim auto-enables OSC 52 only when it can detect terminal support, and
+  -- tmux/screen inhibit that detection (:h clipboard-osc52). Force it when there's
+  -- no local display to talk to, so yanks land on the machine you're sitting at.
+  if vim.env.SSH_TTY and not vim.env.DISPLAY and not vim.env.WAYLAND_DISPLAY then
+    vim.g.clipboard = osc52_provider()
   end
 end
 
